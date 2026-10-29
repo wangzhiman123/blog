@@ -1,0 +1,48 @@
+{{- /*
+  页脚社交图标
+
+  图标列表来自 params.social，排序与标题取自主题的 data/social.yml。
+  总访问量/总访客数不做二次渲染，直接给主题自带的访客数据加中文标签
+  （见 assets/scss/custom.scss 里的 .footer-line.visitor 规则），
+  这样只有一份数字，不会出现两个不一致的统计。
+*/ -}}
+
+{{- $socialMap := resources.Get "data/social.yml" | transform.Unmarshal -}}
+{{- $items := slice -}}
+{{- range $key, $value := site.Params.social -}}
+  {{- if $value -}}
+    {{- $social := index $socialMap (lower $key) | default dict -}}
+    {{- $url := "" -}}
+    {{- $icon := $social.Icon | default dict -}}
+    {{- $title := $social.Title | default $key -}}
+    {{- $weight := $social.Weight | default 99 -}}
+    {{- if reflect.IsMap $value -}}
+      {{- with $value.title }}{{ $title = . }}{{ end -}}
+      {{- with $value.url }}{{ $url = . }}{{ end -}}
+      {{- with $value.weight }}{{ $weight = . }}{{ end -}}
+      {{- with $value.icon -}}
+        {{- with .class }}{{ $icon = dict "Class" . }}{{ end -}}
+        {{- with .simpleicons }}{{ $icon = dict "Simpleicons" . }}{{ end -}}
+        {{- with .src }}{{ $icon = dict "Src" . }}{{ end -}}
+      {{- end -}}
+      {{- if and (not $url) $value.id $social.Prefix -}}
+        {{- $url = printf "%v/%v" (strings.TrimSuffix "/" $social.Prefix) $value.id -}}
+      {{- end -}}
+    {{- else -}}
+      {{- with $social.Prefix }}{{ $url = printf "%v%v" . $value }}{{ end -}}
+    {{- end -}}
+    {{- if $url -}}
+      {{- $items = $items | append (dict "Url" $url "Icon" $icon "Title" $title "Weight" $weight) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- with $items -}}
+  <div class="footer-social">
+    {{- range sort . "Weight" -}}
+      <a class="footer-social-link" href="{{ .Url }}" title="{{ .Title }}" aria-label="{{ .Title }}" rel="me noopener noreferrer" target="_blank">
+        {{- with .Icon }}{{ partial "plugin/icon.html" . }}{{ end -}}
+      </a>
+    {{- end -}}
+  </div>
+{{- end -}}

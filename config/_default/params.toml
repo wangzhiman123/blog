@@ -138,7 +138,8 @@ end_flag = ""
 name = ""
 email = ""
 link = ""
-avatar = ""
+# 站点头像：同时被首页资料卡、页脚、社交卡片复用
+avatar = "/images/avatar.jpg"
 
 # Link configuration.
 [link]
@@ -556,7 +557,7 @@ Mix = false
 
 # Comment configuration.
 [comment]
-enable = false
+enable = true
 
 # Artalk comment configuration.
 # See: [Artalk](https://artalk.js.org/)
@@ -711,13 +712,15 @@ dark_theme = "github-dark"
 # Twikoo comment configuration.
 # See: [Twikoo](https://twikoo.js.org/)
 [comment.twikoo]
-enable = false
-env_id = ""
+enable = true
+# 复用原站（2019527.xyz）自建的 Twikoo 服务，v2.0.17
+env_id = "https://twikoo.2019527.xyz"
 region = ""
 path = ""
+# visitor: 文章阅读量  comment_count: 文章讨论量
 visitor = true
 comment_count = true
-lang = ""
+lang = "zh-CN"
 # Enable lightgallery support.
 lightgallery = false
 # Enable KaTeX support.
@@ -969,12 +972,13 @@ theme_logo = false
 
 # Site creation time.
 [footer.site_time]
-enable = false
+enable = true
 animate = true
 icon = "fa-solid fa-heartbeat"
 pre = ""
 # Example: "2021-12-18T16:15:22+08:00"
-value = ""
+# 站点起点：最早一篇文章的日期，页脚据此计算"已运行 N 天"
+value = "2019-05-27T00:00:00+08:00"
 
 # Footer lines order.
 # Available values: ["first", 0-5, "last"]
@@ -1046,19 +1050,19 @@ orderby = "name"
 
 # Home page profile.
 [home.profile]
-enable = false
+enable = true
 # Whether to show profile and content only in the first home page.
 only_first_page = false
 # Gravatar email for preferred avatar in home page.
 gravatar_email = ""
 # URL of avatar shown in home page, default is author's avatar.
-avatar_url = ""
+avatar_url = "/images/avatar.jpg"
 # Identifier of avatar menu link.
 avatar_menu = ""
 # Title shown in home page (HTML format is supported).
-title = ""
+title = "王志满律师"
 # Subtitle shown in home page (HTML format is supported).
-subtitle = ""
+subtitle = "民事诉讼 · 行政诉讼 · 司法案例研究"
 # Whether to use typeit animation for subtitle.
 typeit = true
 # Whether to show social links.
@@ -1088,7 +1092,12 @@ image_preview = true
 # class = "fa-brands fa-x-twitter"
 # ```
 [social]
-GitHub = ""
+# 值可以是 ID（配合 Prefix 拼成链接），也可以是完整的 url
+GitHub = "wangzhiman123"
+Zhihu = "pxpiloveu"
+Bilibili = "35768392"
+# 微信公众号没有 ID 规则，直接给文章链接 + 自定义图标
+WeChat = { url = "https://mp.weixin.qq.com/s/60l8EQT2kyGSKww-yNw06A", title = "微信公众号", icon = { class = "fa-brands fa-weixin" } }
 Linkedin = ""
 Twitter = ""
 Instagram = ""
@@ -1131,7 +1140,6 @@ Twitch = ""
 Strava = ""
 Skype = ""
 Whatsapp = ""
-Zhihu = ""
 Douban = ""
 Angellist = ""
 Slidershare = ""
@@ -1149,7 +1157,6 @@ Devto = ""
 Gitea = ""
 XMPP = ""
 Matrix = ""
-Bilibili = ""
 ORCID = ""
 Liberapay = ""
 Ko-Fi = ""
@@ -1250,7 +1257,7 @@ font_family = "inherit"
 # Busuanzi count.
 [busuanzi]
 # Whether to enable busuanzi count.
-enable = false
+enable = true
 # Busuanzi count core script source. Default is https://vercount.one/js.
 source = "https://vercount.one/js"
 # Whether to show the site views.
@@ -1426,13 +1433,16 @@ expand_file_tree = false
 # Depends on open custom blocks https://fixit.lruihao.cn/references/blocks/.
 [custom_partials]
 head = []
-menu_desktop = []
-menu_mobile = []
+# 页眉数据看板：文章数/字数/图片数/视频数 + 全站访问量
+menu_desktop = ["custom/header-stats.html"]
+menu_mobile = ["custom/header-stats-mobile.html"]
 profile = []
 aside = []
 comment = []
-footer = []
-widgets = []
+# 页脚社交图标 + 总访问量/总访客数
+footer = ["custom/footer-social.html"]
+# 悬浮按钮：回到底部（与主题的回到顶部互补）
+widgets = ["custom/scroll-buttons.html"]
 assets = []
 post_toc_before = []
 post_toc_after = []

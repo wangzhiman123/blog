@@ -1,0 +1,30 @@
+# -------------------------------------------------------------------------------------
+# Menu configuration (English)
+# 英文站目前只有首页 + 关于页，避免指向不存在的中文分类页
+# -------------------------------------------------------------------------------------
+
+[[main]]
+identifier = "home"
+parent = ""
+pre = ""
+post = ""
+name = "Home"
+url = "/en/"
+title = "Home"
+weight = 1
+
+[main.params]
+icon = "fa-solid fa-house"
+
+[[main]]
+identifier = "about"
+parent = ""
+pre = ""
+post = ""
+name = "About"
+url = "/en/about/"
+title = "About this site"
+weight = 2
+
+[main.params]
+icon = "fa-regular fa-address-card"

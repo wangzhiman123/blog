@@ -1,0 +1,25 @@
+{{- /*
+  页眉数据看板（移动端）
+
+  主题把 custom-menu:mobile 注入在 <li class="menu-item menu-system"> 内部，
+  所以这里只能输出行内元素，不能再套 <li>。
+*/ -}}
+
+{{- $posts := where site.RegularPages "Section" "posts" -}}
+{{- $wordCount := 0 -}}
+{{- range $posts -}}{{- $wordCount = add $wordCount .WordCount -}}{{- end -}}
+
+<span class="stats-pill stats-pill-mobile">
+  <span class="stats-item" title="文章总数">
+    {{- dict "Class" "fa-regular fa-file-lines" | partial "plugin/icon.html" -}}
+    <span class="stats-num">{{ len $posts }}</span>
+  </span>
+  <span class="stats-item" title="全站总字数">
+    {{- dict "Class" "fa-regular fa-pen-to-square" | partial "plugin/icon.html" -}}
+    <span class="stats-num">{{ printf "%.1f万" (div (float $wordCount) 10000) }}</span>
+  </span>
+  <span class="stats-item stats-pv" title="本站总访问量">
+    {{- dict "Class" "fa-regular fa-eye" | partial "plugin/icon.html" -}}
+    <span class="stats-num" id="header-site-pv-mobile">-</span>
+  </span>
+</span>

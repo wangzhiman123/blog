@@ -7,3 +7,181 @@
 // 覆盖变量的 assets/css/_override.scss 则改用站点配置里的 [params.appearance]。
 // 本文件会被主题自动引入到主样式之后。
 // ==============================
+
+// -----------------------------------------------------------------------------
+// 首页资料卡：头像加一圈柔光，和深色底照片更协调
+// -----------------------------------------------------------------------------
+.home-profile {
+  .home-avatar img {
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.12));
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 3px light-dark(rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.24));
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 页眉数据看板（文章数 / 字数 / 图片 / 视频 / 访问量）
+// -----------------------------------------------------------------------------
+.menu-stats {
+  display: flex;
+  align-items: center;
+  margin-inline-start: 0.5rem;
+}
+
+.stats-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
+  white-space: nowrap;
+  border-radius: 999px;
+  color: light-dark(#57606a, #adbac7);
+  background-color: light-dark(rgba(0, 0, 0, 0.04), rgba(255, 255, 255, 0.07));
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: light-dark(rgba(0, 0, 0, 0.07), rgba(255, 255, 255, 0.12));
+  }
+}
+
+.stats-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  i {
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+}
+
+.stats-num {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: light-dark(#24292f, #d0d7de);
+}
+
+.stats-unit {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.stats-pill-mobile {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+// 桌面导航在中等宽度下空间紧张，先收起看板，避免挤压菜单项
+@media (max-width: 1279.98px) {
+  .menu-stats {
+    display: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 页脚：社交图标 + 总访问量 / 总访客
+// -----------------------------------------------------------------------------
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: light-dark(#57606a, #adbac7);
+  background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08));
+  transition: color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: light-dark(#1f2328, #ffffff);
+    background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.18));
+    transform: translateY(-2px);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 页脚统计：给不蒜子的 UV / PV 补上中文标签和单位
+//   原样式只有图标 + 数字，鼠标悬停才知道含义，这里补成"总访客 123 人"。
+//   数值仍由不蒜子脚本写入，样式只加文字，不会产生第二份统计。
+// -----------------------------------------------------------------------------
+.footer-line.visitor {
+  #busuanzi_container_site_uv,
+  #busuanzi_container_site_pv {
+    &::before {
+      margin-inline-end: 0.25rem;
+      font-size: 0.8125rem;
+      color: light-dark(#57606a, #adbac7);
+    }
+
+    &::after {
+      margin-inline-start: 0.15rem;
+      font-size: 0.8125rem;
+      color: light-dark(#57606a, #adbac7);
+    }
+
+    #busuanzi_value_site_uv,
+    #busuanzi_value_site_pv {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  #busuanzi_container_site_uv::before {
+    content: '总访客';
+  }
+
+  #busuanzi_container_site_uv::after {
+    content: '人';
+  }
+
+  #busuanzi_container_site_pv::before {
+    content: '总访问';
+  }
+
+  #busuanzi_container_site_pv::after {
+    content: '次';
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 回到底部：让到主题悬浮按钮左侧同一行，避免叠压
+// -----------------------------------------------------------------------------
+.custom-scroll-buttons {
+  inset-inline-end: 4.75rem;
+  bottom: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .custom-scroll-buttons {
+    inset-inline-end: 4.25rem;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 友情链接页：窄屏下卡片自动单列，避免挤压
+// -----------------------------------------------------------------------------
+.friend-links {
+  @media (max-width: 575.98px) {
+    grid-template-columns: 1fr;
+  }
+}

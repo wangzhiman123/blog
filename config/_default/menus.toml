@@ -1,34 +1,23 @@
 # -------------------------------------------------------------------------------------
-# Menu Configuration
+# 菜单配置（简体中文，默认语言）
 # See: https://fixit.lruihao.cn/docs/getting-started/configuration/#menu-configuration
 # -------------------------------------------------------------------------------------
 
 [[main]]
 identifier = "archives"
 parent = ""
-# You can add extra information before the name (HTML format is supported), such as icons.
 pre = ""
-# You can add extra information after the name (HTML format is supported), such as icons.
 post = ""
-name = "Archives"
+name = "归档"
 url = "archives/"
-# Title will be shown when you hover on this menu link.
-title = ""
+title = "按时间浏览全部文章"
 weight = 1
 
-# Add user-defined content to menu items.
 [main.params]
-# Add CSS class to a specific menu item.
 class = ""
-# Whether set as a draft menu item, hidden by default.
-# Visible when env var is set: HUGO_PARAMS_MENU_DRAFT=true hugo server
 draft = false
-# Add FontAwesome icon to a specific menu item.
 icon = "fa-solid fa-archive"
-# Set menu item type.
-# Available values: ["mobile", "desktop"]
 type = ""
-# Whether to show the submenu item divider line.
 divided = false
 
 [[main]]
@@ -36,9 +25,9 @@ identifier = "categories"
 parent = ""
 pre = ""
 post = ""
-name = "Categories"
+name = "分类"
 url = "categories/"
-title = ""
+title = "按栏目浏览"
 weight = 2
 
 [main.params]
@@ -49,10 +38,23 @@ identifier = "tags"
 parent = ""
 pre = ""
 post = ""
-name = "Tags"
+name = "标签"
 url = "tags/"
-title = ""
+title = "按关键词浏览"
 weight = 3
 
 [main.params]
 icon = "fa-solid fa-tags"
+
+[[main]]
+identifier = "friends"
+parent = ""
+pre = ""
+post = ""
+name = "友链"
+url = "friends/"
+title = "常用参考站点与友情链接"
+weight = 4
+
+[main.params]
+icon = "fa-solid fa-link"

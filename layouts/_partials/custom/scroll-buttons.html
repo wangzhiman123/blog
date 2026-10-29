@@ -1,0 +1,13 @@
+{{- /*
+  悬浮"回到底部"按钮
+
+  主题自带的两三个悬浮按钮固定在右下角并从底部向上堆叠，
+  所以这个按钮用 CSS 横向让出位置，落在同一行左侧，不会与它们重叠。
+  显隐与滚动逻辑见 assets/js/custom.js。
+*/ -}}
+
+<div class="fixed-buttons custom-scroll-buttons">
+  <button type="button" class="fixed-button to-bottom hidden" aria-label="回到底部" title="回到底部">
+    {{- dict "Class" "fa-solid fa-arrow-down" | partial "plugin/icon.html" -}}
+  </button>
+</div>

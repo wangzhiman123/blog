@@ -1,0 +1,23 @@
+# 友情链接数据
+# 字段：nickname（必填）、url（必填）、description（悬停提示/副标题）、avatar（可省略，省略时显示占位图标）、weight（越大越靠前）
+# 想加友链就在这里加一条，重新构建即可，不需要改模板。
+
+- nickname: 中国裁判文书网
+  url: https://wenshu.court.gov.cn
+  description: 全国法院裁判文书公开平台，检索类案的第一站
+  weight: 100
+
+- nickname: 国家法律法规数据库
+  url: https://flk.npc.gov.cn
+  description: 法律、行政法规、司法解释原文查询
+  weight: 90
+
+- nickname: Hugo
+  url: https://gohugo.io
+  description: 本站使用的静态站点生成器
+  weight: 60
+
+- nickname: FixIt
+  url: https://fixit.lruihao.cn
+  description: 本站主题的中文文档与配置参考
+  weight: 50
