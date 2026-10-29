@@ -978,7 +978,7 @@ icon = "fa-solid fa-heartbeat"
 pre = ""
 # Example: "2021-12-18T16:15:22+08:00"
 # 站点起点：最早一篇文章的日期，页脚据此计算"已运行 N 天"
-value = "2019-05-27T00:00:00+08:00"
+value = "2026-10-29T00:00:00+08:00"
 
 # Footer lines order.
 # Available values: ["first", 0-5, "last"]
