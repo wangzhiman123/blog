@@ -7,8 +7,12 @@ on:
       - 'config/**'
       - 'content/**'
       - 'data/**'
+      # 站点自己写的 partial / shortcode / 布局覆盖都在这里，漏了会导致改了模板却不重新构建
+      - 'layouts/**'
+      - 'i18n/**'
       - 'static/**'
       - 'themes/**'
+      - '.github/workflows/deploy.yml'
   workflow_run:
     workflows: ['Update theme']
     types:
