@@ -1,26 +1,38 @@
-description = "This is my new Hugo FixIt site"
-keywords = ["Hugo", "FixIt"]
+# -------------------------------------------------------------------------------------
+# 开发环境参数（hugo server 时生效，覆盖 config/_default/params.toml）
+# 来自 hugo-fixit-starter1 实测修订版
+# -------------------------------------------------------------------------------------
+
+description = "民事诉讼与行政诉讼实务笔记"
+keywords = ["律师", "民事诉讼", "上诉", "司法案例"]
 
 [author]
-name = "Lruihao"
+# 必须与文章 front matter 里的 authors 值一字不差，否则 /authors/ 会分裂成两个归档
+# 实测：写成「王志满」而文章写「王志满律师」→ 生成 /authors/王志满/ 和 /authors/王志满律师/ 两个页面
+name = "王志满律师"
 email = ""
-link = "https://github.com/Lruihao"
-avatar = "https://lruihao.cn/images/avatar.jpg"
+link = ""
+# 留空则用主题默认头像；填写时把图片放到 static/images/ 下
+avatar = ""
 
 [app]
-title = "Hugo FixIt Blog"
+title = "王志满律师"
 
 [header]
 
 [header.title]
-logo = "/images/fixit.min.svg"
+# 留空则头部显示 app.title 文字
+# 模板默认给的是 "/images/fixit.min.svg"（项目站还会带上仓库名前缀），fork 后该文件不存在会 404
+logo = ""
 
 [home]
 
 [home.profile]
 enable = true
 
-[customPartials]
-head = [
-  "inject/fixit-docs-bookmark.html",
-]
+# FixIt v1.0 起参数名从 customPartials 改为 custom_partials（旧名会打弃用警告）
+# 只有保留 shortcode-docs-bookmark 子模块并想用文档书签注入时才需要启用
+# [custom_partials]
+# head = [
+#   "inject/fixit-docs-bookmark.html",
+# ]

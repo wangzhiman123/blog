@@ -4,7 +4,7 @@
 # -------------------------------------------------------------------------------------
 
 # Website title.
-title = ""
+title = "王志满律师"
 # Hostname (and path) to the root.
 baseURL = "http://localhost:1313"
 # Theme list.
@@ -12,17 +12,17 @@ baseURL = "http://localhost:1313"
 # theme = ["FixIt"]
 # Determines default content language.
 # Available values: ["en", "zh-cn", "fr", "pl", ...]
-defaultContentLanguage = "en"
+defaultContentLanguage = "zh-cn"
 # Language code.
 # Available values: ["en", "zh-CN", "fr", "pl", ...]
-locale = "en"
+locale = "zh-CN"
 # Language name.
 # Available values: ["English", "简体中文", "Français", "Polski", ...]
-label = "English"
+label = "简体中文"
 # Whether to include Chinese/Japanese/Korean.
-hasCJKLanguage = false
+hasCJKLanguage = true
 # Timezone local.
-# timeZone = "Asia/Shanghai"
+timeZone = "Asia/Shanghai"
 # Copyright description used only for SEO schema.
 copyright = ""
 # Whether to use robots.txt.
