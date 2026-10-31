@@ -1,0 +1,36 @@
+# 分类层级：一级分类 + 其下的二级分类
+#
+# 文章的 front matter 里仍然写两个名字（一级在前、二级在后），例如：
+#   categories:
+#   - 工作
+#   - 案例复盘
+# 层级关系只在这里定义，分类页、文章页的「工作 › 案例复盘」都读这个文件。
+# 新增二级分类：在对应一级的 children 下加一行；新增一级分类：整段复制一份改 name。
+
+- name: 工作
+  icon: fa-solid fa-briefcase
+  desc: 办案、检索、文书与执业中的实务记录
+  children:
+    - 非诉实务
+    - 案例复盘
+    - 诉讼实务
+    - 文书模板
+    - 办案工具
+    - 法律科普
+    - 执业成长
+
+- name: 学习
+  icon: fa-solid fa-graduation-cap
+  desc: 建站、工具与读书思考
+  children:
+    - 建站笔记
+    - 工具教程
+    - 思考随记
+
+- name: 生活
+  icon: fa-solid fa-mug-hot
+  desc: 日常、办事与家人
+  children:
+    - 日常随笔
+    - 办事指南
+    - 爱妻日常

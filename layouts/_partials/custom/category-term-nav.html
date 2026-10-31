@@ -1,0 +1,54 @@
+{{- /*
+  单个分类页顶部的层级导航
+
+  一级分类（工作 / 学习 / 生活）：面包屑「全部分类 › 工作」，下面列出它的二级分类
+  二级分类（案例复盘等）：面包屑「全部分类 › 工作 › 案例复盘」，下面列出同级分类
+*/ -}}
+{{- $title := .LinkTitle -}}
+{{- $groups := hugo.Data.categories -}}
+{{- $parent := "" -}}
+{{- $siblings := slice -}}
+
+{{- range $groups -}}
+  {{- if eq .name $title -}}
+    {{- $siblings = .children -}}
+  {{- else if in .children $title -}}
+    {{- $parent = .name -}}
+    {{- $siblings = .children -}}
+  {{- end -}}
+{{- end -}}
+
+<nav class="cat-breadcrumb" aria-label="分类层级">
+  <a href="{{ "/categories/" | relLangURL }}">
+    {{- dict "Class" "fa-solid fa-folder-tree" | partial "plugin/icon.html" -}}
+    <span>全部分类</span>
+  </a>
+  {{- with $parent -}}
+    {{- $p := . -}}
+    <span class="cat-breadcrumb-sep">›</span>
+    {{- with site.GetPage (printf "categories/%s" $p) -}}
+      <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+    {{- else -}}
+      <span>{{ $p }}</span>
+    {{- end -}}
+  {{- end -}}
+  <span class="cat-breadcrumb-sep">›</span>
+  <span class="cat-breadcrumb-current">{{ $title }}</span>
+</nav>
+
+{{- with $siblings -}}
+  {{- $list := . -}}
+  <div class="cat-siblings">
+    <span class="cat-siblings-label">{{ if $parent }}同类细分{{ else }}下含细分{{ end }}</span>
+    <div class="cat-chips">
+      {{- range $list -}}
+        {{- $name := . -}}
+        {{- if ne $name $title -}}
+          {{- with site.GetPage (printf "categories/%s" $name) -}}
+            <a class="cat-chip" href="{{ .RelPermalink }}">{{ .LinkTitle }}<sup>{{ len .Pages }}</sup></a>
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    </div>
+  </div>
+{{- end -}}

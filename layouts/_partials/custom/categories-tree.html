@@ -1,0 +1,89 @@
+{{- /*
+  分类总览：一级分类成组，二级分类以标签形式挂在组内
+
+  层级关系来自 data/categories.yml。文章 front matter 里仍然写两个名字
+  （一级在前、二级在后），所以不用改文章，只改这一层展示就能得到：
+    工作  ›  非诉实务 / 案例复盘 / 诉讼实务 …
+*/ -}}
+{{- $groups := hugo.Data.categories -}}
+{{- $tax := site.Taxonomies.categories -}}
+{{- $total := len $tax -}}
+
+{{- partial "custom/taxonomy-head.html" (dict
+  "Icon" "fa-solid fa-folder-tree"
+  "Count" (len $groups)
+  "Title" "大类"
+  "Note" (printf "共 %d 个分类。点大类看该类的全部文章，点小类只看细分。" $total)
+) -}}
+
+<div class="cat-groups">
+  {{- range $groups -}}
+    {{- $g := . -}}
+    {{- $w := index $tax $g.name -}}
+    {{- $count := 0 -}}
+    {{- with $w -}}{{- $count = .Count -}}{{- end -}}
+    <section class="cat-group">
+      <header class="cat-group-head">
+        {{- with site.GetPage (printf "categories/%s" $g.name) -}}
+          <a class="cat-group-name" href="{{ .RelPermalink }}">
+            {{- dict "Class" $g.icon | partial "plugin/icon.html" -}}
+            <span>{{ .LinkTitle }}</span>
+            <sup class="cat-group-count">{{ $count }}</sup>
+          </a>
+        {{- else -}}
+          <span class="cat-group-name">
+            {{- dict "Class" $g.icon | partial "plugin/icon.html" -}}
+            <span>{{ $g.name }}</span>
+            <sup class="cat-group-count">{{ $count }}</sup>
+          </span>
+        {{- end -}}
+        {{- with $g.desc -}}<p class="cat-group-desc">{{ . }}</p>{{- end -}}
+      </header>
+
+      <div class="cat-chips">
+        {{- range $g.children -}}
+          {{- $name := . -}}
+          {{- $cw := index $tax $name -}}
+          {{- $n := 0 -}}
+          {{- with $cw -}}{{- $n = .Count -}}{{- end -}}
+          {{- with site.GetPage (printf "categories/%s" $name) -}}
+            <a class="cat-chip" href="{{ .RelPermalink }}">{{ .LinkTitle }}<sup>{{ $n }}</sup></a>
+          {{- else -}}
+            <span class="cat-chip is-empty">{{ $name }}<sup>0</sup></span>
+          {{- end -}}
+        {{- end -}}
+      </div>
+    </section>
+  {{- end -}}
+</div>
+
+{{- /* 兜底：数据文件里没登记的分类（比如以后新建了但忘了加进 categories.yml），
+       单独列出来，避免文章「凭空消失」 */ -}}
+{{- $known := slice -}}
+{{- range $groups -}}
+  {{- $known = $known | append .name -}}
+  {{- range .children -}}{{- $known = $known | append . -}}{{- end -}}
+{{- end -}}
+{{- $unknown := slice -}}
+{{- range $term, $pages := $tax -}}
+  {{- if not (in $known $term) -}}{{- $unknown = $unknown | append (dict "term" $term "count" $pages.Count) -}}{{- end -}}
+{{- end -}}
+{{- with $unknown -}}
+  <section class="cat-group is-unknown">
+    <header class="cat-group-head">
+      <span class="cat-group-name">
+        {{- dict "Class" "fa-solid fa-circle-question" | partial "plugin/icon.html" -}}
+        <span>未归入层级的分类</span>
+      </span>
+      <p class="cat-group-desc">这些分类还没写进 <code>data/categories.yml</code>，补一行就会归到对应大类下。</p>
+    </header>
+    <div class="cat-chips">
+      {{- range $unknown -}}
+        {{- $item := . -}}
+        {{- with site.GetPage (printf "categories/%s" $item.term) -}}
+          <a class="cat-chip" href="{{ .RelPermalink }}">{{ .LinkTitle }}<sup>{{ $item.count }}</sup></a>
+        {{- end -}}
+      {{- end -}}
+    </div>
+  </section>
+{{- end -}}

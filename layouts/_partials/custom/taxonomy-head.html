@@ -1,0 +1,13 @@
+{{- /*
+  分类页 / 分类子页的统一标题块
+
+  参数：Icon（图标 class）、Count（数字）、Title、Note（说明文字）、Breadcrumb（可选，面包屑 HTML 片段）
+*/ -}}
+{{- $icon := .Icon | default "fa-solid fa-folder-tree" -}}
+{{- $count := .Count | default 0 -}}
+<h1 class="archive-title animate__animated animate__pulse animate__faster">
+  {{- dict "Class" $icon | partial "plugin/icon.html" -}}
+  {{- if $count -}}<sup class="me-1">{{ $count }}</sup>{{- end -}}
+  {{- .Title -}}
+</h1>
+{{- with .Note -}}<p class="cat-head-note">{{ . }}</p>{{- end -}}

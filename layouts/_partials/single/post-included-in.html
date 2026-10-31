@@ -1,0 +1,76 @@
+{{- /*
+  文章页「收录于 …」（覆盖主题 post-included-in.html）
+
+  原来把 categories 里的两个名字平铺：收录于 📁 工作  📁 案例复盘
+  现在按 data/categories.yml 的层级输出：收录于 📁 工作 › 📁 案例复盘
+
+  文章 front matter 不用改，仍然是 [一级, 二级] 两个名字。
+*/ -}}
+{{- $groups := hugo.Data.categories -}}
+{{- $terms := .GetTerms "categories" -}}
+{{- $byName := dict -}}
+{{- range $terms -}}
+  {{- $byName = merge $byName (dict .LinkTitle .) -}}
+{{- end -}}
+
+{{- $topParts := slice -}}
+{{- $subParts := slice -}}
+{{- $used := slice -}}
+{{- $folderIcon := dict "Class" "fa-regular fa-folder" | partial "plugin/icon.html" -}}
+
+{{- /* 一级：按 data 里定义的顺序，缺的跳过 */ -}}
+{{- range $groups -}}
+  {{- $g := . -}}
+  {{- with index $byName $g.name -}}
+    {{- $topParts = $topParts | append (printf `<a href="%s" class="post-category is-top" title="分类 - %s">%s %s</a>` (partial "function/escapeurl.html" .RelPermalink) .LinkTitle $folderIcon .LinkTitle) -}}
+    {{- $used = $used | append $g.name -}}
+  {{- end -}}
+  {{- /* 二级：跟随所属一级的顺序，保证「工作 › 案例复盘」不会变成「案例复盘 › 工作」 */ -}}
+  {{- range $g.children -}}
+    {{- $child := . -}}
+    {{- with index $byName $child -}}
+      {{- $subParts = $subParts | append (printf `<a href="%s" class="post-category" title="分类 - %s">%s %s</a>` (partial "function/escapeurl.html" .RelPermalink) .LinkTitle $folderIcon .LinkTitle) -}}
+      {{- $used = $used | append $child -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 没写进 categories.yml 的分类，兜底显示在最后 */ -}}
+{{- range $terms -}}
+  {{- if not (in $used .LinkTitle) -}}
+    {{- $subParts = $subParts | append (printf `<a href="%s" class="post-category" title="分类 - %s">%s %s</a>` (partial "function/escapeurl.html" .RelPermalink) .LinkTitle $folderIcon .LinkTitle) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $catHTML := "" -}}
+{{- if and $topParts $subParts -}}
+  {{- $catHTML = printf `%s <span class="cat-sep" aria-hidden="true">›</span> %s` (delimit $topParts "&ensp;") (delimit $subParts "&ensp;") -}}
+{{- else if $topParts -}}
+  {{- $catHTML = delimit $topParts "&ensp;" -}}
+{{- else -}}
+  {{- $catHTML = delimit $subParts "&ensp;" -}}
+{{- end -}}
+
+{{- $collections := slice -}}
+{{- range .GetTerms "collections" -}}
+  {{- $collections = $collections | append (
+    printf `<a href="%v" class="post-collection" title="%v">%v %v</a>`
+    (partial "function/escapeurl.html" .RelPermalink)
+    (printf "%v - %v" (T "collection") .LinkTitle)
+    (dict "Class" "fa-solid fa-layer-group" | partial "plugin/icon.html")
+    .LinkTitle
+  ) -}}
+{{- end -}}
+{{- $collectionStr := delimit $collections "&ensp;" -}}
+
+{{- if .Params.categories | or .Params.collections -}}
+  <span class="post-included-in">
+    {{- if not .Params.collections -}}
+      &nbsp;{{- dict "Categories" $catHTML | T "single.includedIn.categories" | safeHTML -}}
+    {{- else if not .Params.categories -}}
+      &nbsp;{{- dict "Collections" $collectionStr | T "single.includedIn.collections" | safeHTML -}}
+    {{- else -}}
+      &nbsp;{{- dict "Categories" $catHTML "Collections" $collectionStr | T "single.includedIn.both" | safeHTML -}}
+    {{- end -}}
+  </span>
+{{- end -}}

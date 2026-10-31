@@ -1,0 +1,39 @@
+{{- /*
+  分类总览页（覆盖主题 taxonomy.html）
+
+  categories 走「一级分类 + 二级分类」的层级视图；
+  tags / authors 等其他 taxonomy 保持主题原样。
+*/ -}}
+{{- define "title" -}}
+  {{- .Params.Title | default (T .Data.Plural) | default .Data.Plural | dict "Some" | T "allSome" -}}
+  {{- if .Site.Params.with_site_title }} {{ .Site.Params.title_delimiter }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  {{- $taxonomies := .Data.Plural -}}
+
+  {{- if eq $taxonomies "categories" -}}
+    <div class="page archive cat-tree">
+      {{- partial "custom/categories-tree.html" . -}}
+    </div>
+  {{- else -}}
+    {{- $icon := .Params.titleIcon | default (dict "Taxonomy" .Data.Singular "Slot" "title" | partial "function/get-taxonomy-icon.html") -}}
+    {{- /* Author terms come from get-authors, not .Data.Terms (legacy `author` / site-default). */ -}}
+    {{- $count := len .Data.Terms.ByCount -}}
+    {{- if eq $taxonomies "authors" -}}
+      {{- $count = len (partial "function/author-terms.html" .) -}}
+    {{- end -}}
+    <div class="page archive">
+      <h1 class="archive-title animate__animated animate__pulse animate__faster">
+        {{- dict "Class" $icon | partial "plugin/icon.html" -}}
+        <sup class="me-1">{{ $count }}</sup>
+        {{- .Params.Title | default (T $taxonomies) | default $taxonomies | dict "Some" | T "allSome" -}}
+      </h1>
+      {{- $template := $taxonomies -}}
+      {{- if not (templates.Exists (printf "%s.html" $template)) -}}
+        {{- $template = "taxonomies" -}}
+      {{- end -}}
+      {{- .Render $template -}}
+    </div>
+  {{- end -}}
+{{- end -}}

@@ -1,0 +1,32 @@
+{{- /*
+  单个分类 / 标签页（覆盖主题 term.html）
+
+  categories 的页面顶部多一段层级导航（面包屑 + 同级分类）；
+  tags / authors 等其他 taxonomy 保持主题原样。
+*/ -}}
+{{- define "title" -}}
+  {{- .Title }} - {{ T .Data.Singular | default .Data.Singular -}}
+  {{- if .Site.Params.with_site_title }} {{ .Site.Params.title_delimiter }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  {{- $icon := .Params.titleIcon | default (dict "Taxonomy" .Data.Singular "Slot" "term" | partial "function/get-taxonomy-icon.html") -}}
+  {{- $pages := .Pages -}}
+  <div class="page archive">
+    {{- if eq .Data.Plural "categories" -}}
+      {{- partial "custom/category-term-nav.html" . -}}
+    {{- end -}}
+    {{- partial "section/archive-header.html" (dict
+      "Pages" $pages
+      "Title" .Title
+      "Icon" $icon
+    ) -}}
+    {{- partial "section/archive-meta.html" (dict "Page" . "Pages" $pages) -}}
+    {{- partial "section/archive-list.html" (dict
+      "Page" .
+      "Pages" $pages
+      "Paginate" (.Site.Params.list.paginate | default .Site.Params.paginate)
+      "DateFormat" (.Site.Params.list.dateFormat | default "01-02")
+    ) -}}
+  </div>
+{{- end -}}

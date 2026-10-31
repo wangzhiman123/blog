@@ -680,3 +680,209 @@
     transform: translate(-50%, 0);
   }
 }
+
+// -----------------------------------------------------------------------------
+// 分类层级：工作 / 学习 / 生活 为一级，其余为二级
+//   层级关系定义在 data/categories.yml，模板读它渲染，
+//   文章 front matter 不需要改（仍是 [一级, 二级]）。
+// -----------------------------------------------------------------------------
+
+// 分类总览页的说明文字
+.cat-head-note {
+  margin: -0.4rem 0 1.2rem;
+  font-size: 0.88rem;
+  color: #57606a;
+  color: light-dark(#57606a, #9aa4b2);
+}
+
+.cat-groups {
+  display: grid;
+  gap: 1rem;
+}
+
+// 每个一级分类一张卡
+.cat-group {
+  padding: 1.1rem 1.2rem 1.2rem;
+  background-color: #ffffff;
+  background-color: light-dark(#ffffff, #1f2328);
+  border: 1px solid #e6e8eb;
+  border: 1px solid light-dark(#e6e8eb, #30363d);
+  border-radius: 0.75rem;
+
+  &.is-unknown {
+    border-style: dashed;
+  }
+}
+
+.cat-group-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px dashed #e6e8eb;
+  border-bottom: 1px dashed light-dark(#e6e8eb, #30363d);
+}
+
+.cat-group-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+
+  i {
+    color: #07c160;
+    color: light-dark(#0a9e50, #3fcf8e);
+  }
+
+  a:hover > span,
+  &:hover > span {
+    text-decoration: underline;
+  }
+}
+
+a.cat-group-name:hover {
+  span {
+    text-decoration: underline;
+  }
+}
+
+.cat-group-count {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: #57606a;
+  color: light-dark(#57606a, #9aa4b2);
+  text-decoration: none;
+}
+
+.cat-group-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #8b949e;
+  color: light-dark(#8b949e, #7d8590);
+
+  code {
+    padding: 0.05rem 0.25rem;
+    font-size: 0.78rem;
+  }
+}
+
+// 二级分类标签
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.85rem;
+  color: #3b4148;
+  color: light-dark(#3b4148, #c9d1d9);
+  text-decoration: none;
+  background-color: #f4f6f8;
+  background-color: light-dark(#f4f6f8, #262c34);
+  border: 1px solid #e6e8eb;
+  border: 1px solid light-dark(#e6e8eb, #30363d);
+  border-radius: 2rem;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+  sup {
+    font-size: 0.7rem;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+  }
+
+  &:hover {
+    color: #07c160;
+    background-color: #ffffff;
+    background-color: light-dark(#ffffff, #1f2328);
+    border-color: #07c160;
+    text-decoration: none;
+
+    sup {
+      color: #07c160;
+    }
+  }
+
+  &.is-empty {
+    opacity: 0.55;
+  }
+}
+
+// 单个分类页：面包屑 + 同级分类
+.cat-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.85rem;
+  color: #8b949e;
+  color: light-dark(#8b949e, #7d8590);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: #07c160;
+    }
+  }
+
+  &-current {
+    font-weight: 600;
+    color: #1f2328;
+    color: light-dark(#1f2328, #e6edf3);
+  }
+}
+
+.cat-siblings {
+  margin-bottom: 1.6rem;
+
+  &-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.78rem;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+  }
+}
+
+// 文章页分类：一级 › 二级
+.cat-sep {
+  padding-inline: 0.15rem;
+  color: #8b949e;
+  color: light-dark(#8b949e, #7d8590);
+}
+
+.post-included-in {
+  .post-category.is-top {
+    font-weight: 600;
+  }
+}
+
+// 手机端：分类卡片收边距，标签小一号
+@media (max-width: 768px) {
+  .cat-group {
+    padding: 0.9rem 0.9rem 1rem;
+  }
+
+  .cat-group-name {
+    font-size: 1rem;
+  }
+
+  .cat-chip {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.8rem;
+  }
+}
