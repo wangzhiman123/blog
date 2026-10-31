@@ -187,12 +187,16 @@
 }
 
 // -----------------------------------------------------------------------------
-// 首页文章列表：等高卡片
+// 首页文章列表：等高卡片（左文右图）
 //   主题默认是「斜纹分隔线 + 顶部大图」，摘要长短不同，卡片高矮差别明显。
-//   这里改成卡片：标题固定两行、摘要固定两行，53 篇排出来高度整齐一致；
-//   有配图的文章，缩略图放到右侧，卡片高度不变。
+//   这里改成卡片：标题固定两行、摘要固定两行，53 篇排出来高度整齐一致。
+//   正文首图会被 Hugo 的自动摘要带进来，而图片不受 line-clamp 约束，
+//   一张竖图能把卡片撑到上千像素高 —— 所以由 layouts/summary.html
+//   把首图提出来当右侧缩略图，摘要正文里不再重复出现。
 // -----------------------------------------------------------------------------
-.home.posts {
+//   多套一层 .page：主题的分隔线是 .summary:not(:last-of-type)::after，
+//   比 .home.posts .summary::after 多一个伪类，不抬一级压不住。
+.page.home.posts {
   .summary {
     position: relative;
     display: grid;
@@ -201,10 +205,13 @@
       'title'
       'content'
       'meta';
-    row-gap: 0.35rem;
+    row-gap: 0.4rem;
     margin-bottom: 0.9rem;
-    padding: 1.15rem 1.25rem;
+    padding: 1.1rem 1.2rem;
+    // light-dark() 在旧内核（微信 X5 等）整条声明会失效，先给一份降级值
+    background-color: #ffffff;
     background-color: light-dark(#ffffff, #1f2328);
+    border: 1px solid #e6e8eb;
     border: 1px solid light-dark(#e6e8eb, #30363d);
     border-radius: 0.75rem;
     transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
@@ -215,7 +222,7 @@
     }
 
     &:first-of-type {
-      padding-top: 1.15rem;
+      padding-top: 1.1rem;
     }
 
     &:last-of-type {
@@ -235,6 +242,7 @@
       margin: 0;
       overflow: hidden;
       font-size: 1.15rem;
+      font-weight: 600;
       line-height: 1.6;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -260,6 +268,7 @@
       overflow: hidden;
       font-size: 0.9rem;
       line-height: 1.7;
+      color: #57606a;
       color: light-dark(#57606a, #9aa4b2);
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -267,13 +276,26 @@
       p {
         margin: 0;
       }
+
+      // 兜底：万一还有图漏进摘要（比如手动写的 summary），一律不显示，
+      // line-clamp 管不住图片，留着就会把卡片顶高
+      img,
+      picture,
+      figure {
+        display: none;
+      }
     }
 
     .post-meta {
       grid-area: meta;
-      margin: 0.4rem 0 0;
+      margin: 0.45rem 0 0;
       font-size: 0.8rem;
+      color: #8b949e;
       color: light-dark(#8b949e, #7d8590);
+      // 分类多的卡片 meta 会折行、把卡片顶高一截，单行截断保住等高
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
 
       // 首页每篇都是同一个作者，这个名字纯属占位
       .post-author {
@@ -293,14 +315,14 @@
     }
   }
 
-  // 有配图：文字在左、缩略图在右，卡片高度不变
-  .summary:has(.featured-image-preview) {
-    grid-template-columns: minmax(0, 1fr) 12rem;
+  // 有缩略图：文字在左、图片在右，卡片高度和没图时一模一样
+  .summary.has-thumb {
+    grid-template-columns: minmax(0, 1fr) clamp(9.5rem, 30%, 15.5rem);
     grid-template-areas:
       'title img'
       'content img'
       'meta img';
-    column-gap: 1.1rem;
+    column-gap: 1.2rem;
 
     .featured-image-preview {
       position: relative;
@@ -310,8 +332,16 @@
       margin: 0;
       overflow: hidden;
       aspect-ratio: auto;
-      border-radius: 0.5rem;
+      background-color: #f3f5f7;
+      background-color: light-dark(#f3f5f7, #2a2f37);
+      border-radius: 0.55rem;
 
+      a {
+        display: block;
+        height: 100%;
+      }
+
+      // 图片不参与高度计算：绝对定位铺满右侧，object-fit 裁切
       img {
         position: absolute;
         inset: 0;
@@ -388,7 +418,7 @@
 // -----------------------------------------------------------------------------
 @media (max-width: 767.98px) {
   // 首页卡片：收边距、压字号；缩略图在窄屏隐藏，优先保证文字可读
-  .home.posts {
+  .page.home.posts {
     .summary {
       margin-bottom: 0.75rem;
       padding: 1rem;
@@ -415,7 +445,8 @@
       }
     }
 
-    .summary:has(.featured-image-preview) {
+    // 窄屏一律单列：图挤在旁边会把文字压成一条一条，不如不要
+    .summary.has-thumb {
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         'title'
@@ -423,8 +454,6 @@
         'meta';
     }
 
-    // 单独写一条，不依赖 :has() —— 微信内置浏览器对 :has() 支持较晚，
-    // 落空的话封面图会以整宽大图的形式顶在卡片上，把卡片高度撑坏
     .summary .featured-image-preview {
       display: none;
     }
