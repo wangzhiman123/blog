@@ -540,8 +540,12 @@
 // -----------------------------------------------------------------------------
 .post-info-share {
   .post-share-link {
-    margin-inline: 0.1rem;
+    // 图标本身只有 1em 宽，手机上很难戳中，撑开热区
+    display: inline-block;
+    padding: 0.2rem 0.35rem;
+    margin-inline: 0.05rem;
     color: inherit;
+    cursor: pointer;
     transition: color 0.2s ease, opacity 0.2s ease;
 
     &:hover {
@@ -569,6 +573,11 @@
 .post-share-qr {
   display: none;
   position: fixed;
+  // inset 是后加的简写，旧内核不认识整条会失效，先写四边再用 inset 覆盖
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1200;
   align-items: center;
@@ -582,7 +591,8 @@
 
   &-dialog {
     position: relative;
-    width: min(17rem, 88vw);
+    width: 17rem;
+    max-width: 88vw;
     padding: 1.4rem 1.25rem 1.1rem;
     text-align: center;
     background-color: #ffffff;
@@ -649,11 +659,12 @@
 // 复制链接 / 复制成功的轻提示
 .custom-toast {
   position: fixed;
-  bottom: 4.5rem;
+  bottom: 5.5rem;
   left: 50%;
-  z-index: 1300;
-  max-width: 80vw;
+  z-index: 1400;
+  max-width: 82vw;
   padding: 0.55rem 1rem;
+  word-break: break-word;
   font-size: 0.85rem;
   color: #ffffff;
   text-align: center;

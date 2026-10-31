@@ -5,6 +5,11 @@
   这里整体换成国内常用的：微信（二维码）、QQ、QQ空间、微博、豆瓣、复制链接。
 
   开关在 config/_default/params.toml 的 [share] 段。
+
+  交互脚本直接内联在组件末尾，不放进 custom.js：
+  1. 不依赖外部脚本的缓存（改完立刻生效，老访客不会加载到旧版）
+  2. 直接给按钮绑事件，不用事件委托 —— 点图标时 target 是 <svg><path>，
+     旧内核里 SVG 元素没有 closest()，走委托会直接 return，表现为「点了没反应」
 */ -}}
 {{- $share := dict "Page" . "Key" "share" | partial "function/param.html" | default dict -}}
 {{- if not $share.enable -}}
@@ -53,7 +58,7 @@
 {{- end -}}
 
 {{- if $share.Wechat -}}
-  {{- /* 桌面端扫码用；手机上点微信按钮直接复制链接，见 assets/js/custom.js */ -}}
+  {{- /* 桌面端扫码用；手机上点微信按钮直接复制链接，见下面脚本 */ -}}
   <div class="post-share-qr" id="post-share-qr" aria-hidden="true">
     <div class="post-share-qr-dialog" role="dialog" aria-modal="true" aria-label="微信扫码打开">
       <button type="button" class="post-share-qr-close" data-share-close aria-label="关闭">&times;</button>
@@ -65,3 +70,124 @@
     </div>
   </div>
 {{- end -}}
+
+<script>
+  // 分享交互：不依赖事件委托，直接绑在元素上（图标是 svg/path，老内核没有 closest）
+  (function () {
+    var pageUrl = {{ $url | jsonify | safeJS }}
+    var mask = document.getElementById('post-share-qr')
+
+    function toast(msg) {
+      var el = document.getElementById('custom-toast')
+      if (!el) {
+        el = document.createElement('div')
+        el.id = 'custom-toast'
+        el.className = 'custom-toast'
+        document.body.appendChild(el)
+      }
+      el.textContent = msg
+      el.className = 'custom-toast is-show'
+      clearTimeout(toast.timer)
+      toast.timer = setTimeout(function () {
+        el.className = 'custom-toast'
+      }, 2400)
+    }
+
+    // 复制：先试剪贴板接口，失败退回 execCommand，再失败弹出手动复制框
+    function copy(text) {
+      function manual() {
+        window.prompt('复制下面的链接，粘贴到微信 / QQ 里即可：', text)
+        toast('已选中链接，按 Ctrl+C 复制')
+      }
+      function fallback() {
+        var ta = document.createElement('textarea')
+        ta.value = text
+        ta.setAttribute('readonly', '')
+        ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;'
+        document.body.appendChild(ta)
+        try {
+          ta.focus()
+          ta.select()
+          ta.setSelectionRange(0, text.length)
+        } catch (e) {}
+        var ok = false
+        try {
+          ok = document.execCommand('copy')
+        } catch (e) {
+          ok = false
+        }
+        document.body.removeChild(ta)
+        if (ok) {
+          toast('链接已复制，粘贴给好友即可')
+        } else {
+          manual()
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          navigator.clipboard.writeText(text).then(function () {
+            toast('链接已复制，粘贴给好友即可')
+          }, fallback)
+          return
+        } catch (e) {}
+      }
+      fallback()
+    }
+
+    function openQr() {
+      if (mask) {
+        mask.className = 'post-share-qr is-open'
+        mask.setAttribute('aria-hidden', 'false')
+      } else {
+        copy(pageUrl)
+      }
+    }
+
+    function closeQr() {
+      if (!mask)
+        return
+      mask.className = 'post-share-qr'
+      mask.setAttribute('aria-hidden', 'true')
+    }
+
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod|Mobile|MicroMessenger/i.test(navigator.userAgent)
+    }
+
+    // 逐个绑定：点 svg / path 时事件冒泡到 <a>，不依赖 target.closest()
+    function bind(selector, handler) {
+      var list = document.querySelectorAll(selector)
+      for (var i = 0; i < list.length; i++) {
+        list[i].addEventListener('click', function (e) {
+          if (e.preventDefault)
+            e.preventDefault()
+          handler(e)
+        })
+      }
+    }
+
+    bind('[data-share-wechat]', function () {
+      if (isMobile())
+        copy(pageUrl)
+      else
+        openQr()
+    })
+
+    bind('[data-share-copy]', function () {
+      copy(pageUrl)
+    })
+
+    bind('[data-share-close]', closeQr)
+
+    if (mask)
+      mask.addEventListener('click', function (e) {
+        if (e.target === mask)
+          closeQr()
+      })
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.keyCode === 27)
+        closeQr()
+    })
+  })()
+</script>
