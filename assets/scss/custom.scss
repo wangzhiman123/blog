@@ -417,10 +417,12 @@
         'title'
         'content'
         'meta';
+    }
 
-      .featured-image-preview {
-        display: none;
-      }
+    // 单独写一条，不依赖 :has() —— 微信内置浏览器对 :has() 支持较晚，
+    // 落空的话封面图会以整宽大图的形式顶在卡片上，把卡片高度撑坏
+    .summary .featured-image-preview {
+      display: none;
     }
   }
 
