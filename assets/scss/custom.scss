@@ -185,3 +185,301 @@
     grid-template-columns: 1fr;
   }
 }
+
+// -----------------------------------------------------------------------------
+// 首页文章列表：等高卡片
+//   主题默认是「斜纹分隔线 + 顶部大图」，摘要长短不同，卡片高矮差别明显。
+//   这里改成卡片：标题固定两行、摘要固定两行，53 篇排出来高度整齐一致；
+//   有配图的文章，缩略图放到右侧，卡片高度不变。
+// -----------------------------------------------------------------------------
+.home.posts {
+  .summary {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'content'
+      'meta';
+    row-gap: 0.35rem;
+    margin-bottom: 0.9rem;
+    padding: 1.15rem 1.25rem;
+    background-color: light-dark(#ffffff, #1f2328);
+    border: 1px solid light-dark(#e6e8eb, #30363d);
+    border-radius: 0.75rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+
+    // 卡片自带边框，去掉原来的斜纹分隔线
+    &::after {
+      content: none;
+    }
+
+    &:first-of-type {
+      padding-top: 1.15rem;
+    }
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      border-color: light-dark(#c9d1d9, #4b5563);
+      box-shadow: 0 8px 20px light-dark(rgba(31, 35, 40, 0.08), rgba(0, 0, 0, 0.45));
+      transform: translateY(-2px);
+    }
+
+    .single-title {
+      grid-area: title;
+      display: -webkit-box;
+      min-height: 3.2em;
+      margin: 0;
+      overflow: hidden;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+
+      a {
+        color: inherit;
+
+        // 标题链接铺满整张卡片：手机上点哪儿都能进文章，比只戳标题好按
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+      }
+    }
+
+    .content {
+      grid-area: content;
+      display: -webkit-box;
+      min-height: 3.4em;
+      margin: 0;
+      overflow: hidden;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: light-dark(#57606a, #9aa4b2);
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .post-meta {
+      grid-area: meta;
+      margin: 0.4rem 0 0;
+      font-size: 0.8rem;
+      color: light-dark(#8b949e, #7d8590);
+
+      // 首页每篇都是同一个作者，这个名字纯属占位
+      .post-author {
+        display: none;
+      }
+
+      // 标题的点击遮罩盖住了整张卡片，分类链接要抬到它上面才点得动
+      a {
+        position: relative;
+        z-index: 2;
+      }
+    }
+
+    // 「阅读全文」与整卡点击重复，标签也挤，手机上尤其明显
+    .post-footer {
+      display: none;
+    }
+  }
+
+  // 有配图：文字在左、缩略图在右，卡片高度不变
+  .summary:has(.featured-image-preview) {
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    grid-template-areas:
+      'title img'
+      'content img'
+      'meta img';
+    column-gap: 1.1rem;
+
+    .featured-image-preview {
+      position: relative;
+      grid-area: img;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      aspect-ratio: auto;
+      border-radius: 0.5rem;
+
+      img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      &:hover {
+        scale: none;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 分页：页码 + 「跳至第 N 页」
+//   主题只给页码，页数多了（本站 9 页）中间页要一页页点，这里补一个输入框。
+//   控件由 assets/js/custom.js 插入，样式在这里。
+// -----------------------------------------------------------------------------
+.page-jump {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0.25rem 0 1rem;
+  font-size: 0.85rem;
+  color: light-dark(#57606a, #9aa4b2);
+
+  input {
+    width: 3.5rem;
+    padding: 0.2rem 0.35rem;
+    font: inherit;
+    color: inherit;
+    text-align: center;
+    appearance: textfield;
+    background-color: light-dark(#ffffff, #1f2328);
+    border: 1px solid light-dark(#d8dee4, #30363d);
+    border-radius: 0.35rem;
+
+    &:focus {
+      outline: 2px solid light-dark(#0969da, #58a6ff);
+      outline-offset: -1px;
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+  }
+
+  button {
+    padding: 0.2rem 0.7rem;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background-color: light-dark(#f3f4f6, #2a2f37);
+    border: 1px solid light-dark(#d8dee4, #30363d);
+    border-radius: 0.35rem;
+    transition: 0.2s;
+
+    &:hover {
+      color: light-dark(#0969da, #58a6ff);
+      border-color: light-dark(#0969da, #58a6ff);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 手机端适配
+//   主题自带的响应式只处理了栅格，实际读起来还有几处别扭：
+//   卡片内边距偏大、正文表格撑破屏幕、长链接顶出边界、分页换行后挤在一起。
+// -----------------------------------------------------------------------------
+@media (max-width: 767.98px) {
+  // 首页卡片：收边距、压字号；缩略图在窄屏隐藏，优先保证文字可读
+  .home.posts {
+    .summary {
+      margin-bottom: 0.75rem;
+      padding: 1rem;
+
+      &:first-of-type {
+        padding-top: 1rem;
+      }
+
+      .single-title {
+        min-height: 3.1em;
+        font-size: 1.05rem;
+      }
+
+      .content {
+        font-size: 0.875rem;
+      }
+
+      .post-meta {
+        font-size: 0.75rem;
+      }
+    }
+
+    .summary:has(.featured-image-preview) {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'title'
+        'content'
+        'meta';
+
+      .featured-image-preview {
+        display: none;
+      }
+    }
+  }
+
+  // 文章正文：表格可以左右滑动，不再把整页顶宽
+  .single {
+    .content {
+      table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        th,
+        td {
+          white-space: nowrap;
+        }
+      }
+
+      // 长网址、长英文单词允许断行
+      p,
+      li,
+      td,
+      th {
+        overflow-wrap: anywhere;
+      }
+
+      // 引用块和代码块留出合理边距
+      blockquote {
+        margin-inline: 0;
+        padding-inline-start: 0.9rem;
+      }
+
+      .highlight,
+      pre {
+        border-radius: 0.5rem;
+      }
+    }
+  }
+
+  // 分页：手机上页码更紧凑，跳页框单独一行
+  .pagination {
+    gap: 0.1rem;
+    padding-block: 0.75rem;
+
+    a {
+      padding: 5px 8px;
+    }
+  }
+
+  .page-jump {
+    margin-top: 0;
+    font-size: 0.8rem;
+  }
+
+  // 页脚统计在小屏换行后居中，避免左边齐右边空
+  .footer-line.visitor {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.75rem;
+  }
+}
+

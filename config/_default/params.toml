@@ -23,7 +23,9 @@ fingerprint = ""
 # Date format.
 date_format = "2006-01-02"
 # Website images for Open Graph and Twitter Cards.
-images = []
+# 分享到微信 / QQ / Twitter 时的缩略图。文章自己写了 images 或 cover 时会优先用文章的，
+# 这里是没有配图的文章和首页的兜底。图由 tools/make-og-image.ps1 生成，1200x630。
+images = ["/images/og-default.png"]
 # Whether to add site title to the title of every page.
 # Remember to set up your site title in `hugo.toml` (e.g. `title = "title"`).
 with_site_title = true

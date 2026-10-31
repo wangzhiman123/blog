@@ -88,9 +88,74 @@
     })
   }
 
+  /**
+   * 分页器「跳至第 N 页」
+   *
+   * 主题只渲染页码，本站 9 页，想翻到中间某页得一下下点。
+   * 这里读最后一个页码链接反推总页数与 URL 前缀（/page/2/ 这种），
+   * 再插一个输入框，回车或点按钮直接跳。
+   */
+  function initPageJump() {
+    var list = document.querySelector('.pagination')
+    if (!list || list.dataset.jumpReady === '1')
+      return
+
+    var anchors = list.querySelectorAll('a[href]')
+    if (!anchors.length)
+      return
+
+    // 模板对最后一页不做折叠，所以最后一个链接必然是末页
+    var lastHref = anchors[anchors.length - 1].getAttribute('href') || ''
+    var matched = lastHref.match(/^(.*\/page\/)(\d+)\/?$/)
+    if (!matched)
+      return
+
+    var prefix = matched[1]
+    var total = parseInt(matched[2], 10)
+    if (!(total > 1))
+      return
+
+    var home = prefix.replace(/page\/$/, '')
+    var active = list.querySelector('.page-item.active a')
+    var current = active ? parseInt(active.textContent, 10) || 1 : 1
+
+    list.dataset.jumpReady = '1'
+
+    var box = document.createElement('div')
+    box.className = 'page-jump'
+    box.innerHTML = '跳至第 <input type="number" min="1" max="' + total
+      + '" inputmode="numeric" aria-label="输入页码，共 ' + total + ' 页" placeholder="' + current
+      + '"> 页 <button type="button">跳转</button>'
+
+    var input = box.querySelector('input')
+    var button = box.querySelector('button')
+
+    function go() {
+      var n = parseInt(input.value, 10)
+      if (!Number.isFinite(n) || n < 1 || n > total) {
+        input.style.borderColor = '#f85149'
+        input.focus()
+        return
+      }
+      window.location.href = n === 1 ? home : prefix + n + '/'
+    }
+
+    button.addEventListener('click', go)
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter')
+        go()
+    })
+    input.addEventListener('input', function () {
+      input.style.borderColor = ''
+    })
+
+    list.insertAdjacentElement('afterend', box)
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
+    initPageJump()
   }
 
   if (document.readyState === 'loading')

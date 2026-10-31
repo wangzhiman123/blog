@@ -133,11 +133,11 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>友链管理器</h1>
-  <div class="sub">拖动排序、改完点「下载」替换仓库里的 <code class="k">data/friends.yml</code> 即可。所有数据只存在你的浏览器里，不上传任何服务器。</div>
+  <h1>友链代码生成器</h1>
+  <div class="sub">填好一条 → 点「复制代码」→ 粘到 <code class="k">data/friends.yml</code> 末尾。不用下载文件，不用跑脚本。<br>页面里的列表只是草稿，和线上文件不会自动同步；数据只存在你的浏览器里，不上传任何服务器。</div>
 
   <div class="toolbar">
-    <button class="primary" onclick="addItem()">＋ 新增友链</button>
+    <button class="primary" onclick="addItem()">＋ 新增一条友链</button>
     <button onclick="document.getElementById('file').click()">导入（yml / 备份 json）</button>
     <button onclick="backupJson()">备份为 json</button>
     <button onclick="renumber()">按顺序重排权重</button>
@@ -160,24 +160,25 @@
       </div>
 
       <div class="card">
-        <h2><span class="num">3</span>导出</h2>
-        <pre class="code" id="yaml"></pre>
-        <div class="toolbar" style="margin:12px 0 0">
-          <button class="primary" onclick="download()">下载 friends.yml</button>
-          <button onclick="copyYaml()">复制</button>
-        </div>
+        <h2><span class="num">3</span>怎么粘贴</h2>
+        <ol class="steps">
+          <li>左边填好一条，点它右上角的 <b>「复制代码」</b></li>
+          <li>打开仓库里的 <code class="k">data/friends.yml</code>，拉到文件最后，回车空一行，粘贴</li>
+          <li>保存提交，等 1～2 分钟，刷新 <code class="k">/friends/</code> 就能看到</li>
+        </ol>
         <div class="note" style="margin-top:10px">
-          文件名固定是 <b>friends.yml</b>，直接覆盖仓库里的 <code class="k">data/friends.yml</code>。
+          页面排序只看 <b>weight</b>（数字越大越靠前），跟代码写在文件第几行无关 —— 所以粘到末尾最省事，想置顶就把 weight 填大一点。
         </div>
       </div>
 
       <div class="card">
-        <h2>怎么让它生效</h2>
-        <ol class="steps">
-          <li>点「下载当前文件」，得到 <code class="k">friends.yml</code></li>
-          <li>双击站点目录里的 <b>一键更新友链.bat</b>，脚本会自动把文件放进 <code class="k">data/</code> 并推送</li>
-          <li>等 1～2 分钟 GitHub Actions 部署完成，刷新页面即可</li>
-        </ol>
+        <h2><span class="num">4</span>整份代码（可选）</h2>
+        <div class="note" style="margin-bottom:10px">想整体覆盖文件、或把全部友链按现在的顺序重排权重时，用这一份。</div>
+        <pre class="code" id="yaml"></pre>
+        <div class="toolbar" style="margin:12px 0 0">
+          <button onclick="copyYaml()">复制整份</button>
+          <button onclick="download()">下载 friends.yml</button>
+        </div>
       </div>
     </div>
   </div>
@@ -223,6 +224,7 @@ function render() {
           <span class="handle" draggable="true" title="按住拖动排序">⣿</span>
           <span class="idx">${i + 1}</span>
           <span class="spacer"></span>
+          <button class="mini primary" onclick="copyOne('${it.id}')" title="复制这一条的 YAML 代码">复制代码</button>
           <button class="mini" onclick="move(${i},-1)" title="上移">↑</button>
           <button class="mini" onclick="move(${i},1)" title="下移">↓</button>
           <button class="mini danger" onclick="remove('${it.id}')">删除</button>
@@ -245,7 +247,7 @@ function render() {
             <input type="text" value="${esc(it.description)}" data-id="${it.id}" data-k="description" placeholder="鼠标悬停时显示" oninput="onEdit(this)">
           </div>
           <div class="field">
-            <label>权重（越大越靠前）</label>
+            <label>权重（越大越靠前；比现有最大值大就置顶）</label>
             <input type="number" value="${esc(it.weight)}" data-id="${it.id}" data-k="weight" oninput="onEdit(this)">
           </div>
         </div>
@@ -319,8 +321,9 @@ function validateOne(it, el) {
 }
 
 function addItem() {
-  items.push({ id: uid(), nickname: '', url: '', description: '', avatar: '', weight: 0 });
-  renumber();
+  const ws = items.map(x => Number(x.weight) || 0);
+  const w = ws.length ? Math.max(1, Math.min.apply(null, ws) - 5) : 100;
+  items.push({ id: uid(), nickname: '', url: '', description: '', avatar: '', weight: w });
   render();
   const inputs = document.querySelectorAll('input[data-k="nickname"]');
   if (inputs.length) inputs[inputs.length - 1].focus();
@@ -404,17 +407,22 @@ function ystr(s) {
   return '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
 }
 
+function headComment() {
+  return '# 友情链接数据\n# 想加友链：打开 /tools/youlian.html 填一条，点「复制代码」，粘到本文件末尾即可。\n# 字段：nickname（必填）、url（必填）、description、avatar（可省略）、weight（越大越靠前）\n\n';
+}
+
+function itemYaml(it) {
+  let s = `- nickname: ${ystr(it.nickname)}\n  url: ${ystr(it.url)}`;
+  if (it.description) s += `\n  description: ${ystr(it.description)}`;
+  if (it.avatar) s += `\n  avatar: ${ystr(it.avatar)}`;
+  s += `\n  weight: ${Number(it.weight) || 0}`;
+  return s;
+}
+
 function buildYaml() {
   const list = sortedItems();
-  const head = '# 友情链接数据\n# 由「友链管理器」生成。想改内容，打开 /tools/youlian.html 编辑后重新下载即可。\n# 字段：nickname（必填）、url（必填）、description、avatar（可省略）、weight（越大越靠前）\n\n';
-  if (!list.length) return head + '[]\n';
-  return head + list.map(it => {
-    let s = `- nickname: ${ystr(it.nickname)}\n  url: ${ystr(it.url)}`;
-    if (it.description) s += `\n  description: ${ystr(it.description)}`;
-    if (it.avatar) s += `\n  avatar: ${ystr(it.avatar)}`;
-    s += `\n  weight: ${Number(it.weight) || 0}`;
-    return s;
-  }).join('\n\n') + '\n';
+  if (!list.length) return headComment() + '[]\n';
+  return headComment() + list.map(itemYaml).join('\n\n') + '\n';
 }
 
 function renderYaml() {
@@ -430,21 +438,36 @@ function download() {
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  toast('已下载 ' + name + '，放到 data/ 目录');
+  toast('已下载整份 friends.yml');
 }
 
-function copyYaml() {
-  const txt = buildYaml();
-  const done = () => toast('已复制到剪贴板');
+function copyText(txt, okMsg) {
+  const done = () => toast(okMsg || '已复制到剪贴板');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(txt).then(done).catch(fallback);
   } else fallback();
   function fallback() {
     const ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动选择'); }
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动选中代码复制'); }
     ta.remove();
   }
+}
+
+function copyYaml() {
+  copyText(buildYaml(), '已复制整份 friends.yml');
+}
+
+function copyOne(id) {
+  const it = items.find(x => x.id === id);
+  if (!it) return;
+  if (!it.nickname.trim()) { toast('先把名称填上再复制'); return; }
+  if (!/^https?:\/\/.+\..+/.test(it.url.trim())) { toast('网址要带 https:// 才复制'); return; }
+  copyText(itemYaml(it), '已复制，粘到 data/friends.yml 末尾');
 }
 
 /* ---------- 导入 ---------- */
