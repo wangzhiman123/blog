@@ -152,10 +152,149 @@
     list.insertAdjacentElement('afterend', box)
   }
 
+  // ---------------------------------------------------------------------------
+  // 友链页：头像加载失败时换成默认头像
+  // 头像引用的是对方站点的图片，随时可能失效或触发防盗链，不能让它显示成破图。
+  // 不用事件委托（旧内核的 SVG 元素没有 closest），逐个绑定。
+  // ---------------------------------------------------------------------------
+  function initFriendAvatarFallback() {
+    var imgs = document.querySelectorAll('.friend-links img.friend-avatar')
+    if (!imgs.length)
+      return
+
+    var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+      + '<rect width="100" height="100" rx="8" fill="#d8d8d8"/>'
+      + '<circle cx="50" cy="50" r="32" stroke="#8c8c8c" stroke-width="3" fill="none" opacity="0.55"/>'
+      + '<circle cx="38" cy="42" r="3.5" fill="#8c8c8c" opacity="0.7"/>'
+      + '<circle cx="62" cy="42" r="3.5" fill="#8c8c8c" opacity="0.7"/>'
+      + '<path d="M36 58c4 6 24 6 28 0" stroke="#8c8c8c" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round"/>'
+      + '</svg>'
+    )
+
+    function replace(img) {
+      if (img.getAttribute('data-avatar-failed') === '1')
+        return
+      img.setAttribute('data-avatar-failed', '1')
+      img.classList.add('is-fallback')
+      img.removeAttribute('srcset')
+      img.src = fallback
+    }
+
+    for (var i = 0; i < imgs.length; i++) {
+      (function (img) {
+        img.addEventListener('error', function () { replace(img) })
+        // 绑定监听之前就已经失败的，补一次判断
+        if (img.complete && img.naturalWidth === 0)
+          replace(img)
+      })(imgs[i])
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 友链页：搜索框
+  // 按 data-search（站点名称 + 简介，已小写）做包含匹配，空格分隔视为「同时满足」
+  // ---------------------------------------------------------------------------
+  function initFriendSearch() {
+    var input = document.getElementById('friend-search-input')
+    if (!input)
+      return
+
+    var clearBtn = document.getElementById('friend-search-clear')
+    var emptyTip = document.getElementById('friend-empty')
+    var totalNum = document.getElementById('friend-total-num')
+    var groups = document.querySelectorAll('.friend-group')
+    var cards = document.querySelectorAll('.friend-links .friend-link')
+    if (!cards.length)
+      return
+
+    var total = cards.length
+    if (totalNum)
+      totalNum.setAttribute('data-all', String(total))
+
+    function textOf(card) {
+      var t = card.getAttribute('data-search')
+      if (!t) {
+        t = (card.textContent || '').toLowerCase()
+        card.setAttribute('data-search', t)
+      }
+      return t
+    }
+
+    function apply() {
+      var q = input.value.replace(/^\s+|\s+$/g, '').toLowerCase()
+      var words = q ? q.split(/\s+/) : []
+      var shown = 0
+
+      for (var i = 0; i < cards.length; i++) {
+        var card = cards[i]
+        var text = textOf(card)
+        var hit = true
+        for (var j = 0; j < words.length; j++) {
+          if (text.indexOf(words[j]) === -1) {
+            hit = false
+            break
+          }
+        }
+        if (hit) {
+          card.removeAttribute('hidden')
+          shown++
+        }
+        else {
+          card.setAttribute('hidden', '')
+        }
+      }
+
+      // 整组都没命中就收起这个分区，避免留下一排空标题
+      for (var k = 0; k < groups.length; k++) {
+        var members = groups[k].querySelectorAll('.friend-link')
+        var any = false
+        for (var m = 0; m < members.length; m++) {
+          if (!members[m].hasAttribute('hidden')) {
+            any = true
+            break
+          }
+        }
+        if (any)
+          groups[k].removeAttribute('hidden')
+        else
+          groups[k].setAttribute('hidden', '')
+      }
+
+      if (clearBtn)
+        clearBtn.hidden = !q
+      if (emptyTip)
+        emptyTip.hidden = shown !== 0
+      if (totalNum)
+        totalNum.textContent = q ? String(shown) : totalNum.getAttribute('data-all')
+    }
+
+    input.addEventListener('input', apply)
+    input.addEventListener('search', apply)
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && input.value) {
+        input.value = ''
+        apply()
+      }
+    })
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        input.value = ''
+        apply()
+        input.focus()
+      })
+    }
+
+    apply()
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
     initPageJump()
+    initFriendAvatarFallback()
+    initFriendSearch()
   }
 
   if (document.readyState === 'loading')

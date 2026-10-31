@@ -916,3 +916,191 @@ a.cat-group-name:hover {
     font-size: 0.8rem;
   }
 }
+
+// -----------------------------------------------------------------------------
+// 友链页：搜索框、分区标题、头像容错
+// 头像本身是对方站点的外链，这里只管容器形状与「长条 logo 不要被圆形裁掉」
+
+.special.friends {
+  .friend-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.1rem 0 0.4rem;
+  }
+
+  .friend-search {
+    position: relative;
+    display: flex;
+    flex: 1 1 260px;
+    align-items: center;
+    max-width: 460px;
+    height: 2.4rem;
+    padding: 0 0.7rem;
+    background: #faf8f3;
+    background: light-dark(#faf8f3, #252c36);
+    border: 1px solid #d8d3c8;
+    border: 1px solid light-dark(#d8d3c8, #3e4a5a);
+    border-radius: 999px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus-within {
+      border-color: #c2a86f;
+      box-shadow: 0 0 0 3px rgba(194, 168, 111, 0.16);
+    }
+
+    > i {
+      flex: none;
+      font-size: 0.85rem;
+      color: #8b949e;
+      color: light-dark(#8b949e, #7d8590);
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      padding: 0 0.45rem;
+      font-size: 0.9rem;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      outline: none;
+
+      // 自带的叉号与自定义清空按钮重复，藏掉
+      &::-webkit-search-cancel-button {
+        display: none;
+      }
+    }
+  }
+
+  .friend-search-clear {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    font-size: 0.75rem;
+    line-height: 1;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+
+    &:hover {
+      color: #586069;
+      color: light-dark(#586069, #b0b8c4);
+      background: rgba(140, 140, 140, 0.15);
+    }
+  }
+
+  .friend-total {
+    font-size: 0.82rem;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+
+    b {
+      font-weight: 600;
+      color: #586069;
+      color: light-dark(#586069, #b0b8c4);
+    }
+  }
+
+  .friend-empty {
+    margin: 0.6rem 0 1rem;
+    font-size: 0.88rem;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+  }
+
+  .friend-group {
+    margin-top: 1.6rem;
+    scroll-margin-top: 5rem;
+
+    &:first-of-type {
+      margin-top: 1rem;
+    }
+  }
+
+  .friend-group-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0 0 0.85rem;
+    padding: 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+    border: 0;
+  }
+
+  .friend-group-name {
+    position: relative;
+    padding-left: 0.6rem;
+
+    &::before {
+      position: absolute;
+      top: 0.15em;
+      bottom: 0.15em;
+      left: 0;
+      width: 3px;
+      content: "";
+      background: #c2a86f;
+      border-radius: 2px;
+    }
+  }
+
+  .friend-group-count {
+    padding: 0 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+    background: rgba(140, 140, 140, 0.14);
+    border-radius: 999px;
+  }
+
+  .friend-group-desc {
+    flex: 1 1 100%;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #8b949e;
+    color: light-dark(#8b949e, #7d8590);
+  }
+
+  // 横向长条 logo：完整显示，别被圆形裁掉半截
+  .friend-links[data-scheme] > .friend-link img.friend-avatar--contain {
+    padding: 7px;
+    object-fit: contain;
+    background: rgba(140, 140, 140, 0.12);
+  }
+}
+
+// 搜索过滤时用 hidden 属性隐藏卡片 / 分区
+// 主题给 .friend-link 设了 display: flex，会盖过浏览器默认的 [hidden]，必须提权
+.friend-links .friend-link[hidden],
+.special.friends .friend-group[hidden],
+.special.friends .friend-empty[hidden] {
+  display: none !important;
+}
+
+// 手机端：搜索框占满一行，分区标题小一号
+@media (max-width: 768px) {
+  .special.friends {
+    .friend-search {
+      flex: 1 1 100%;
+      max-width: none;
+    }
+
+    .friend-group-title {
+      font-size: 0.95rem;
+    }
+
+    .friend-group {
+      margin-top: 1.3rem;
+    }
+  }
+}

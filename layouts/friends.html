@@ -1,0 +1,102 @@
+{{- /*
+  友链页（项目级覆盖主题 layouts/friends.html）
+
+  相比主题原版增加了三处：
+    1. 顶部搜索框 —— 按站点名称 / 简介实时过滤，多个关键词用空格分隔
+    2. 分区展示   —— 读 data/friends.yml 的 group 字段，按 friend_groups 定义的顺序分组
+    3. 头像容错   —— 头像直接引用对方外链，不用 referrer 防盗链；加载失败时自动换成默认头像
+
+  @feature Front matter params:
+    - friend_scheme {String} - 卡片样式: "mahjong" | "domino"（默认） | "note"
+    - friend_sort {String}   - 排序字段: "weight"（默认，降序）
+    - friend_groups {Array}  - 分组定义 [{ key, name, desc }]，顺序即展示顺序
+    - friend_link_check {Boolean} - 构建期死链检测（仅开发模式）
+    - link.guard.enable {Boolean} - 外部链接跳转确认
+*/ -}}
+
+{{- define "title" -}}
+  {{- cond (.Param "capitalize_titles") (title .Title) .Title -}}
+  {{- if .Site.Params.with_site_title }} {{ .Site.Params.site_title_delimiter | default "-" }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  {{- $isGuarded := .Params.link.guard.enable | default false -}}
+  {{- $scheme := .Params.friend_scheme | default "mahjong" -}}
+  {{- $linkCheck := .Params.friend_link_check | default false -}}
+  {{- $groups := .Params.friend_groups | default slice -}}
+
+  {{- /* 读取友链：friends.<lang>.yml > friends.yml */ -}}
+  {{- $friends := index hugo.Data (printf "friends.%v" .Language) | default hugo.Data.friends | default slice -}}
+  {{- $friends = sort $friends "weight" "desc" -}}
+
+  {{- /* 无头像时的默认头像（与主题一致的笑脸） */ -}}
+  {{- $placeholder := `<svg class="friend-avatar" aria-hidden="true" fill="currentColor" viewBox="0 0 100 100"><rect width="100" height="100" rx="8" fill="currentColor" opacity="0.08"/><circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/><circle cx="38" cy="42" r="3" opacity="0.5"/><circle cx="62" cy="42" r="3" opacity="0.5"/><path d="M36 58c4 6 24 6 28 0" stroke="currentColor" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/></svg>` -}}
+
+  <article class="page single special friends">
+    <div class="page-header">
+      <h1 class="single-title animate__animated animate__pulse animate__faster">{{- cond (.Param "capitalize_titles") (title .Title) .Title -}}</h1>
+      {{- with .Params.subtitle -}}<p class="single-subtitle animate__animated animate__fadeIn">{{ . | $.RenderString }}</p>{{- end -}}
+    </div>
+
+    {{- if $friends -}}
+      <div class="friend-toolbar">
+        <label class="friend-search" for="friend-search-input">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input id="friend-search-input" type="search" placeholder="搜索站点名称或简介，空格分隔多个关键词" autocomplete="off" spellcheck="false" aria-label="搜索友链">
+          <button class="friend-search-clear" type="button" id="friend-search-clear" aria-label="清空搜索" hidden><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </label>
+        <span class="friend-total">共 <b id="friend-total-num">{{ len $friends }}</b> 个站点</span>
+      </div>
+      <p class="friend-empty" id="friend-empty" hidden>没有匹配的站点，换个关键词试试，或直接 <a href="#%E7%94%B3%E8%AF%B7%E5%8F%8B%E9%93%BE">申请友链</a>。</p>
+
+      {{- $groupKeys := slice -}}
+      {{- range $groups -}}{{- $groupKeys = $groupKeys | append .key -}}{{- end -}}
+
+      {{- range $groups -}}
+        {{- $key := .key -}}
+        {{- $list := where $friends "group" $key -}}
+        {{- if $list -}}
+          {{- $gid := printf "group-%s" $key -}}
+          <section class="friend-group" id="{{ $gid }}" data-group="{{ $key }}">
+            <h2 class="friend-group-title">
+              <span class="friend-group-name">{{ .name | default $key }}</span>
+              <span class="friend-group-count">{{ len $list }}</span>
+              {{- with .desc -}}<span class="friend-group-desc">{{ . }}</span>{{- end -}}
+            </h2>
+            <div class="friend-links" data-scheme="{{ $scheme }}">
+              {{- range $friend := $list -}}
+                {{- partial "custom/friend-card.html" (dict "friend" $friend "scheme" $scheme "placeholder" $placeholder "isGuarded" $isGuarded "linkCheck" $linkCheck) -}}
+              {{- end -}}
+            </div>
+          </section>
+        {{- end -}}
+      {{- end -}}
+
+      {{- /* 未归类的条目，兜底展示，避免加了数据却不显示 */ -}}
+      {{- $rest := $friends -}}
+      {{- with $groupKeys -}}{{- $rest = where $friends "group" "not in" . -}}{{- end -}}
+      {{- with $rest -}}
+        <section class="friend-group" id="group-others" data-group="others">
+          <h2 class="friend-group-title">
+            <span class="friend-group-name">其他站点</span>
+            <span class="friend-group-count">{{ len . }}</span>
+          </h2>
+          <div class="friend-links" data-scheme="{{ $scheme }}">
+            {{- range $friend := . -}}
+              {{- partial "custom/friend-card.html" (dict "friend" $friend "scheme" $scheme "placeholder" $placeholder "isGuarded" $isGuarded "linkCheck" $linkCheck) -}}
+            {{- end -}}
+          </div>
+        </section>
+      {{- end -}}
+    {{- end -}}
+
+    {{- /* 正文：友链说明 + 申请模板 */ -}}
+    <div class="content friend-content" id="content">
+      {{- dict "Content" .Content "Ruby" (.Param "ruby") "Fraction" (.Param "fraction") "Fontawesome" (.Param "fontawesome") | partial "function/content.html" | safeHTML -}}
+    </div>
+  </article>
+{{- end -}}
+
+{{- define "comments" -}}
+  {{- partial "base/comment.html" . -}}
+{{- end -}}

@@ -1,0 +1,81 @@
+{{- /*
+  单张友链卡片
+
+  头像策略：直接引用对方站点图片（外链），不落地到仓库。
+    - referrerpolicy="no-referrer"：绕过一部分站点的防盗链
+    - 加载失败由 custom.js 的 initFriendAvatarFallback() 换成默认头像
+    - avatar_fit: contain 用于横向长条 logo，避免圆形裁切后只剩一截
+
+  @param {Map}    .friend      单条友链数据（nickname / url / description / avatar / avatar_fit）
+  @param {String} .scheme      卡片样式 mahjong | domino | note
+  @param {String} .placeholder 无头像时使用的内联 SVG
+  @param {Boolean} .isGuarded  外链跳转确认
+  @param {Boolean} .linkCheck  构建期死链检测（仅开发模式生效）
+*/ -}}
+
+{{- $friend := .friend -}}
+{{- $scheme := .scheme -}}
+{{- $isGuarded := .isGuarded -}}
+
+{{- /* 头像 */ -}}
+{{- $avatar := "" -}}
+{{- if $friend.avatar -}}
+  {{- $class := "friend-avatar" -}}
+  {{- if eq ($friend.avatar_fit | default "cover") "contain" -}}
+    {{- $class = "friend-avatar friend-avatar--contain" -}}
+  {{- end -}}
+  {{- $avatar = printf `<img class="%s" src="%s" alt="%s" loading="lazy" decoding="async" referrerpolicy="no-referrer">` $class (htmlEscape $friend.avatar) (htmlEscape $friend.nickname) -}}
+{{- else -}}
+  {{- $avatar = .placeholder -}}
+{{- end -}}
+
+{{- /* 名称 */ -}}
+{{- $nickname := printf `<span class="friend-nickname" title="%s">%s</span>` (htmlEscape $friend.nickname) (htmlEscape $friend.nickname) -}}
+
+{{- /* 简介：mahjong 用 title 提示，其余样式直接显示一行 */ -}}
+{{- $description := "" -}}
+{{- with $friend.description -}}
+  {{- if ne $scheme "mahjong" -}}
+    {{- $description = printf `<p class="friend-description">%s</p>` (htmlEscape .) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 卡片内容 */ -}}
+{{- $content := "" -}}
+{{- if eq $scheme "domino" -}}
+  {{- $content = printf `%s<span class="friend-info">%s%s</span>` $avatar $nickname $description -}}
+{{- else if eq $scheme "note" -}}
+  {{- $content = printf `%s%s` $nickname $description -}}
+{{- else -}}
+  {{- $content = printf `%s%s` $avatar $nickname -}}
+{{- end -}}
+
+{{- /* 搜索用的检索文本：名称 + 简介，统一小写 */ -}}
+{{- $search := lower (printf "%s %s" $friend.nickname ($friend.description | default "")) -}}
+
+{{- /* 死链检测（仅开发模式） */ -}}
+{{- $isBroken := false -}}
+{{- $linkStatus := "ok" -}}
+{{- if and hugo.IsDevelopment .linkCheck -}}
+  {{- with $friend.url -}}{{- $linkStatus = partial "function/check-link.html" (dict "url" .) -}}{{- end -}}
+{{- end -}}
+{{- $isBroken = eq $linkStatus "broken" -}}
+
+{{- $class := "friend-link" -}}
+{{- if $isBroken -}}{{- $class = printf "%s friend-link--broken" $class -}}{{- end -}}
+
+{{- $attr := printf `data-search="%s"` (htmlEscape $search) -}}
+{{- if $isBroken -}}
+  {{- $attr = printf `%s data-expired-label="%s"` $attr (T "friends.expired") -}}
+{{- end -}}
+
+{{- $options := dict
+  "Destination" $friend.url
+  "Title" $friend.description
+  "Content" $content
+  "Class" $class
+  "ExternalIcon" false
+  "IsGuarded" $isGuarded
+  "Attr" $attr
+-}}
+{{- partial "plugin/link.html" $options -}}

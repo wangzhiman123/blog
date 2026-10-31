@@ -1,23 +1,176 @@
 # 友情链接数据
-# 字段：nickname（必填）、url（必填）、description（悬停提示/副标题）、avatar（可省略，省略时显示占位图标）、weight（越大越靠前）
-# 想加友链就在这里加一条，重新构建即可，不需要改模板。
+#
+# 字段说明：
+#   nickname     必填，站点名称
+#   url          必填，站点地址
+#   description  一句话简介，鼠标悬停提示，也会被搜索框检索
+#   avatar       头像地址。**直接写对方的图片链接即可，不要把图片存进仓库**；
+#                留空则显示默认的灰色头像（对方换头像、防盗链都不会影响站点）
+#   avatar_fit   头像填充方式：cover（默认，裁切填满）/ contain（完整显示，适合横向长条 logo）
+#   group        分组，取值见 content/friends/index.md 里的 friend_groups
+#   weight       排序权重，越大越靠前（只在同一分组内比较）
+#
+# 新增一条：复制下面任意一组，改内容即可，不用动模板。
 
+# ============ 官方检索 ============
 - nickname: 中国裁判文书网
   url: https://wenshu.court.gov.cn
-  description: 全国法院裁判文书公开平台，检索类案的第一站
+  description: 人民法院出版社主办，查询全国法院生效裁判文书的官方平台
+  avatar: ""
+  group: official
   weight: 100
 
 - nickname: 国家法律法规数据库
   url: https://flk.npc.gov.cn
-  description: 法律、行政法规、司法解释原文查询
+  description: 全国人大常务委员会办公厅主办，法律、行政法规、司法解释权威文本
+  avatar: https://flk.npc.gov.cn/favicon.ico
+  group: official
+  weight: 95
+
+- nickname: 人民法院在线服务网
+  url: https://zxfw.court.gov.cn
+  description: 最高人民法院电子诉讼平台，集成调解、立案、阅卷、送达、保全、鉴定
+  avatar: https://zxfw.court.gov.cn/favicon.ico
+  group: official
   weight: 90
+
+# ============ 常用工具 ============
+- nickname: GitHub
+  url: https://github.com
+  description: 全球最大的代码托管平台，也是本站源码的存放处
+  avatar: https://github.com/favicon.ico
+  group: tools
+  weight: 85
 
 - nickname: Hugo
   url: https://gohugo.io
   description: 本站使用的静态站点生成器
-  weight: 60
+  avatar: ""
+  group: tools
+  weight: 80
 
 - nickname: FixIt
   url: https://fixit.lruihao.cn
   description: 本站主题的中文文档与配置参考
-  weight: 50
+  avatar: ""
+  group: tools
+  weight: 75
+
+# ============ 博友 ============
+- nickname: 买四个萝卜
+  url: https://blog.msglbo.cn
+  description: 只有坏掉的东西才会停下来
+  avatar: https://q1.qlogo.cn/g?b=qq&nk=24130801&s=100
+  group: blogs
+  weight: 70
+
+- nickname: 敲代码的卡卡罗特
+  url: https://blog.share888.top
+  description: 灵魂和身体都要在路上
+  avatar: https://blog.share888.top/favicon.ico
+  group: blogs
+  weight: 68
+
+- nickname: Somoe Home
+  url: https://somoe.xyz
+  description: 在文字的深海里，拾贝而行
+  avatar: https://somoe.xyz/qiumonster.webp
+  group: blogs
+  weight: 66
+
+- nickname: Exyone's Blog
+  url: https://exyon.ee
+  description: 莫道蓬门小，清幽胜琼楼。一隅藏天地，流水遇知音。
+  avatar: ""
+  group: blogs
+  weight: 64
+
+- nickname: SaraKale's blog
+  url: https://sarakale.top/blog
+  description: 兴趣广泛，涉足于游戏 / 动漫 / 设计 / 音乐等，常在二次元流浪
+  avatar: https://npm.elemecdn.com/sarakale-assets@v1/sarakale.jpg
+  group: blogs
+  weight: 62
+
+- nickname: 个人成长计划
+  url: https://blog.el9.cn/
+  description: 上药三品，神与气精。
+  avatar: ""
+  group: blogs
+  weight: 60
+
+- nickname: 爱情在线
+  url: https://aqzx.com
+  description: 一个记录日常的数字回忆录 · 始于 2000
+  avatar: https://aqzx.com/img/index_bg.jpg
+  group: blogs
+  weight: 58
+
+- nickname: 记录生活，精彩一刻
+  url: https://9sb.net
+  description: 资源 · 共享 · 生活 · 学习
+  avatar: https://9sb.net/logo.svg
+  group: blogs
+  weight: 56
+
+- nickname: 傥师妹 TangShiMei 的小空间
+  url: https://blog.224418.xyz/
+  description: 想和你重新认识一次，从你叫什么开始
+  avatar: https://blog.224418.xyz/img/favicon/avatar.png
+  group: blogs
+  weight: 54
+
+- nickname: 若梦博客
+  url: https://www.rmbk.cc/
+  description: 聚合优质博客
+  avatar: https://www.rmbk.cc/static/images/logo.png
+  avatar_fit: contain
+  group: blogs
+  weight: 52
+
+# ============ 博客圈 ============
+- nickname: BlogFinder
+  url: https://bf.zzxworld.com
+  description: 发现优秀的个人博客
+  avatar: https://bf.zzxworld.com/images/logo-v2.png
+  avatar_fit: contain
+  group: circles
+  weight: 45
+
+- nickname: 博客集
+  url: https://bloginc.cn/
+  description: 致力于收集优秀的中文独立博客
+  avatar: https://bloginc.cn/favicon.ico
+  group: circles
+  weight: 43
+
+- nickname: BlogsClub
+  url: https://www.blogsclub.org/
+  description: 博客俱乐部
+  avatar: https://www.blogsclub.org/usr/themes/default/assets/images/blogsclub_web.svg
+  avatar_fit: contain
+  group: circles
+  weight: 41
+
+- nickname: 博客星球
+  url: https://www.blogplanet.cn/
+  description: 每一个博客都是一个独立星球！
+  avatar: https://www.blogplanet.cn/img/bkxq.png
+  group: circles
+  weight: 39
+
+- nickname: 博友圈
+  url: https://www.boyouquan.com/
+  description: 博客人的朋友圈
+  avatar: https://www.boyouquan.com/assets/images/sites/logo/logo-blue.svg
+  avatar_fit: contain
+  group: circles
+  weight: 37
+
+- nickname: 开往 · 友链接力
+  url: https://www.travellings.cn/
+  description: 让传统友链活跃起来，让网页相互接力，让流量相互流动
+  avatar: https://www.travellings.cn/assets/dark.png
+  avatar_fit: contain
+  group: circles
+  weight: 35
