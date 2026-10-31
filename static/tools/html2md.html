@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML 转 Markdown · 王志满律师</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #656d76;
+    --line: #d8dee4;
+    --brand: #1a7f5a;
+    --brand-weak: #e8f5ef;
+    --warn: #9a6700;
+    --warn-bg: #fff8e5;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c;
+      --card: #1f2228;
+      --text: #e6edf3;
+      --muted: #9aa4b2;
+      --line: #30363d;
+      --brand: #3fb950;
+      --brand-weak: #132a1e;
+      --warn: #d29922;
+      --warn-bg: #2b2413;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.7 -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  header { margin-bottom: 18px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 960px) { .cols { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 span.num {
+    display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brand-weak); color: var(--brand);
+    font-size: 12px; align-items: center; justify-content: center; font-weight: 700;
+  }
+  textarea {
+    width: 100%; padding: 10px 12px; font: inherit;
+    font: 13px/1.6 ui-monospace, Consolas, "Courier New", monospace;
+    color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px;
+    resize: vertical; min-height: 340px;
+  }
+  textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  textarea.dragover { border-color: var(--brand); background: var(--brand-weak); }
+  .opts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; }
+  .opt { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .opt input { width: 15px; height: 15px; }
+  .base { margin-top: 12px; }
+  .base label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .base .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+  input[type=url] {
+    width: 100%; padding: 8px 10px; font: inherit; font-size: 13px;
+    color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 7px;
+  }
+  input[type=url]:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  button {
+    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  button.primary:hover { filter: brightness(1.08); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  pre.out {
+    margin: 0; padding: 12px; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; font: 12.5px/1.65 ui-monospace, Consolas, "Courier New", monospace;
+    white-space: pre-wrap; word-break: break-word; max-height: 460px; overflow: auto;
+    min-height: 340px;
+  }
+  pre.out:empty::before { content: "还没有内容"; color: var(--muted); }
+  /* 源码 / 预览 切换 */
+  .out-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .out-head h2 { margin: 0; }
+  .out-head .grow { flex: 1; }
+  button.btn-sm { padding: 6px 16px; font-size: 13px; }
+
+  .tabs { display: flex; gap: 2px; }
+  .tabs button {
+    padding: 5px 12px; font-size: 13px; color: var(--muted);
+    background: transparent; border: 0; border-radius: 6px; cursor: pointer;
+  }
+  .tabs button:hover { color: var(--text); }
+  .tabs button.active { color: #fff; font-weight: 600; background: var(--brand); }
+
+  .preview {
+    padding: 14px 16px; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; min-height: 360px; max-height: 480px; overflow: auto;
+    font-size: 14px; line-height: 1.78; word-break: break-word;
+  }
+
+  /* 空状态：一张纸的图标 + 一行说明 */
+  .preview .empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; min-height: 330px; color: var(--muted); font-size: 13.5px;
+  }
+  .preview .empty svg { width: 40px; height: 40px; opacity: .45; }
+  .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
+    margin: 1.1em 0 .5em; line-height: 1.4; font-weight: 600;
+  }
+  .preview h1:first-child, .preview h2:first-child, .preview p:first-child { margin-top: 0; }
+  .preview h1 { font-size: 1.5em; padding-bottom: .25em; border-bottom: 1px solid var(--line); }
+  .preview h2 { font-size: 1.3em; }
+  .preview h3 { font-size: 1.12em; }
+  .preview h4, .preview h5, .preview h6 { font-size: 1em; }
+  .preview p { margin: .75em 0; }
+  .preview ul, .preview ol { margin: .7em 0; padding-left: 1.6em; }
+  .preview li { margin: .25em 0; }
+  .preview li > ul, .preview li > ol { margin: .25em 0; }
+  .preview blockquote {
+    margin: .9em 0; padding: .1em 0 .1em 1em;
+    border-left: 3px solid var(--line); color: var(--muted);
+  }
+  .preview code {
+    padding: .1em .4em; font-size: .9em; font-family: ui-monospace, Consolas, "Courier New", monospace;
+    background: rgba(127, 127, 127, .16); border-radius: 4px;
+  }
+  .preview pre {
+    margin: .8em 0; padding: 10px 12px; overflow: auto;
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .preview pre code { padding: 0; background: none; font-size: 12.5px; line-height: 1.65; }
+  .preview table { border-collapse: collapse; width: 100%; margin: .9em 0; font-size: .94em; }
+  .preview th, .preview td { border: 1px solid var(--line); padding: 6px 9px; }
+  .preview th { background: rgba(127, 127, 127, .1); font-weight: 600; }
+  .preview img { max-width: 100%; border-radius: 6px; }
+  .preview hr { margin: 1.3em 0; border: 0; border-top: 1px solid var(--line); }
+  .preview a { color: var(--brand); }
+  .preview del { color: var(--muted); }
+  .preview mark { padding: 0 .15em; background: var(--brand-weak); color: inherit; border-radius: 3px; }
+
+  .preview[hidden], pre.out[hidden] { display: none !important; }
+  .msg { font-size: 13px; margin-top: 10px; min-height: 20px; }
+  .msg.ok { color: var(--brand); }
+  .msg.bad { color: #cf222e; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .tips { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-top: 12px; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+  .doc { font-size: 13.5px; }
+  .doc table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin: 8px 0 4px; }
+  .doc th, .doc td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .doc th { background: var(--bg); font-weight: 600; }
+  .doc code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .doc h3 { font-size: 14px; margin: 16px 0 6px; }
+  .doc ul { margin: 6px 0; padding-left: 20px; }
+  .doc li { margin: 2px 0; }
+  footer.tools { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+  footer.tools a { color: var(--brand); text-decoration: none; }
+  footer.tools a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>HTML 转 Markdown</h1>
+    <div class="sub">把网页、Word、公众号里复制的内容贴进来，右边立刻变成 Markdown，一键复制。不联网、不安装，双击就能用。</div>
+  </header>
+
+  <div class="cols">
+    <!-- 左：HTML 输入 -->
+    <div>
+      <div class="card">
+        <h2><span class="num">1</span>HTML 输入</h2>
+        <textarea id="input" spellcheck="false" placeholder="在这里粘贴 HTML 代码，或直接把 .html 文件拖进来。
+
+也可以从浏览器里选中一段网页内容复制过来——带格式的那种，工具会自动取其中的 HTML。"></textarea>
+
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="optHardBreak" checked>换行转硬换行</label>
+          <label class="opt"><input type="checkbox" id="optImage" checked>保留图片</label>
+          <label class="opt"><input type="checkbox" id="optTable" checked>表格转 GFM</label>
+          <label class="opt"><input type="checkbox" id="optMerge" checked>合并多余空行</label>
+          <label class="opt"><input type="checkbox" id="optChrome">去掉导航页脚</label>
+          <label class="opt"><input type="checkbox" id="optShift">标题降一级</label>
+        </div>
+
+        <div class="base">
+          <label>原始网址 <span class="hint">可选。填了就把它拼到相对链接 / 图片前面</span></label>
+          <input type="url" id="baseUrl" placeholder="https://example.com/article/123">
+        </div>
+
+        <div class="btns">
+          <button id="btnFile">选择 HTML 文件</button>
+          <button id="btnSample">载入示例</button>
+          <button id="btnClear">清空</button>
+        </div>
+        <input type="file" id="file" accept=".html,.htm,.xhtml,text/html" style="display:none">
+        <div class="meta"><span id="inStat">0 字符</span></div>
+      </div>
+    </div>
+
+    <!-- 右：Markdown 输出 -->
+    <div>
+      <div class="card">
+        <div class="out-head">
+          <h2><span class="num">2</span>Markdown 输出</h2>
+          <div class="tabs" id="tabs">
+            <button type="button" class="active" data-view="preview">预览</button>
+            <button type="button" data-view="source">源码</button>
+          </div>
+          <span class="grow"></span>
+          <button class="primary btn-sm" id="btnCopy">复制</button>
+        </div>
+
+        <div class="preview" id="preview"></div>
+        <pre class="out" id="output" hidden></pre>
+
+        <div class="btns">
+          <button id="btnDownload">下载 .md</button>
+          <button id="btnSelectAll">全选结果</button>
+        </div>
+        <div class="msg" id="msg"></div>
+        <div class="meta"><span id="outStat">0 字符</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card doc">
+    <h3>能转什么</h3>
+    <table>
+      <tr><th>HTML</th><th>结果</th></tr>
+      <tr><td><code>h1</code> ~ <code>h6</code></td><td><code>#</code> ~ <code>######</code>，勾「标题降一级」时整体下移</td></tr>
+      <tr><td><code>strong</code> / <code>b</code>、<code>em</code> / <code>i</code>、<code>del</code> / <code>s</code></td><td><code>**粗**</code>、<code>*斜*</code>、<code>~~删~~</code></td></tr>
+      <tr><td><code>code</code>、<code>pre</code></td><td>行内反引号；代码块自动识别 <code>language-xxx</code> 类名</td></tr>
+      <tr><td><code>a</code>、<code>img</code></td><td><code>[文字](链接)</code>、<code>![说明](图片)</code></td></tr>
+      <tr><td><code>ul</code> / <code>ol</code> 嵌套</td><td>逐级缩进，有序列表保留 <code>start</code> 起始序号</td></tr>
+      <tr><td><code>blockquote</code></td><td><code>&gt;</code> 引用，嵌套多层也对</td></tr>
+      <tr><td><code>table</code></td><td>GFM 表格，<code>align</code> 转成 <code>:---:</code> 对齐</td></tr>
+      <tr><td><code>hr</code>、<code>dl</code>、<code>figure</code></td><td><code>---</code>、定义列表、图注</td></tr>
+    </table>
+
+    <h3>故意不转的</h3>
+    <ul>
+      <li><code>script</code>、<code>style</code>、<code>iframe</code>、<code>svg</code>、表单控件——直接丢弃，免得把脚本带进文章；</li>
+      <li>内联的 <code>style</code>、<code>class</code>、<code>id</code>——Markdown 里没有对应写法，留着只会变噪音；</li>
+      <li><code>data:</code> 开头的 base64 图片——转出来是一长串乱码，不如删掉；</li>
+      <li><code>javascript:</code> 伪链接——只保留文字。</li>
+    </ul>
+
+    <h3>转完记得看一眼</h3>
+    <ul>
+      <li>合并单元格（<code>colspan</code> / <code>rowspan</code>）Markdown 表达不了，会按第一列对齐，需要手工补；</li>
+      <li>Word 复制过来的内容常带一堆无意义嵌套，转完把多余空行删一删更清爽；</li>
+      <li>图片若是对方站点的临时地址，发布前记得换成本地图片，否则过一阵会失效。</li>
+    </ul>
+
+    <p class="hint" id="howto"></p>
+  </div>
+
+  <footer class="tools">
+    其他工具：<a href="/tools/xiezuo.html">写作助手</a> · <a href="/tools/youlian.html">友链生成器</a> · <a href="/friends/">友情链接</a>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================================
+   HTML → Markdown
+   纯浏览器端实现，不依赖任何库，离线可用。
+   解析用 DOMParser（拿到的文档是惰性的，脚本不会执行）。
+   ========================================================================== */
+
+var SKIP_TAGS = {
+  SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEMPLATE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1,
+  SVG: 1, CANVAS: 1, VIDEO: 1, AUDIO: 1, MAP: 1, AREA: 1,
+  FORM: 1, INPUT: 1, BUTTON: 1, SELECT: 1, OPTION: 1, TEXTAREA: 1, LABEL: 1,
+  LINK: 1, META: 1, HEAD: 1, TITLE: 1
+};
+
+var CHROME_TAGS = { NAV: 1, HEADER: 1, FOOTER: 1, ASIDE: 1 };
+
+var BLOCK_TAGS = {
+  ADDRESS: 1, ARTICLE: 1, ASIDE: 1, BLOCKQUOTE: 1, BODY: 1, CENTER: 1,
+  DETAILS: 1, DIALOG: 1, DIR: 1, DIV: 1, DL: 1, FIELDSET: 1, FIGCAPTION: 1,
+  FIGURE: 1, FOOTER: 1, FORM: 1, H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1,
+  HEADER: 1, HGROUP: 1, HR: 1, LI: 1, MAIN: 1, NAV: 1, OL: 1, P: 1, PRE: 1,
+  SECTION: 1, SUMMARY: 1, TABLE: 1, UL: 1
+};
+
+var HEADINGS = { H1: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6 };
+
+/* <br> 的占位符。收尾时统一换成「两个空格 + 换行」。
+   不能在这里直接写 "  \n"——行尾空白会被后面「去掉多余空白」那一步吃掉，
+   硬换行就白转了。 */
+var BR_MARK = "\u0001";
+
+function defaultOptions() {
+  return {
+    hardBreak: true,
+    image: true,
+    table: true,
+    mergeBlank: true,
+    dropChrome: false,
+    shiftHeading: 0,
+    baseUrl: ""
+  };
+}
+
+/* ---------- 文本转义 ---------- */
+/* 先把源码里的换行、制表符折成空格（HTML 本身就是这么渲染的），
+   再转义 Markdown 有特殊含义的字符。硬换行由 <br> 单独处理，不受影响。 */
+function escapeText(str) {
+  return String(str)
+    .replace(/\u00a0/g, " ")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\\/g, "\\\\")
+    .replace(/([*_`\[\]])/g, "\\$1")
+    // 长得像标签的尖括号要转义，否则某些渲染器会把 <div> 之类当成 HTML 吞掉
+    .replace(/<(?=[a-zA-Z\/!?])/g, "\\<");
+}
+
+/* 把强调标记包在文字上，保留两侧空白，避免出现 "** 粗 **" */
+function wrap(inner, mark) {
+  var m = String(inner).match(/^(\s*)([\s\S]*?)(\s*)$/);
+  if (!m || !m[2]) return inner;
+  if (!/\S/.test(m[2])) return inner;
+  return m[1] + mark + m[2] + mark + m[3];
+}
+
+/* 中文之间不应该有空格。
+   网页源码里为了折行加的换行，转过来会变成「， 法院」这种多余空格，
+   这里把「中文字符 + 空白 + 中文字符」中间的空白去掉。
+   <br> 的占位符 \u0001 不是空白字符，不会被误删。 */
+var CJK = "\\u4e00-\\u9fa5\\u3400-\\u4dbf\\u3040-\\u30ff\\u3001-\\u303f\\uff01-\\uff60";
+var CJK_GAP = new RegExp("([" + CJK + "])[ \\t\\n]+(?=[" + CJK + "])", "g");
+
+function collapseCJK(str) {
+  return String(str).replace(CJK_GAP, "$1");
+}
+
+/* ---------- 链接 / 图片地址 ---------- */
+function resolveUrl(raw, baseUrl) {
+  var url = String(raw || "").trim();
+  if (!url) return "";
+  if (/^data:/i.test(url)) return "";
+  if (/^javascript:/i.test(url)) return "";
+  if (!baseUrl) return url;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(url)) return url;   // 已有协议
+  if (url.indexOf("//") === 0) return "https:" + url;
+  try {
+    return new URL(url, baseUrl).href;
+  } catch (e) {
+    return url;
+  }
+}
+
+function encodeLink(url) {
+  return String(url).replace(/ /g, "%20").replace(/\(/g, "%28").replace(/\)/g, "%29");
+}
+
+/* ---------- 行内元素 ---------- */
+function renderInline(node, opts) {
+  if (!node.nodeType) return "";
+  if (node.nodeType === 3) return escapeText(node.nodeValue);
+  if (node.nodeType !== 1) return "";
+
+  var tag = node.tagName;
+  if (SKIP_TAGS[tag]) return "";
+  if (opts.dropChrome && CHROME_TAGS[tag]) return "";
+
+  if (tag === "BR") return opts.hardBreak ? BR_MARK : "\n";
+  if (tag === "IMG") return renderImage(node, opts);
+  if (tag === "HR") return " ";
+
+  if (tag === "CODE" || tag === "KBD" || tag === "SAMP") {
+    var code = String(node.textContent || "").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
+    if (!code) return "";
+    var ticks = "`";
+    while (code.indexOf(ticks) !== -1) ticks += "`";
+    var pad = (code.charAt(0) === "`" || code.charAt(code.length - 1) === "`") ? " " : "";
+    return ticks + pad + code + pad + ticks;
+  }
+
+  // 其余元素先递归取内容
+  var inner = "";
+  var kids = node.childNodes;
+  for (var i = 0; i < kids.length; i++) inner += renderInline(kids[i], opts);
+
+  switch (tag) {
+    case "STRONG": case "B": return wrap(inner, "**");
+    case "EM": case "I": case "CITE": return wrap(inner, "*");
+    case "DEL": case "S": case "STRIKE": return wrap(inner, "~~");
+    case "MARK": return wrap(inner, "==");
+    case "A": return renderLink(node, inner, opts);
+    case "SUP": return inner ? "<sup>" + inner + "</sup>" : "";
+    case "SUB": return inner ? "<sub>" + inner + "</sub>" : "";
+    default: return inner;
+  }
+}
+
+function renderLink(node, inner, opts) {
+  var href = resolveUrl(node.getAttribute("href"), opts.baseUrl);
+  var text = inner.replace(/^\s+|\s+$/g, "");
+  if (!href) return inner;
+  if (!text) text = href;
+  var title = node.getAttribute("title");
+  var tail = title ? ' "' + String(title).replace(/"/g, '\\"') + '"' : "";
+  return "[" + text + "](" + encodeLink(href) + tail + ")";
+}
+
+function renderImage(node, opts) {
+  if (!opts.image) return "";
+  var src = resolveUrl(node.getAttribute("src") || node.getAttribute("data-src"), opts.baseUrl);
+  if (!src) return "";
+  var alt = String(node.getAttribute("alt") || "").replace(/[[\]]/g, "").replace(/\s+/g, " ");
+  var title = node.getAttribute("title");
+  var tail = title ? ' "' + String(title).replace(/"/g, '\\"') + '"' : "";
+  return "![" + alt + "](" + encodeLink(src) + tail + ")";
+}
+
+/* ---------- 块级 ---------- */
+function renderBlocks(parent, opts, depth) {
+  var out = [];
+  var buf = "";
+
+  function flush() {
+    var t = collapseCJK(buf.replace(/[ \t]{2,}/g, " ").replace(/^\s+|\s+$/g, ""));
+    if (t) out.push(t);
+    buf = "";
+  }
+
+  var kids = parent.childNodes;
+  for (var i = 0; i < kids.length; i++) {
+    var n = kids[i];
+    if (n.nodeType === 3) { buf += escapeText(n.nodeValue); continue; }
+    if (n.nodeType !== 1) continue;
+    var tag = n.tagName;
+    if (SKIP_TAGS[tag]) continue;
+    if (opts.dropChrome && CHROME_TAGS[tag]) continue;
+
+    if (BLOCK_TAGS[tag]) {
+      flush();
+      var block = renderBlock(n, opts, depth);
+      if (block && /\S/.test(block)) out.push(block.replace(/\s+$/, ""));
+    } else {
+      buf += renderInline(n, opts);
+    }
+  }
+  flush();
+  return out.join("\n\n");
+}
+
+function renderBlock(node, opts, depth) {
+  var tag = node.tagName;
+
+  if (HEADINGS[tag]) {
+    var level = HEADINGS[tag] + (opts.shiftHeading || 0);
+    if (level < 1) level = 1;
+    if (level > 6) level = 6;
+    var text = renderInlineChildren(node, opts)
+      .replace(/\u0001/g, " ")          // 标题里不能有换行，<br> 直接当空格
+      .replace(/^\s+|\s+$/g, "");
+    if (!text) return "";
+    return new Array(level + 1).join("#") + " " + text;
+  }
+
+  switch (tag) {
+    case "P":
+      return renderBlocks(node, opts, depth);
+
+    case "HR":
+      return "---";
+
+    case "PRE":
+      return renderPre(node, opts);
+
+    case "BLOCKQUOTE":
+      var quoted = renderBlocks(node, opts, depth);
+      if (!quoted) return "";
+      return quoted.split("\n").map(function (line) {
+        return line ? "> " + line : ">";
+      }).join("\n");
+
+    case "UL":
+    case "OL":
+      return renderList(node, opts, depth);
+
+    case "TABLE":
+      return renderTable(node, opts);
+
+    case "DL":
+      return renderDefinitionList(node, opts);
+
+    default:
+      return renderBlocks(node, opts, depth);
+  }
+}
+
+function renderInlineChildren(node, opts) {
+  var s = "";
+  var kids = node.childNodes;
+  for (var i = 0; i < kids.length; i++) s += renderInline(kids[i], opts);
+  return collapseCJK(s.replace(/[ \t]{2,}/g, " "));
+}
+
+/* 代码块：语言取自 language-xxx / lang-xxx / brush:xxx */
+function renderPre(node, opts) {
+  var codeEl = node.querySelector ? node.querySelector("code") : null;
+  var raw = String((codeEl || node).textContent || "");
+  raw = raw.replace(/\u00a0/g, " ").replace(/^\n+/, "").replace(/\s+$/, "");
+  if (!raw) return "";
+
+  var cls = "";
+  if (codeEl && codeEl.className) cls = String(codeEl.className);
+  if (!cls && node.className) cls = String(node.className);
+
+  var lang = "";
+  var m = cls.match(/(?:language|lang|brush)\s*[:-]\s*([a-z0-9+#._-]+)/i);
+  if (m) lang = m[1];
+  if (!lang) {
+    var attr = codeEl && codeEl.getAttribute ? codeEl.getAttribute("data-lang") : null;
+    if (attr) lang = attr;
+  }
+
+  var fence = "```";
+  while (raw.indexOf(fence) !== -1) fence += "`";
+  return fence + lang + "\n" + raw + "\n" + fence;
+}
+
+/* 列表：支持嵌套、有序列表起始序号 */
+function renderList(list, opts, depth) {
+  var ordered = list.tagName === "OL";
+  var start = parseInt(list.getAttribute("start") || "1", 10);
+  if (isNaN(start)) start = 1;
+
+  var lines = [];
+  var index = 0;
+
+  for (var i = 0; i < list.children.length; i++) {
+    var li = list.children[i];
+    if (li.tagName !== "LI") continue;
+    index++;
+
+    var marker = ordered ? (start + index - 1) + ". " : "- ";
+    var indent = new Array(marker.length + 1).join(" ");
+
+    var parts = splitListItem(li, opts, depth);
+    var body = parts.body;
+    var nested = parts.nested;
+
+    if (!body && !nested.length) {
+      lines.push(marker.replace(/\s+$/, ""));
+      continue;
+    }
+
+    var bodyLines = (body || "").split("\n");
+    lines.push(marker + bodyLines[0]);
+    for (var j = 1; j < bodyLines.length; j++) {
+      lines.push((bodyLines[j] ? indent : "") + bodyLines[j]);
+    }
+
+    for (var k = 0; k < nested.length; k++) {
+      var nestedLines = nested[k].split("\n");
+      for (var n = 0; n < nestedLines.length; n++) {
+        lines.push(indent + nestedLines[n]);
+      }
+    }
+  }
+
+  return lines.join("\n");
+}
+
+/* 一个 li 拆成「正文」与「子列表」两部分 */
+function splitListItem(li, opts, depth) {
+  var bodyParts = [];
+  var nested = [];
+  var buf = "";
+
+  function flush() {
+    var t = collapseCJK(buf.replace(/[ \t]{2,}/g, " ").replace(/^\s+|\s+$/g, ""));
+    if (t) bodyParts.push(t);
+    buf = "";
+  }
+
+  var kids = li.childNodes;
+  for (var i = 0; i < kids.length; i++) {
+    var n = kids[i];
+    if (n.nodeType === 3) { buf += escapeText(n.nodeValue); continue; }
+    if (n.nodeType !== 1) continue;
+    var tag = n.tagName;
+    if (SKIP_TAGS[tag]) continue;
+
+    if (tag === "UL" || tag === "OL") {
+      flush();
+      nested.push(renderList(n, opts, depth + 1));
+    } else if (BLOCK_TAGS[tag]) {
+      flush();
+      var b = renderBlock(n, opts, depth + 1);
+      if (b && /\S/.test(b)) bodyParts.push(b);
+    } else {
+      buf += renderInline(n, opts);
+    }
+  }
+  flush();
+
+  return { body: bodyParts.join("\n"), nested: nested };
+}
+
+/* 表格：GFM。关掉这个开关时退化成「一行一行的纯文本」，不是直接丢掉内容 */
+function renderTable(table, opts) {
+  var rows = [];
+  var aligns = [];
+  var headCount = 0;
+
+  function collect(tr) {
+    var cells = [];
+    for (var i = 0; i < tr.children.length; i++) {
+      var cell = tr.children[i];
+      if (cell.tagName !== "TD" && cell.tagName !== "TH") continue;
+      var text = renderBlocks(cell, opts, 0)
+        .replace(/\u0001/g, "<br>")     // 单元格里不能有换行
+        .replace(/\n+/g, "<br>")
+        .replace(/\|/g, "\\|")
+        .replace(/^\s+|\s+$/g, "");
+      cells.push(text);
+    }
+    return cells;
+  }
+
+  function collectAlign(tr) {
+    var list = [];
+    for (var i = 0; i < tr.children.length; i++) {
+      var cell = tr.children[i];
+      if (cell.tagName !== "TD" && cell.tagName !== "TH") continue;
+      var a = (cell.getAttribute("align") || "").toLowerCase();
+      if (!a && cell.style && cell.style.textAlign) a = String(cell.style.textAlign).toLowerCase();
+      list.push(a);
+    }
+    return list;
+  }
+
+  // 先找 thead，没有就取第一行当表头
+  var section = table.querySelector("thead");
+  var bodySection = table.querySelector("tbody");
+
+  if (section) {
+    for (var i = 0; i < section.children.length; i++) {
+      if (section.children[i].tagName !== "TR") continue;
+      if (!aligns.length) aligns = collectAlign(section.children[i]);
+      rows.push(collect(section.children[i]));
+      headCount++;
+    }
+  }
+
+  var scanIn = bodySection || table;
+  for (var j = 0; j < scanIn.children.length; j++) {
+    var tr = scanIn.children[j];
+    if (tr.tagName !== "TR") continue;
+    if (!aligns.length) aligns = collectAlign(tr);
+    rows.push(collect(tr));
+  }
+
+  if (!rows.length) return "";
+
+  // 关掉 GFM 表格：退化成一行一行，至少内容不丢
+  if (!opts.table) {
+    var plain = [];
+    for (var t = 0; t < rows.length; t++) {
+      var line = rows[t].filter(function (v) { return v; }).join(" | ");
+      if (line) plain.push(line);
+    }
+    return plain.join("\n");
+  }
+
+  var width = 0;
+  for (var r = 0; r < rows.length; r++) width = Math.max(width, rows[r].length);
+  if (!width) return "";
+
+  function pad(row) {
+    var out = row.slice(0);
+    while (out.length < width) out.push("");
+    return out;
+  }
+
+  var lines = [];
+  var header = pad(rows[0]);
+  lines.push("| " + header.join(" | ") + " |");
+
+  var sep = [];
+  for (var c = 0; c < width; c++) {
+    var a = aligns[c] || "";
+    if (a === "center") sep.push(":---:");
+    else if (a === "right") sep.push("---:");
+    else if (a === "left") sep.push(":---");
+    else sep.push("---");
+  }
+  lines.push("| " + sep.join(" | ") + " |");
+
+  for (var q = 1; q < rows.length; q++) {
+    lines.push("| " + pad(rows[q]).join(" | ") + " |");
+  }
+
+  return lines.join("\n");
+}
+
+/* 定义列表 */
+function renderDefinitionList(dl, opts) {
+  var lines = [];
+  for (var i = 0; i < dl.children.length; i++) {
+    var child = dl.children[i];
+    if (child.tagName === "DT") {
+      var term = renderInlineChildren(child, opts).replace(/^\s+|\s+$/g, "");
+      if (term) lines.push("- **" + term + "**");
+    } else if (child.tagName === "DD") {
+      var def = renderBlocks(child, opts, 0).replace(/\n+/g, " ");
+      if (def) lines.push("  " + def);
+    }
+  }
+  return lines.join("\n");
+}
+
+/* ---------- 清理 ---------- */
+function cleanTree(root, opts) {
+  var all = root.querySelectorAll("*");
+  for (var i = 0; i < all.length; i++) {
+    var el = all[i];
+    if (SKIP_TAGS[el.tagName] || (opts.dropChrome && CHROME_TAGS[el.tagName])) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }
+  }
+}
+
+/* ---------- 主入口 ---------- */
+function htmlToMarkdown(html, options) {
+  var opts = {};
+  var base = defaultOptions();
+  for (var k in base) if (Object.prototype.hasOwnProperty.call(base, k)) opts[k] = base[k];
+  if (options) for (var k2 in options) if (Object.prototype.hasOwnProperty.call(options, k2)) opts[k2] = options[k2];
+
+  var input = String(html == null ? "" : html);
+  if (!/\S/.test(input)) return "";
+
+  var doc = null;
+  try {
+    doc = new DOMParser().parseFromString(input, "text/html");
+  } catch (e) {
+    doc = null;
+  }
+  if (!doc || !doc.body) {
+    var holder = document.implementation.createHTMLDocument("");
+    holder.body.innerHTML = input;
+    doc = holder;
+  }
+
+  var root = doc.body;
+  if (!root) return "";
+
+  cleanTree(root, opts);
+
+  var md = renderBlocks(root, opts, 0);
+
+  // 收尾：统一换行、去掉多余空行，最后再把 <br> 占位符还原成硬换行
+  md = md.replace(/\r\n/g, "\n").replace(/\u00a0/g, " ");
+  if (opts.mergeBlank) md = md.replace(/\n{3,}/g, "\n\n");
+  md = md.replace(/[ \t]+\n/g, "\n");
+  md = md.replace(/[ \t]*\u0001[ \t]*/g, "  \n");
+  md = md.replace(/^\n+/, "").replace(/\s+$/, "");
+  return md ? md + "\n" : "";
+}
+
+/* ============================================================================
+   Markdown → HTML（只用于预览）
+   不追求完整实现，只保证「本工具产出的 Markdown」能显示成该有的样子，
+   这样预览看到的就是复制出去之后的效果。
+   ========================================================================== */
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function mdInline(text) {
+  var store = [];
+
+  function keep(html) {
+    store.push(html);
+    return "\uE000" + (store.length - 1) + "\uE001";
+  }
+
+  var s = String(text == null ? "" : text);
+
+  // 1) 反斜杠转义的字符先摘出来，免得后面被当成语法
+  s = s.replace(/\\([\\`*_{}\[\]()#+\-.!<>|~=])/g, function (m, ch) {
+    return keep(escHtml(ch));
+  });
+
+  // 2) 其余文字统一转义
+  s = escHtml(s);
+
+  // 3) 硬换行（行尾两个以上空格）
+  s = s.replace(/ {2,}\n/g, "<br>\n");
+
+  // 4) 行内代码，整段摘出来，避免里面的星号被当成强调
+  s = s.replace(/(`+)([\s\S]*?)\1/g, function (m, ticks, code) {
+    var c = code.replace(/^ ([\s\S]*) $/, "$1");
+    return keep("<code>" + c + "</code>");
+  });
+
+  // 5) 图片、链接（标题属性此时已被转成 &quot;）
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([\s\S]*?)&quot;)?\)/g, function (m, alt, src, title) {
+    return keep('<img src="' + src + '" alt="' + alt + '"' + (title ? ' title="' + title + '"' : "") + ">");
+  });
+  s = s.replace(/\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([\s\S]*?)&quot;)?\)/g, function (m, label, href, title) {
+    return keep('<a href="' + href + '"' + (title ? ' title="' + title + '"' : "") + ">" + label + "</a>");
+  });
+
+  // 6) 强调（顺序不能乱：先长后短）
+  s = s.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+  s = s.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
+  s = s.replace(/==([\s\S]+?)==/g, "<mark>$1</mark>");
+
+  // 7) 还原摘出来的片段
+  s = s.replace(/\uE000(\d+)\uE001/g, function (m, n) {
+    return store[+n] == null ? "" : store[+n];
+  });
+
+  return s;
+}
+
+function splitTableRow(line) {
+  var s = String(line).trim();
+  if (s.charAt(0) === "|") s = s.slice(1);
+  if (s.charAt(s.length - 1) === "|") s = s.slice(0, -1);
+
+  var cells = [];
+  var buf = "";
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i);
+    if (ch === "\\" && s.charAt(i + 1) === "|") { buf += "|"; i++; continue; }
+    if (ch === "|") { cells.push(buf); buf = ""; continue; }
+    buf += ch;
+  }
+  cells.push(buf);
+  return cells.map(function (c) { return c.trim(); });
+}
+
+function isTableSep(line) {
+  if (line.indexOf("-") === -1) return false;
+  return /^\s*\|?[\s:|-]+\|?\s*$/.test(line);
+}
+
+/* 列表：按缩进递归，子列表挂到上一个 li 里面 */
+function parseMdList(lines, start) {
+  var first = lines[start].match(/^(\s*)([-*+]|\d+\.)\s+/);
+  var baseIndent = first[1].length;
+  var ordered = /\d/.test(first[2]);
+  var items = [];
+  var i = start;
+
+  while (i < lines.length) {
+    var m = lines[i].match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
+    if (!m) break;
+    var indent = m[1].length;
+    if (indent < baseIndent) break;
+
+    if (indent > baseIndent) {
+      var sub = parseMdList(lines, i);
+      if (items.length) items[items.length - 1].children.push(sub.html);
+      i = sub.next;
+      continue;
+    }
+
+    var content = [m[3]];
+    i++;
+
+    // 条目里的续行（缩进比当前条目深、又不是新条目）
+    while (i < lines.length) {
+      var ln = lines[i];
+      if (!/\S/.test(ln)) break;
+      if (/^(\s*)([-*+]|\d+\.)\s+/.test(ln)) break;
+      if (ln.match(/^\s*/)[0].length <= baseIndent) break;
+      content.push(ln.replace(/^\s+/, ""));
+      i++;
+    }
+
+    items.push({ text: content.join("\n"), children: [] });
+  }
+
+  var tag = ordered ? "ol" : "ul";
+  var html = "<" + tag + ">";
+  for (var k = 0; k < items.length; k++) {
+    html += "<li>" + mdInline(items[k].text) + items[k].children.join("") + "</li>";
+  }
+  html += "</" + tag + ">";
+  return { html: html, next: i };
+}
+
+function mdToHtml(md) {
+  var lines = String(md == null ? "" : md).replace(/\r\n/g, "\n").split("\n");
+  var out = [];
+  var i = 0;
+
+  while (i < lines.length) {
+    var line = lines[i];
+
+    if (!/\S/.test(line)) { i++; continue; }
+
+    // 代码块
+    var fence = line.match(/^(`{3,}|~{3,})\s*([^\s`]*)\s*$/);
+    if (fence) {
+      var mark = fence[1];
+      var lang = fence[2] || "";
+      var buf = [];
+      i++;
+      while (i < lines.length && lines[i].indexOf(mark) !== 0) { buf.push(lines[i]); i++; }
+      i++;
+      out.push("<pre><code" + (lang ? ' class="language-' + escHtml(lang) + '"' : "") + ">" +
+        escHtml(buf.join("\n")) + "</code></pre>");
+      continue;
+    }
+
+    // 标题
+    var h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h) {
+      var lv = h[1].length;
+      out.push("<h" + lv + ">" + mdInline(h[2]) + "</h" + lv + ">");
+      i++;
+      continue;
+    }
+
+    // 分隔线
+    if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+      out.push("<hr>");
+      i++;
+      continue;
+    }
+
+    // 引用（可以嵌套）
+    if (/^\s*>/.test(line)) {
+      var qbuf = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) {
+        qbuf.push(lines[i].replace(/^\s*>\s?/, ""));
+        i++;
+      }
+      out.push("<blockquote>" + mdToHtml(qbuf.join("\n")) + "</blockquote>");
+      continue;
+    }
+
+    // 表格
+    if (/^\s*\|/.test(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+      var head = splitTableRow(line);
+      var sep = splitTableRow(lines[i + 1]);
+      i += 2;
+      var body = [];
+      while (i < lines.length && /^\s*\|/.test(lines[i])) {
+        body.push(splitTableRow(lines[i]));
+        i++;
+      }
+
+      function alignOf(cell) {
+        var t = String(cell || "").trim();
+        if (/^:-+:$/.test(t)) return "center";
+        if (/^-+:$/.test(t)) return "right";
+        if (/^:-+$/.test(t)) return "left";
+        return "";
+      }
+
+      var thead = "<thead><tr>";
+      for (var c1 = 0; c1 < head.length; c1++) {
+        var al = alignOf(sep[c1]);
+        thead += "<th" + (al ? ' style="text-align:' + al + '"' : "") + ">" + mdInline(head[c1]) + "</th>";
+      }
+      thead += "</tr></thead>";
+
+      var tbody = "<tbody>";
+      for (var r = 0; r < body.length; r++) {
+        tbody += "<tr>";
+        for (var c2 = 0; c2 < head.length; c2++) {
+          var a2 = alignOf(sep[c2]);
+          tbody += "<td" + (a2 ? ' style="text-align:' + a2 + '"' : "") + ">" + mdInline(body[r][c2] || "") + "</td>";
+        }
+        tbody += "</tr>";
+      }
+      tbody += "</tbody>";
+
+      out.push("<table>" + thead + tbody + "</table>");
+      continue;
+    }
+
+    // 列表
+    if (/^\s*([-*+]|\d+\.)\s+/.test(line)) {
+      var list = parseMdList(lines, i);
+      out.push(list.html);
+      i = list.next;
+      continue;
+    }
+
+    // 段落：一直吃到空行或下一个块级语法
+    var pbuf = [line];
+    i++;
+    while (i < lines.length && /\S/.test(lines[i])) {
+      if (/^\s*(#{1,6}\s|>|\||([-*+]|\d+\.)\s|(`{3,}|~{3,}))/.test(lines[i])) break;
+      pbuf.push(lines[i]);
+      i++;
+    }
+    out.push("<p>" + mdInline(pbuf.join("\n")) + "</p>");
+  }
+
+  return out.join("\n");
+}
+
+/* 供测试使用 */
+if (typeof window !== "undefined") {
+  window.htmlToMarkdown = htmlToMarkdown;
+  window.mdToHtml = mdToHtml;
+}
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { htmlToMarkdown: htmlToMarkdown, mdToHtml: mdToHtml };
+}
+
+/* ============================================================================
+   界面逻辑
+   ========================================================================== */
+if (typeof document !== "undefined") {
+  var $ = function (id) { return document.getElementById(id); };
+
+  var inputEl = $("input");
+  var outputEl = $("output");
+  var previewEl = $("preview");
+  var msgEl = $("msg");
+
+  var currentView = "preview";
+  var lastMd = "";
+
+  /* 预览区空状态：一张纸的图标 + 一行说明 */
+  var EMPTY_HTML = '<div class="empty">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
+    + '<path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/>'
+    + '</svg>'
+    + '<span>转换后的 Markdown 将在这里预览</span>'
+    + '</div>';
+
+  /* 预览是默认视图，所以每次转换都把 HTML 一起生成好 */
+  function renderPreview() {
+    if (currentView !== "preview") return;
+    if (!lastMd) { previewEl.innerHTML = EMPTY_HTML; return; }
+    try {
+      previewEl.innerHTML = mdToHtml(lastMd);
+    } catch (e) {
+      previewEl.innerHTML = EMPTY_HTML;
+      say("预览渲染失败：" + (e && e.message ? e.message : e), false);
+    }
+  }
+
+  function setView(view) {
+    currentView = view;
+    var buttons = $("tabs").getElementsByTagName("button");
+    for (var i = 0; i < buttons.length; i++) {
+      var on = buttons[i].getAttribute("data-view") === view;
+      buttons[i].className = on ? "active" : "";
+      buttons[i].setAttribute("aria-selected", on ? "true" : "false");
+    }
+    previewEl.hidden = view !== "preview";
+    outputEl.hidden = view !== "source";
+    if (view === "preview") renderPreview();
+  }
+
+  var SAMPLE = [
+    '<h2>二审改判：定金应当返还</h2>',
+    '<p>本案的核心争点是<strong>定金能否适用不可归责于双方的免责事由</strong>，',
+    '法院最终认定出卖人构成违约，判决<em>双倍返还定金</em>。</p>',
+    '<blockquote><p>《民法典》第五百八十七条：收受定金的一方不履行债务，致使不能实现合同目的的，应当双倍返还定金。</p></blockquote>',
+    '<h3>三个要点</h3>',
+    '<ul>',
+    '  <li>认购书的性质是预约，不是本约；</li>',
+    '  <li>开发商未取得预售许可，属于<code>根本违约</code>；</li>',
+    '  <li>买受人已尽到合理催告义务。',
+    '    <ul><li>催告函已签收</li><li>有微信记录佐证</li></ul>',
+    '  </li>',
+    '</ul>',
+    '<h3>办案步骤</h3>',
+    '<ol>',
+    '  <li>固定证据',
+    '    <ol><li>认购书原件</li><li>付款凭证</li></ol>',
+    '  </li>',
+    '  <li>发函催告</li>',
+    '  <li>提起诉讼</li>',
+    '</ol>',
+    '<p>参考：<a href="/posts/deposit/" title="定金罚则">定金罚则的适用</a>，',
+    '也可以看<a href="https://flk.npc.gov.cn">国家法律法规数据库</a>。</p>',
+    '<pre><code class="language-yaml">title: 二审改判\ndate: 2026-11-01</code></pre>',
+    '<table>',
+    '  <thead><tr><th>项目</th><th align="right">金额</th></tr></thead>',
+    '  <tbody>',
+    '    <tr><td>已付定金</td><td align="right">5 万元</td></tr>',
+    '    <tr><td>判决返还</td><td align="right">10 万元</td></tr>',
+    '  </tbody>',
+    '</table>',
+    '<p><img src="/images/case.png" alt="庭审现场"></p>',
+    '<hr>',
+    '<p>最后提醒一句：<del>旧观点</del> 新规则已经变了。</p>'
+  ].join("\n");
+
+  function readOptions() {
+    return {
+      hardBreak: $("optHardBreak").checked,
+      image: $("optImage").checked,
+      table: $("optTable").checked,
+      mergeBlank: $("optMerge").checked,
+      dropChrome: $("optChrome").checked,
+      shiftHeading: $("optShift").checked ? 1 : 0,
+      baseUrl: ($("baseUrl").value || "").replace(/\s+$/, "")
+    };
+  }
+
+  function say(text, ok) {
+    msgEl.textContent = text || "";
+    msgEl.className = "msg" + (text ? (ok ? " ok" : " bad") : "");
+  }
+
+  function stat(text) {
+    return text.length + " 字符 · " + text.split("\n").length + " 行";
+  }
+
+  function render() {
+    var raw = inputEl.value || "";
+    $("inStat").textContent = stat(raw);
+
+    var md = "";
+    if (!/\S/.test(raw)) {
+      lastMd = "";
+      outputEl.textContent = "";
+      previewEl.innerHTML = EMPTY_HTML;
+      $("outStat").textContent = "0 字符";
+      return md;
+    }
+
+    try {
+      md = htmlToMarkdown(raw, readOptions());
+      lastMd = md;
+      outputEl.textContent = md;
+      $("outStat").textContent = stat(md);
+      renderPreview();
+      if (!md) say("这段 HTML 里没有可以转换的正文（可能只有样式或脚本）。", false);
+      else say("", true);
+    } catch (e) {
+      lastMd = "";
+      outputEl.textContent = "";
+      previewEl.innerHTML = EMPTY_HTML;
+      say("转换出错：" + (e && e.message ? e.message : e), false);
+    }
+    return md;
+  }
+
+  /* 复制：优先 Clipboard API，退到 execCommand，再退到手动选中 */
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text)["catch"](function () {
+        return legacyCopy(text);
+      });
+    }
+    return legacyCopy(text);
+  }
+
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    if (!ok) {
+      // 最后一道：选中右侧结果，让用户自己按 Ctrl+C
+      var range = document.createRange();
+      range.selectNodeContents(outputEl);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return Promise.reject(new Error("浏览器不允许自动复制，已帮你选中，按 Ctrl+C 即可"));
+    }
+    return Promise.resolve();
+  }
+
+  $("btnCopy").addEventListener("click", function () {
+    var md = render();
+    if (!md) { say("还没有可复制的内容。", false); return; }
+    copyText(md).then(function () {
+      say("已复制 " + md.length + " 个字符，直接粘到 md 文件里就行。", true);
+    }, function (err) {
+      say(err && err.message ? err.message : "复制失败，请手动选中右侧内容。", false);
+    });
+  });
+
+  $("btnDownload").addEventListener("click", function () {
+    var md = render();
+    if (!md) { say("还没有可下载的内容。", false); return; }
+    var blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "converted.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    say("已下载 converted.md。", true);
+  });
+
+  $("btnSample").addEventListener("click", function () {
+    inputEl.value = SAMPLE;
+    render();
+    say("示例已载入，可以对照右边的结果看转换规则。", true);
+  });
+
+  $("btnClear").addEventListener("click", function () {
+    inputEl.value = "";
+    $("baseUrl").value = "";
+    render();
+    say("", true);
+    inputEl.focus();
+  });
+
+  $("btnFile").addEventListener("click", function () { $("file").click(); });
+
+  $("file").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    readFile(f);
+    this.value = "";
+  });
+
+  function readFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      inputEl.value = String(reader.result || "");
+      render();
+      say("已读取 " + file.name + "，共 " + inputEl.value.length + " 个字符。", true);
+    };
+    reader.onerror = function () { say("读不了这个文件，换个文件或直接粘贴代码。", false); };
+    reader.readAsText(file, "utf-8");
+  }
+
+  /* 拖拽文件到输入框 */
+  inputEl.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    inputEl.className = "dragover";
+  });
+  inputEl.addEventListener("dragleave", function () {
+    inputEl.className = "";
+  });
+  inputEl.addEventListener("drop", function (e) {
+    inputEl.className = "";
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    e.preventDefault();
+    readFile(f);
+  });
+
+  /* 粘贴：网页复制的内容带 text/html，优先用它 */
+  inputEl.addEventListener("paste", function (e) {
+    var cd = e.clipboardData || window.clipboardData;
+    if (!cd || !cd.getData) return;
+
+    var html = cd.getData("text/html") || "";
+    var plain = cd.getData("text/plain") || "";
+    var looksLikeSource = /<\/?[a-zA-Z][^>]*>/.test(plain);
+
+    if (!html || looksLikeSource) return;  // 粘贴的本来就是 HTML 源码，按原样处理
+
+    e.preventDefault();
+
+    // 简单清洗编辑器加的外壳，避免整段包一层 div
+    var cleaned = html
+      .replace(/^[\s\S]*?<body[^>]*>/i, function (m) { return m; })
+      .replace(/<meta[^>]*>/gi, "")
+      .replace(/<!--[\s\S]*?-->/g, "");
+
+    var start = inputEl.selectionStart;
+    var end = inputEl.selectionEnd;
+    var value = inputEl.value || "";
+    inputEl.value = value.slice(0, start) + cleaned + value.slice(end);
+    inputEl.selectionStart = inputEl.selectionEnd = start + cleaned.length;
+
+    render();
+    say("已从剪贴板取到带格式的 HTML，共 " + cleaned.length + " 个字符。", true);
+  });
+
+  /* 兜底：某些旧浏览器不给自动复制，帮用户把结果选中 */
+  $("btnSelectAll").addEventListener("click", function () {
+    var md = outputEl.textContent || "";
+    if (!md) { say("右侧还没有内容。", false); return; }
+    setView("source");   // 源码模式下才选得中
+    var range = document.createRange();
+    range.selectNodeContents(outputEl);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    say("已选中 " + md.length + " 个字符，按 Ctrl+C（Mac 上 Command+C）复制。", true);
+  });
+
+  /* 预览 / 源码 切换 */
+  (function () {
+    var buttons = $("tabs").getElementsByTagName("button");
+    for (var i = 0; i < buttons.length; i++) {
+      (function (btn) {
+        btn.addEventListener("click", function () {
+          setView(btn.getAttribute("data-view"));
+        });
+      })(buttons[i]);
+    }
+  })();
+
+  var bound = ["input", "baseUrl"];
+  for (var i = 0; i < bound.length; i++) {
+    $(bound[i]).addEventListener("input", render);
+  }
+  var checks = ["optHardBreak", "optImage", "optTable", "optMerge", "optChrome", "optShift"];
+  for (var j = 0; j < checks.length; j++) {
+    $(checks[j]).addEventListener("change", render);
+  }
+
+  $("howto").textContent = location.protocol === "file:"
+    ? "当前是本地文件方式打开，所有功能都能用，不需要联网。"
+    : "也可以把这个页面另存到电脑上，双击打开，功能完全一样。";
+
+  setView("preview");   // 默认进预览
+  render();
+}
+</script>
+</body>
+</html>
