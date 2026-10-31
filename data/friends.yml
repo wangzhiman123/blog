@@ -120,15 +120,15 @@
   group: blogs
   weight: 54
 
+# ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
   description: 聚合优质博客
   avatar: https://www.rmbk.cc/static/images/logo.png
   avatar_fit: contain
-  group: blogs
+  group: circles
   weight: 52
 
-# ============ 博客圈 ============
 - nickname: BlogFinder
   url: https://bf.zzxworld.com
   description: 发现优秀的个人博客
