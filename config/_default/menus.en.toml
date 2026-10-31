@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------------
 # Menu configuration (English)
-# 英文站目前只有首页 + 关于页，避免指向不存在的中文分类页
+# 英文站菜单：首页 / 归档 / 友链 / 关于，均指向已存在的英文页面
 # -------------------------------------------------------------------------------------
 
 [[main]]
@@ -17,6 +17,32 @@ weight = 1
 icon = "fa-solid fa-house"
 
 [[main]]
+identifier = "archives"
+parent = ""
+pre = ""
+post = ""
+name = "Archives"
+url = "/en/archives/"
+title = "All posts by date"
+weight = 2
+
+[main.params]
+icon = "fa-regular fa-clock"
+
+[[main]]
+identifier = "friends"
+parent = ""
+pre = ""
+post = ""
+name = "Friends"
+url = "/en/friends/"
+title = "Sites I use often"
+weight = 3
+
+[main.params]
+icon = "fa-solid fa-link"
+
+[[main]]
 identifier = "about"
 parent = ""
 pre = ""
@@ -24,7 +50,7 @@ post = ""
 name = "About"
 url = "/en/about/"
 title = "About this site"
-weight = 2
+weight = 4
 
 [main.params]
 icon = "fa-regular fa-address-card"
