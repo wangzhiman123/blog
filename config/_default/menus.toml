@@ -3,37 +3,23 @@
 # See: https://fixit.lruihao.cn/docs/getting-started/configuration/#menu-configuration
 #
 # 结构：
-#   博客 ▾（悬停自动展开）→ 文章 / 分类 / 标签
+#   归档
+#   分类 ▾（鼠标移上去自动展开）→ 工作 / 学习 / 生活
+#   标签
 #   友链
-# 子菜单用 parent 字段挂到父级 identifier，最多两层。
-# 想在手机上也能看到某条目，就不要写 type = "desktop"。
+#   关于
+#
+# 「分类」下拉里的三项就是 data/categories.yml 里的一级分类，
+# 增删一级分类时，这里要同步改三处：identifier、name、pageRef。
 # -------------------------------------------------------------------------------------
 
-# ============ 博客（父级，鼠标移上去自动展开） ============
+# ============ 归档 ============
 [[main]]
-identifier = "blog"
+identifier = "archives"
 parent = ""
 pre = ""
 post = ""
-name = "博客"
-url = "archives/"
-title = "全部文章、分类与标签"
-weight = 1
-
-[main.params]
-class = ""
-draft = false
-icon = "fa-solid fa-blog"
-type = ""
-divided = false
-
-# ---- 子项：文章 ----
-[[main]]
-identifier = "archives"
-parent = "blog"
-pre = ""
-post = ""
-name = "文章"
+name = "归档"
 url = "archives/"
 title = "按时间浏览全部文章"
 weight = 1
@@ -41,19 +27,19 @@ weight = 1
 [main.params]
 class = ""
 draft = false
-icon = "fa-solid fa-file-lines"
+icon = "fa-solid fa-archive"
 type = ""
 divided = false
 
-# ---- 子项：分类 ----
+# ============ 分类（父级，鼠标移上去自动展开三个一级分类） ============
 [[main]]
 identifier = "categories"
-parent = "blog"
+parent = ""
 pre = ""
 post = ""
 name = "分类"
 url = "categories/"
-title = "按栏目浏览（工作 / 学习 / 生活）"
+title = "按栏目浏览全部文章"
 weight = 2
 
 [main.params]
@@ -63,10 +49,67 @@ icon = "fa-solid fa-folder-tree"
 type = ""
 divided = false
 
-# ---- 子项：标签 ----
+# ---- 一级分类：工作 ----
+[[main]]
+identifier = "cat-work"
+parent = "categories"
+pre = ""
+post = ""
+name = "工作"
+pageRef = "/categories/工作"
+url = "categories/工作/"
+title = "合同、公司、劳动等实务文章"
+weight = 1
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-briefcase"
+type = ""
+divided = false
+
+# ---- 一级分类：学习 ----
+[[main]]
+identifier = "cat-study"
+parent = "categories"
+pre = ""
+post = ""
+name = "学习"
+pageRef = "/categories/学习"
+url = "categories/学习/"
+title = "读书、备考与执业成长"
+weight = 2
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-graduation-cap"
+type = ""
+divided = false
+
+# ---- 一级分类：生活 ----
+[[main]]
+identifier = "cat-life"
+parent = "categories"
+pre = ""
+post = ""
+name = "生活"
+pageRef = "/categories/生活"
+url = "categories/生活/"
+title = "日常随笔与生活记录"
+weight = 3
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-mug-hot"
+type = ""
+divided = false
+
+# ============ 标签 ============
 [[main]]
 identifier = "tags"
-parent = "blog"
+parent = ""
 pre = ""
 post = ""
 name = "标签"
@@ -90,7 +133,7 @@ post = ""
 name = "友链"
 url = "friends/"
 title = "常用参考站点与友情链接"
-weight = 2
+weight = 4
 
 [main.params]
 class = ""
@@ -108,7 +151,7 @@ post = ""
 name = "关于"
 url = "about/"
 title = "关于作者与本站"
-weight = 3
+weight = 5
 
 [main.params]
 class = ""
@@ -116,4 +159,3 @@ draft = false
 icon = "fa-regular fa-address-card"
 type = ""
 divided = false
-
