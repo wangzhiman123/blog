@@ -943,9 +943,23 @@ copyright = true
 author = true
 # Site creation year.
 since = ""
-# Public network security only in China (HTML format is supported).
+# 备案信息（预留位，现在留空 → 页脚不显示这一行，也不会有空白占位）
+#
+# 【现状】站点托管在 GitHub Pages（境外），无需备案，下面两项保持空字符串即可。
+# 【将来】迁到国内服务器、完成备案后，把空字符串换成真实备案号，不用改模板、
+#         不用改样式，保存后推送就会自动构建，页脚立刻出现备案信息。
+#
+# 填写格式：HTML（会原样输出，所以可以直接写 <a>、<img>）
+#
+# ① 公安网安备案号（示例，把编码换成你自己的）
+#    先到 beian.mps.gov.cn 下载备案图标，放到 static/images/gongan-beian.png
+#    gov = '<a href="https://beian.mps.gov.cn/#/query/webSearch?code=36010000000000" target="_blank" rel="noopener noreferrer"><img src="/images/gongan-beian.png" alt="公安备案" width="14" height="14" style="vertical-align:-2px" /> 赣公网安备 36010000000000 号</a>'
+#
+# ② ICP 备案号（示例）
+#    icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
+#
+# 提示：只填其中一项也可以，另一项空着不影响显示；两项都空则整行隐藏。
 gov = ""
-# ICP info only in China (HTML format is supported).
 icp = ""
 # License info (HTML format is supported).
 license = ""
@@ -1426,7 +1440,7 @@ profile = []
 aside = []
 comment = []
 # 页脚社交图标 + 总访问量/总访客数
-footer = ["custom/footer-social.html"]
+footer = ["custom/footer-legal.html", "custom/footer-social.html"]
 # 悬浮按钮：回到底部（与主题的回到顶部互补）
 widgets = ["custom/scroll-buttons.html"]
 assets = []

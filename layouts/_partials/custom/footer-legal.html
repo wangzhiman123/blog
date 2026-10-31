@@ -1,0 +1,16 @@
+{{- /*
+  页脚法律链接行
+  关于 / 隐私政策 / 免责声明 三个静态页的常驻入口。
+  这三页不放主菜单 —— 主菜单留给「博客 ▾ / 友链 / 关于」，
+  法务类页面按惯例收在页脚。
+*/ -}}
+
+<div class="footer-line footer-legal">
+  <a href="{{ "/about/" | relURL }}" title="关于作者与本站">关于</a>
+  <span class="footer-legal-sep" aria-hidden="true">·</span>
+  <a href="{{ "/privacy/" | relURL }}" title="本站如何处理您的个人信息">隐私政策</a>
+  <span class="footer-legal-sep" aria-hidden="true">·</span>
+  <a href="{{ "/disclaimer/" | relURL }}" title="内容性质、脱敏做法与转载规则">免责声明</a>
+  <span class="footer-legal-sep" aria-hidden="true">·</span>
+  <a href="{{ "/sitemap.xml" | relURL }}" title="站点地图">站点地图</a>
+</div>

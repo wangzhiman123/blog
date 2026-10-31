@@ -1,0 +1,58 @@
+{{- /*
+  静态页布局（关于 / 隐私政策 / 免责声明 等）
+
+  覆盖主题的 page.html，只做一件事：把文章页的「目录」搬过来。
+  主题的 page 布局本身不渲染目录，而这三个页面都挺长（隐私政策 11 节、
+  免责声明 9 节），没有目录读者要一直滚。其余部分与主题保持一致：
+
+  - toc 是否显示仍由 front matter 的 `toc: true` 控制，不写就不显示；
+  - 侧栏目录给大屏用，正文上方的折叠目录给小屏用。
+*/ -}}
+
+{{- define "title" -}}
+  {{- cond (.Param "capitalize_titles") (title .Title) .Title -}}
+  {{- if .Site.Params.with_site_title }} {{ .Site.Params.title_delimiter }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  {{- $pagefindEnabled := and .Site.Params.search.enable (eq .Site.Params.search.type "pagefind") -}}
+  {{- $toc := dict "Page" . "Key" "toc" | partial "function/param.html" -}}
+  {{- $tableOfContents := .Fragments.ToHTML ($toc.start_level | int) ($toc.end_level | int) ($toc.ordered | default false) -}}
+  {{- $showToc := $toc.enable | and (ne $tableOfContents `<nav id="TableOfContents"></nav>`) -}}
+  {{- .Store.Set "showToc" $showToc -}}
+
+  <article class="page single special">
+    <div class="page-header">
+      <h1 class="single-title animate__animated animate__pulse animate__faster"{{ if $pagefindEnabled }} data-pagefind-body{{ end }}>{{- cond (.Param "capitalize_titles") (title .Title) .Title -}}</h1>
+      {{- with .Params.subtitle -}}<p class="single-subtitle animate__animated animate__fadeIn">{{ . | $.RenderString }}</p>{{- end -}}
+    </div>
+
+    {{- if $showToc -}}
+      <div class="details toc" id="toc-static" data-kept="{{ if $toc.keep_static }}true{{ else }}false{{ end }}">
+        <div class="details-summary toc-title">
+          <span>{{ T "single.contents" }}</span>
+          <span>{{ dict "Class" "details-icon fa-solid fa-angle-right" | partial "plugin/icon.html" }}</span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"></div>
+      </div>
+      <template data-toc>{{ $tableOfContents }}</template>
+    {{- end -}}
+
+    {{- $content := dict "Content" .Content "Ruby" (.Param "ruby") "Fraction" (.Param "fraction") "Fontawesome" (.Param "fontawesome") | partial "function/content.html" | safeHTML -}}
+    <div class="content" id="content"{{ if $pagefindEnabled }} data-pagefind-body{{ end }}>
+      {{- if not .Params.password -}}
+        {{- $content -}}
+      {{- end -}}
+    </div>
+
+    {{- dict "Content" $content "Password" .Params.password "Message" .Params.message "Page" . | partial "plugin/fixit-encryptor.html" -}}
+  </article>
+
+  {{- if $showToc -}}
+    {{- partial "single/aside-toc.html" . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "comments" -}}
+  {{- partial "base/comment.html" . -}}
+{{- end -}}

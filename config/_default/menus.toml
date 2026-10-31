@@ -1,14 +1,39 @@
 # -------------------------------------------------------------------------------------
 # 菜单配置（简体中文，默认语言）
 # See: https://fixit.lruihao.cn/docs/getting-started/configuration/#menu-configuration
+#
+# 结构：
+#   博客 ▾（悬停自动展开）→ 文章 / 分类 / 标签
+#   友链
+# 子菜单用 parent 字段挂到父级 identifier，最多两层。
+# 想在手机上也能看到某条目，就不要写 type = "desktop"。
 # -------------------------------------------------------------------------------------
 
+# ============ 博客（父级，鼠标移上去自动展开） ============
 [[main]]
-identifier = "archives"
+identifier = "blog"
 parent = ""
 pre = ""
 post = ""
-name = "归档"
+name = "博客"
+url = "archives/"
+title = "全部文章、分类与标签"
+weight = 1
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-blog"
+type = ""
+divided = false
+
+# ---- 子项：文章 ----
+[[main]]
+identifier = "archives"
+parent = "blog"
+pre = ""
+post = ""
+name = "文章"
 url = "archives/"
 title = "按时间浏览全部文章"
 weight = 1
@@ -16,26 +41,32 @@ weight = 1
 [main.params]
 class = ""
 draft = false
-icon = "fa-solid fa-archive"
+icon = "fa-solid fa-file-lines"
 type = ""
 divided = false
 
+# ---- 子项：分类 ----
 [[main]]
 identifier = "categories"
-parent = ""
+parent = "blog"
 pre = ""
 post = ""
 name = "分类"
 url = "categories/"
-title = "按栏目浏览"
+title = "按栏目浏览（工作 / 学习 / 生活）"
 weight = 2
 
 [main.params]
+class = ""
+draft = false
 icon = "fa-solid fa-folder-tree"
+type = ""
+divided = false
 
+# ---- 子项：标签 ----
 [[main]]
 identifier = "tags"
-parent = ""
+parent = "blog"
 pre = ""
 post = ""
 name = "标签"
@@ -44,8 +75,13 @@ title = "按关键词浏览"
 weight = 3
 
 [main.params]
+class = ""
+draft = false
 icon = "fa-solid fa-tags"
+type = ""
+divided = false
 
+# ============ 友链 ============
 [[main]]
 identifier = "friends"
 parent = ""
@@ -54,7 +90,30 @@ post = ""
 name = "友链"
 url = "friends/"
 title = "常用参考站点与友情链接"
-weight = 4
+weight = 2
 
 [main.params]
+class = ""
+draft = false
 icon = "fa-solid fa-link"
+type = ""
+divided = false
+
+# ============ 关于 ============
+[[main]]
+identifier = "about"
+parent = ""
+pre = ""
+post = ""
+name = "关于"
+url = "about/"
+title = "关于作者与本站"
+weight = 3
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-regular fa-address-card"
+type = ""
+divided = false
+
