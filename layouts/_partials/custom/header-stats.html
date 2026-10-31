@@ -2,53 +2,29 @@
   页眉数据看板（桌面端）
 
   渲染在 <ul class="menu"> 内部，因此必须输出 <li>。
-  数据全部在构建期计算，不依赖外部接口：
-    文章数 = posts 区文章数量
-    字数   = 所有文章 WordCount 之和（hasCJKLanguage 下中文按字计）
-    图片数 = 正文中 ![]() / <img> / {{< image >}} 三种写法之和
-    视频数 = 正文中 {{< youtube|bilibili|vimeo|video >}} 与 <video> 之和
-    访问量 = 不蒜子全站 PV，由 assets/js/custom.js 从页脚镜像过来
+  数据由 custom/stats-data.html 统一计算（文章数 / 字数 / 图片 / 视频），
+  访问量来自不蒜子，由 assets/js/custom.js 从页脚镜像过来。
 */ -}}
 
-{{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $wordCount := 0 -}}
-{{- $imgCount := 0 -}}
-{{- $videoCount := 0 -}}
-{{- /* 用码点拼出 "{{"，否则模板会把字面量当成短代码开始标记 */ -}}
-{{- $ob := printf "%c%c" 123 123 -}}
-{{- $imgRe := printf `!\[[^\]]*\]\([^)]+\)|<img\s|%s[<%%]\s*image\b` $ob -}}
-{{- $vidRe := printf `%s[<%%]\s*(youtube|bilibili|vimeo|video)\b|<video\s` $ob -}}
-{{- range $posts -}}
-  {{- $wordCount = add $wordCount .WordCount -}}
-  {{- $raw := .RawContent -}}
-  {{- $imgCount = add $imgCount (len (findRE $imgRe $raw)) -}}
-  {{- $videoCount = add $videoCount (len (findRE $vidRe $raw)) -}}
-{{- end -}}
-
-{{- $wordText := "" -}}
-{{- if ge $wordCount 10000 -}}
-  {{- $wordText = printf "%.1f 万字" (div (float $wordCount) 10000) -}}
-{{- else -}}
-  {{- $wordText = printf "%d 字" $wordCount -}}
-{{- end -}}
+{{- $stats := partialCached "custom/stats-data.html" . "site-stats" -}}
 
 <li class="menu-item menu-stats" aria-label="{{ T "single.views" }}">
   <span class="stats-pill">
-    <span class="stats-item" title="文章总数：{{ len $posts }} 篇">
+    <span class="stats-item" title="文章总数：{{ $stats.count }} 篇">
       {{- dict "Class" "fa-regular fa-file-lines" | partial "plugin/icon.html" -}}
-      <span class="stats-num">{{ len $posts }}</span><span class="stats-unit">篇</span>
+      <span class="stats-num">{{ $stats.count }}</span><span class="stats-unit">篇</span>
     </span>
-    <span class="stats-item" title="全站总字数：{{ $wordCount }} 字">
+    <span class="stats-item" title="全站总字数：{{ $stats.words }} 字">
       {{- dict "Class" "fa-regular fa-pen-to-square" | partial "plugin/icon.html" -}}
-      <span class="stats-num">{{ $wordText }}</span>
+      <span class="stats-num">{{ $stats.wordText }}</span>
     </span>
-    <span class="stats-item" title="正文图片总数：{{ $imgCount }} 张">
+    <span class="stats-item" title="正文图片总数：{{ $stats.images }} 张">
       {{- dict "Class" "fa-regular fa-image" | partial "plugin/icon.html" -}}
-      <span class="stats-num">{{ $imgCount }}</span><span class="stats-unit">图</span>
+      <span class="stats-num">{{ $stats.images }}</span><span class="stats-unit">图</span>
     </span>
-    <span class="stats-item" title="正文视频总数：{{ $videoCount }} 个">
+    <span class="stats-item" title="正文视频总数：{{ $stats.videos }} 个">
       {{- dict "Class" "fa-solid fa-video" | partial "plugin/icon.html" -}}
-      <span class="stats-num">{{ $videoCount }}</span><span class="stats-unit">视频</span>
+      <span class="stats-num">{{ $stats.videos }}</span><span class="stats-unit">视频</span>
     </span>
     <span class="stats-item stats-pv" title="本站总访问量（不蒜子统计）">
       {{- dict "Class" "fa-regular fa-eye" | partial "plugin/icon.html" -}}

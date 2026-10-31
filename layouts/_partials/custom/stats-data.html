@@ -1,0 +1,46 @@
+{{- /*
+  页眉数据看板的数据源（桌面端 / 移动端共用）
+
+  全部在构建期算好，不依赖任何外部接口：
+    文章数 = posts 区文章数量
+    字数   = 所有文章 WordCount 之和（hasCJKLanguage 下中文按字计）
+    图片数 = 正文中 ![]() / <img> / {{< image >}} 三种写法之和
+    视频数 = 正文中 {{< youtube|bilibili|vimeo|video >}} 与 <video> 之和
+    访问量 = 不蒜子全站 PV，由 assets/js/custom.js 从页脚镜像过来
+
+  用 partialCached 调用，53 篇文章只遍历一次。
+*/ -}}
+
+{{- $posts := where site.RegularPages "Section" "posts" -}}
+{{- $wordCount := 0 -}}
+{{- $imgCount := 0 -}}
+{{- $videoCount := 0 -}}
+{{- /* 用码点拼出 "{{"，否则模板会把字面量当成短代码开始标记 */ -}}
+{{- $ob := printf "%c%c" 123 123 -}}
+{{- $imgRe := printf `!\[[^\]]*\]\([^)]+\)|<img\s|%s[<%%]\s*image\b` $ob -}}
+{{- $vidRe := printf `%s[<%%]\s*(youtube|bilibili|vimeo|video)\b|<video\s` $ob -}}
+{{- range $posts -}}
+  {{- $wordCount = add $wordCount .WordCount -}}
+  {{- $raw := .RawContent -}}
+  {{- $imgCount = add $imgCount (len (findRE $imgRe $raw)) -}}
+  {{- $videoCount = add $videoCount (len (findRE $vidRe $raw)) -}}
+{{- end -}}
+
+{{- $wordText := "" -}}
+{{- $wordTextShort := "" -}}
+{{- if ge $wordCount 10000 -}}
+  {{- $wordText = printf "%.1f 万字" (div (float $wordCount) 10000) -}}
+  {{- $wordTextShort = printf "%.1f万" (div (float $wordCount) 10000) -}}
+{{- else -}}
+  {{- $wordText = printf "%d 字" $wordCount -}}
+  {{- $wordTextShort = printf "%d" $wordCount -}}
+{{- end -}}
+
+{{- return (dict
+  "count" (len $posts)
+  "words" $wordCount
+  "wordText" $wordText
+  "wordTextShort" $wordTextShort
+  "images" $imgCount
+  "videos" $videoCount
+) -}}

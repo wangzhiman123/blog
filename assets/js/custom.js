@@ -152,10 +152,121 @@
     list.insertAdjacentElement('afterend', box)
   }
 
+  /** 轻提示：复制成功之类的一句话反馈 */
+  function toast(msg) {
+    var el = document.getElementById('custom-toast')
+    if (!el) {
+      el = document.createElement('div')
+      el.id = 'custom-toast'
+      el.className = 'custom-toast'
+      document.body.appendChild(el)
+    }
+    el.textContent = msg
+    el.classList.add('is-show')
+    clearTimeout(toast.timer)
+    toast.timer = setTimeout(function () {
+      el.classList.remove('is-show')
+    }, 2200)
+  }
+
+  /** 复制文本，老内核也尽量能用 */
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text)
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea')
+      ta.value = text
+      ta.setAttribute('readonly', '')
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'
+      document.body.appendChild(ta)
+      ta.select()
+      ta.setSelectionRange(0, text.length)
+      var ok = false
+      try {
+        ok = document.execCommand('copy')
+      } catch (e) {
+        ok = false
+      }
+      document.body.removeChild(ta)
+      ok ? resolve() : reject(new Error('copy failed'))
+    })
+  }
+
+  /**
+   * 分享按钮
+   * 桌面端点微信 → 弹二维码（Hugo 构建时生成的 PNG）
+   * 手机端点微信 → 弹二维码没法扫，直接复制链接让用户粘到微信里
+   */
+  function initShare() {
+    var mask = document.getElementById('post-share-qr')
+    var hasCopy = document.querySelector('[data-share-copy]')
+    if (!mask && !hasCopy) return
+
+    function openQr() {
+      if (!mask) return
+      mask.classList.add('is-open')
+      mask.setAttribute('aria-hidden', 'false')
+    }
+    function closeQr() {
+      if (!mask) return
+      mask.classList.remove('is-open')
+      mask.setAttribute('aria-hidden', 'true')
+    }
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod|Mobile|MicroMessenger/i.test(navigator.userAgent)
+    }
+    function doCopy() {
+      copyText(location.href)
+        .then(function () {
+          toast('链接已复制')
+        })
+        .catch(function () {
+          toast('复制失败，请手动复制地址栏')
+        })
+    }
+
+    document.addEventListener('click', function (e) {
+      var el = e.target
+      if (!el || !el.closest) return
+
+      if (el.closest('[data-share-wechat]')) {
+        e.preventDefault()
+        if (isMobile()) {
+          copyText(location.href)
+            .then(function () {
+              toast('链接已复制，去微信里粘贴给好友')
+            })
+            .catch(function () {
+              toast('复制失败，请手动复制地址栏')
+            })
+        } else {
+          openQr()
+        }
+        return
+      }
+
+      if (el.closest('[data-share-close]') || el === mask) {
+        closeQr()
+        return
+      }
+
+      if (el.closest('[data-share-copy]')) {
+        e.preventDefault()
+        doCopy()
+      }
+    })
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeQr()
+    })
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
     initPageJump()
+    initShare()
   }
 
   if (document.readyState === 'loading')

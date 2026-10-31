@@ -529,33 +529,17 @@ report = true
 # Open in editor protocol (e.g. "vscode", "trae" etc.), empty to disable.
 editor = "vscode"
 
-# Social share links in post page.
+# 文章页底部的分享按钮（只用国内能打开的渠道）
+# 主题默认的 Twitter / Facebook / Linkedin 等在境内用不了，已在
+# layouts/_partials/plugin/share.html 里整体换掉。
 [share]
 enable = true
-Twitter = true
-Facebook = true
-Linkedin = false
-Whatsapp = false
-Pinterest = false
-Tumblr = false
-HackerNews = false
-Reddit = false
-VK = false
-Buffer = false
-Xing = false
-Line = false
-Instapaper = false
-Pocket = false
-Flipboard = false
+Wechat = true   # 微信：桌面弹二维码，手机直接复制链接
+QQ = true
+Qzone = true
 Weibo = true
-Myspace = false
-Blogger = false
-Baidu = false
-Odnoklassniki = false
-Evernote = false
-Skype = false
-Trello = false
-Mix = false
+Douban = true
+CopyLink = true
 
 # Comment configuration.
 [comment]

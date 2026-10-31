@@ -1,0 +1,67 @@
+{{- /*
+  分享按钮（覆盖主题 plugin/share.html）
+
+  主题自带 Twitter / Facebook / Linkedin 等境外渠道，国内都打不开，
+  这里整体换成国内常用的：微信（二维码）、QQ、QQ空间、微博、豆瓣、复制链接。
+
+  开关在 config/_default/params.toml 的 [share] 段。
+*/ -}}
+{{- $share := dict "Page" . "Key" "share" | partial "function/param.html" | default dict -}}
+{{- if not $share.enable -}}
+  {{- return -}}
+{{- end -}}
+
+{{- $title := cond (.Param "capitalize_titles") (title .Title) .Title -}}
+{{- $url := .Permalink -}}
+{{- $desc := .Description | default $title -}}
+{{- $si := (.Site.Store.Get "cdn" | default dict).simpleIconsPrefix -}}
+
+{{- if $share.Wechat -}}
+  <a href="javascript:void(0);" class="post-share-link" data-share-wechat title="分享到微信" aria-label="分享到微信">
+    {{- dict "Simpleicons" "wechat" "Prefix" $si | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.QQ -}}
+  <a href="https://connect.qq.com/widget/shareqq/index.html?url={{ $url | urlquery }}&amp;title={{ $title | urlquery }}&amp;summary={{ $desc | urlquery }}" target="_blank" rel="noopener noreferrer" class="post-share-link" title="分享到 QQ" aria-label="分享到 QQ">
+    {{- dict "Simpleicons" "qq" "Prefix" $si | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.Qzone -}}
+  <a href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url={{ $url | urlquery }}&amp;title={{ $title | urlquery }}&amp;summary={{ $desc | urlquery }}" target="_blank" rel="noopener noreferrer" class="post-share-link" title="分享到 QQ 空间" aria-label="分享到 QQ 空间">
+    {{- dict "Simpleicons" "qzone" "Prefix" $si | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.Weibo -}}
+  <a href="https://service.weibo.com/share/share.php?url={{ $url | urlquery }}&amp;title={{ $title | urlquery }}" target="_blank" rel="noopener noreferrer" class="post-share-link" title="分享到微博" aria-label="分享到微博">
+    {{- dict "Class" "fa-brands fa-weibo" | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.Douban -}}
+  <a href="https://www.douban.com/share/service?href={{ $url | urlquery }}&amp;name={{ $title | urlquery }}&amp;text={{ $desc | urlquery }}" target="_blank" rel="noopener noreferrer" class="post-share-link" title="分享到豆瓣" aria-label="分享到豆瓣">
+    {{- dict "Simpleicons" "douban" "Prefix" $si | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.CopyLink -}}
+  <a href="javascript:void(0);" class="post-share-link" data-share-copy title="复制链接" aria-label="复制这篇文章的链接">
+    {{- dict "Class" "fa-solid fa-link" | partial "plugin/icon.html" -}}
+  </a>
+{{- end -}}
+
+{{- if $share.Wechat -}}
+  {{- /* 桌面端扫码用；手机上点微信按钮直接复制链接，见 assets/js/custom.js */ -}}
+  <div class="post-share-qr" id="post-share-qr" aria-hidden="true">
+    <div class="post-share-qr-dialog" role="dialog" aria-modal="true" aria-label="微信扫码打开">
+      <button type="button" class="post-share-qr-close" data-share-close aria-label="关闭">&times;</button>
+      <p class="post-share-qr-title">微信扫一扫，在手机上继续读</p>
+      {{- with images.QR $url (dict "level" "medium" "scale" 6 "targetDir" "images/qr") }}
+        <img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="这篇文章的微信二维码" loading="lazy">
+      {{- end }}
+      <button type="button" class="post-share-qr-copy" data-share-copy>复制链接</button>
+    </div>
+  </div>
+{{- end -}}

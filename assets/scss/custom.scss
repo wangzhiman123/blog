@@ -73,12 +73,26 @@
   opacity: 0.8;
 }
 
+// 手机上展示和桌面端同样的 5 项（文章 / 字数 / 图片 / 视频 / 访问量），
+// 靠缩字号 + 压间距塞进一行；极窄屏（<340px）允许折成两行，居中排
 .stats-pill-mobile {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  gap: 0.3rem 0.7rem;
+  margin-top: 0.7rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  line-height: 1.35rem;
+  white-space: normal;
+
+  i {
+    font-size: 0.7rem;
+  }
+
+  .stats-unit {
+    font-size: 0.7rem;
+  }
 }
 
 // 桌面导航在中等宽度下空间紧张，先收起看板，避免挤压菜单项
@@ -518,3 +532,140 @@
   }
 }
 
+
+// -----------------------------------------------------------------------------
+// 分享按钮：国内渠道（微信 / QQ / QQ空间 / 微博 / 豆瓣 / 复制链接）
+//   按钮由 layouts/_partials/plugin/share.html 输出，微信二维码用 Hugo
+//   构建时生成的 PNG（images.QR），不依赖任何第三方接口。
+// -----------------------------------------------------------------------------
+.post-info-share {
+  .post-share-link {
+    margin-inline: 0.1rem;
+    color: inherit;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    &:hover {
+      color: #07c160;
+      opacity: 1;
+    }
+
+    // 不是所有渠道都是微信绿，按渠道给个顺眼的悬停色
+    &[href*='connect.qq.com']:hover,
+    &[href*='qzshare']:hover {
+      color: #12b7f5;
+    }
+
+    &[href*='weibo.com']:hover {
+      color: #e6162d;
+    }
+
+    &[href*='douban.com']:hover {
+      color: #007722;
+    }
+  }
+}
+
+// 微信二维码弹层（桌面端扫码用）
+.post-share-qr {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.45);
+
+  &.is-open {
+    display: flex;
+  }
+
+  &-dialog {
+    position: relative;
+    width: min(17rem, 88vw);
+    padding: 1.4rem 1.25rem 1.1rem;
+    text-align: center;
+    background-color: #ffffff;
+    background-color: light-dark(#ffffff, #1f2328);
+    border-radius: 0.85rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+
+    img {
+      display: block;
+      width: 11rem;
+      height: 11rem;
+      margin: 0.75rem auto 0;
+      border-radius: 0.35rem;
+    }
+  }
+
+  &-title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2328;
+    color: light-dark(#1f2328, #e6edf3);
+  }
+
+  &-close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.5rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: #8b949e;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:hover {
+      color: #e6162d;
+    }
+  }
+
+  &-copy {
+    margin-top: 0.9rem;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.85rem;
+    color: #1f2328;
+    color: light-dark(#1f2328, #e6edf3);
+    cursor: pointer;
+    background-color: #f3f4f6;
+    background-color: light-dark(#f3f4f6, #2a2f37);
+    border: 1px solid #d8dee4;
+    border: 1px solid light-dark(#d8dee4, #30363d);
+    border-radius: 0.4rem;
+
+    &:hover {
+      color: #07c160;
+      border-color: #07c160;
+    }
+  }
+}
+
+// 复制链接 / 复制成功的轻提示
+.custom-toast {
+  position: fixed;
+  bottom: 4.5rem;
+  left: 50%;
+  z-index: 1300;
+  max-width: 80vw;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  color: #ffffff;
+  text-align: center;
+  pointer-events: none;
+  background-color: rgba(31, 35, 40, 0.92);
+  border-radius: 2rem;
+  opacity: 0;
+  transform: translate(-50%, 0.5rem);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+
+  &.is-show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

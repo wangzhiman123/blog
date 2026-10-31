@@ -3,22 +3,31 @@
 
   主题把 custom-menu:mobile 注入在 <li class="menu-item menu-system"> 内部，
   所以这里只能输出行内元素，不能再套 <li>。
+
+  项目与桌面端保持一致：文章数 / 字数 / 图片 / 视频 / 访问量。
+  数据来自 custom/stats-data.html（partialCached，不会重复遍历文章）。
 */ -}}
 
-{{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $wordCount := 0 -}}
-{{- range $posts -}}{{- $wordCount = add $wordCount .WordCount -}}{{- end -}}
+{{- $stats := partialCached "custom/stats-data.html" . "site-stats" -}}
 
 <span class="stats-pill stats-pill-mobile">
-  <span class="stats-item" title="文章总数">
+  <span class="stats-item" title="文章总数：{{ $stats.count }} 篇">
     {{- dict "Class" "fa-regular fa-file-lines" | partial "plugin/icon.html" -}}
-    <span class="stats-num">{{ len $posts }}</span>
+    <span class="stats-num">{{ $stats.count }}</span><span class="stats-unit">篇</span>
   </span>
-  <span class="stats-item" title="全站总字数">
+  <span class="stats-item" title="全站总字数：{{ $stats.words }} 字">
     {{- dict "Class" "fa-regular fa-pen-to-square" | partial "plugin/icon.html" -}}
-    <span class="stats-num">{{ printf "%.1f万" (div (float $wordCount) 10000) }}</span>
+    <span class="stats-num">{{ $stats.wordTextShort }}</span><span class="stats-unit">字</span>
   </span>
-  <span class="stats-item stats-pv" title="本站总访问量">
+  <span class="stats-item" title="正文图片总数：{{ $stats.images }} 张">
+    {{- dict "Class" "fa-regular fa-image" | partial "plugin/icon.html" -}}
+    <span class="stats-num">{{ $stats.images }}</span><span class="stats-unit">图</span>
+  </span>
+  <span class="stats-item" title="正文视频总数：{{ $stats.videos }} 个">
+    {{- dict "Class" "fa-solid fa-video" | partial "plugin/icon.html" -}}
+    <span class="stats-num">{{ $stats.videos }}</span><span class="stats-unit">视频</span>
+  </span>
+  <span class="stats-item stats-pv" title="本站总访问量（不蒜子统计）">
     {{- dict "Class" "fa-regular fa-eye" | partial "plugin/icon.html" -}}
     <span class="stats-num" id="header-site-pv-mobile">-</span>
   </span>
