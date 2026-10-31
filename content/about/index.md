@@ -27,8 +27,7 @@ toc: false
 
 ### 品牌矩阵
 
-- **个人网站**：[王志满律师网 www.2019527.xyz](https://2019527.xyz)
-- **本站**：[444527.xyz](https://444527.xyz)（同源镜像站，文章同步更新）
+- **个人网站**：[王志满律师网 www.2019527.xyz](https://2019527.xyz)（就是本站）
 - **微信公众号**：[王志满律师（公众号 ID：www2019527xyz）](https://mp.weixin.qq.com/s/60l8EQT2kyGSKww-yNw06A)
 - **小红书**：[王志满律师（小红书号：3838565289）](https://xhslink.cn/o/4cNvEm7Bclh)
 - **知乎**：[王志满律师](https://www.zhihu.com/people/pxpiloveu)
@@ -44,4 +43,4 @@ toc: false
 
 * * *
 
-> 本站与 [www.2019527.xyz](https://2019527.xyz) 为同一作者维护的两个发布入口，内容同源。关于个人信息的处理规则，见[《隐私政策》](/privacy/)。
+> 关于本站如何处理您的个人信息，见[《隐私政策》](/privacy/)；关于站内文章的性质、脱敏做法与转载规则，见[《免责声明》](/disclaimer/)。

@@ -1,5 +1,7 @@
 title = "王志满律师"
-baseURL = "https://444527.xyz/"
+# 站点正式地址。换域名时改这一行 + static/CNAME + 三篇法务页里提到的域名。
+# 结尾必须有斜杠，否则 og:image、RSS、搜索索引的绝对地址会拼错。
+baseURL = "https://2019527.xyz/"
 theme = [
   "FixIt",
   "shortcode-docs-bookmark"

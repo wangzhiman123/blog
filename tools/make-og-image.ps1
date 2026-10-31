@@ -74,7 +74,7 @@ $linePen = New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(70, 2
 $g.DrawLine($linePen, 128, 400, 620, 400)
 
 # ---- 底部域名 ----
-$g.DrawString('444527.xyz', $fontSite, $soft, 128, 432)
+$g.DrawString('2019527.xyz', $fontSite, $soft, 128, 432)
 
 $g.Dispose()
 $bmp.Save($outFile, [System.Drawing.Imaging.ImageFormat]::Png)
