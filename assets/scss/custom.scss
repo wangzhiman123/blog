@@ -408,6 +408,10 @@
 
       .post-meta {
         font-size: 0.75rem;
+        // 手机上分类多时会折行，把卡片顶高，截断成一行保住等高
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
