@@ -1326,8 +1326,13 @@ src = ""
 token = ""
 
 # Cookie consent configuration.
+# 已关闭：本站只有「不蒜子」一个访问计数脚本，没有广告投放、没有用户画像、
+# 没有跨站追踪，属于《个人信息保护法》里不需要单独弹窗征得同意的情形。
+# 关掉后右下角不会再自动弹出授权条，页面更干净；相关处理规则已写在
+# /privacy/ 页（隐私政策第三节），读者知情权仍然有保障。
+# 将来如果接入第三方广告或跨站追踪脚本，把 enable 改回 true 即可。
 [cookieconsent]
-enable = true
+enable = false
 
 # Text strings used for Cookie consent banner.
 [cookieconsent.content]
