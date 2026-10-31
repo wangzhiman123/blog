@@ -1,13 +1,14 @@
 # -------------------------------------------------------------------------------------
-# 多语言配置
-#   中文（zh-cn）：默认语言，占用根路径 /
-#   英文（en）  ：次级语言，占用 /en/
+# 语言配置
 #
-# 注意：defaultContentLanguage 在 hugo.toml 里已经设为 "zh-cn"，
-#       defaultContentLanguageInSubdir 保持 false，中文才不会跑到 /zh-cn/ 下。
+# 本站只做中文，单语言站。
+#   zh-cn：默认语言，占用根路径 /
 #
-# 给某篇文章补英文版：在文章目录里新增 index.en.md（或 xxx.en.md），
-# 页面右上角的语言切换就会自动出现在该文章上。
+# 之前配过英文站（/en/），现已整体移除，相关文件也一并删除：
+#   content/en/、各文章目录下的 index.en.md、menus.en.toml、data/friends.en.yml
+#
+# 如果哪天想重新开英文站：在下面重新加一个 [en] 块，并给文章补 index.en.md，
+# 页面右上角的语言切换会自动出现（模板按 hugo.IsMultilingual 判断）。
 # -------------------------------------------------------------------------------------
 
 [zh-cn]
@@ -17,24 +18,3 @@ weight = 1
 title = "王志满律师"
 contentDir = "content"
 hasCJKLanguage = true
-
-[en]
-locale = "en-US"
-label = "English"
-weight = 2
-title = "Wang Zhiman · Lawyer"
-contentDir = "content/en"
-hasCJKLanguage = false
-
-[en.params]
-description = "Notes on Chinese civil litigation and administrative litigation"
-
-# 英文站暂无译文，先不渲染文章列表，改为在首页放一段英文说明
-[en.params.home]
-
-[en.params.home.profile]
-title = "Wang Zhiman"
-subtitle = "Lawyer · Civil and Administrative Litigation"
-
-[en.params.home.posts]
-enable = false

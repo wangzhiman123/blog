@@ -140,7 +140,6 @@
     <button class="primary" onclick="addItem()">＋ 新增友链</button>
     <button onclick="document.getElementById('file').click()">导入（yml / 备份 json）</button>
     <button onclick="backupJson()">备份为 json</button>
-    <button onclick="toggleEnAll()">展开/收起英文</button>
     <button onclick="renumber()">按顺序重排权重</button>
     <button class="danger" onclick="clearAll()">清空</button>
     <input type="file" id="file" accept=".yml,.yaml,.txt,.json" style="display:none" onchange="importFile(event)">
@@ -162,17 +161,13 @@
 
       <div class="card">
         <h2><span class="num">3</span>导出</h2>
-        <div class="tabs">
-          <button id="tab-zh" class="active" onclick="switchTab('zh')">中文 friends.yml</button>
-          <button id="tab-en" onclick="switchTab('en')">英文 friends.en.yml</button>
-        </div>
         <pre class="code" id="yaml"></pre>
         <div class="toolbar" style="margin:12px 0 0">
-          <button class="primary" onclick="download()">下载当前文件</button>
+          <button class="primary" onclick="download()">下载 friends.yml</button>
           <button onclick="copyYaml()">复制</button>
         </div>
         <div class="note" style="margin-top:10px">
-          英文版留空会自动沿用中文名称和简介，所以不填也能用。
+          文件名固定是 <b>friends.yml</b>，直接覆盖仓库里的 <code class="k">data/friends.yml</code>。
         </div>
       </div>
 
@@ -193,18 +188,13 @@
 <script>
 const KEY = 'fixit_friends_v1';
 let items = [];
-let tab = 'zh';
 let dragId = null;
 
 const SEED = [
-  { nickname: '中国裁判文书网', url: 'https://wenshu.court.gov.cn', description: '全国法院裁判文书公开平台，检索类案的第一站', avatar: '', weight: 100,
-    en_nickname: 'China Judgements Online', en_description: 'Official platform for published court judgments — the first stop when researching similar cases' },
-  { nickname: '国家法律法规数据库', url: 'https://flk.npc.gov.cn', description: '法律、行政法规、司法解释原文查询', avatar: '', weight: 90,
-    en_nickname: 'National Laws and Regulations Database', en_description: 'Statutes, administrative regulations and judicial interpretations in full text' },
-  { nickname: 'Hugo', url: 'https://gohugo.io', description: '本站使用的静态站点生成器', avatar: '', weight: 60,
-    en_nickname: 'Hugo', en_description: 'The static site generator behind this site' },
-  { nickname: 'FixIt', url: 'https://fixit.lruihao.cn', description: '本站主题的中文文档与配置参考', avatar: '', weight: 50,
-    en_nickname: 'FixIt Theme', en_description: 'Documentation and configuration reference for the theme used here' }
+  { nickname: '中国裁判文书网', url: 'https://wenshu.court.gov.cn', description: '全国法院裁判文书公开平台，检索类案的第一站', avatar: '', weight: 100 },
+  { nickname: '国家法律法规数据库', url: 'https://flk.npc.gov.cn', description: '法律、行政法规、司法解释原文查询', avatar: '', weight: 90 },
+  { nickname: 'Hugo', url: 'https://gohugo.io', description: '本站使用的静态站点生成器', avatar: '', weight: 60 },
+  { nickname: 'FixIt', url: 'https://fixit.lruihao.cn', description: '本站主题的中文文档与配置参考', avatar: '', weight: 50 }
 ];
 
 /* ---------- 存储 ---------- */
@@ -263,20 +253,6 @@ function render() {
           <label>头像地址（可留空，留空自动显示图标）</label>
           <input type="text" value="${esc(it.avatar)}" data-id="${it.id}" data-k="avatar" placeholder="https://.../avatar.png" oninput="onEdit(this)">
         </div>
-        <div class="en-box ${it._enOpen ? 'open' : ''}" data-en="${it.id}">
-          <div class="tip">英文站显示用，留空则沿用上面的中文</div>
-          <div class="grid2">
-            <div class="field">
-              <label>English name</label>
-              <input type="text" value="${esc(it.en_nickname)}" data-id="${it.id}" data-k="en_nickname" oninput="onEdit(this)">
-            </div>
-            <div class="field">
-              <label>English description</label>
-              <input type="text" value="${esc(it.en_description)}" data-id="${it.id}" data-k="en_description" oninput="onEdit(this)">
-            </div>
-          </div>
-        </div>
-        <button class="mini" style="margin-top:8px" onclick="toggleEn('${it.id}')">英文信息 ▾</button>
       </div>
     `).join('');
     bindDrag();
@@ -296,8 +272,8 @@ function renderPreview() {
   const sorted = sortedItems();
   if (!sorted.length) { box.innerHTML = '<div class="empty">暂无预览</div>'; return; }
   box.innerHTML = sorted.map(it => {
-    const name = tab === 'en' ? (it.en_nickname || it.nickname) : it.nickname;
-    const desc = tab === 'en' ? (it.en_description || it.description) : it.description;
+    const name = it.nickname;
+    const desc = it.description;
     const initial = (name || '?').trim().charAt(0).toUpperCase();
     const av = it.avatar
       ? `<img src="${esc(it.avatar)}" alt="" onerror="this.style.display='none'">`
@@ -343,7 +319,7 @@ function validateOne(it, el) {
 }
 
 function addItem() {
-  items.push({ id: uid(), nickname: '', url: '', description: '', avatar: '', weight: 0, en_nickname: '', en_description: '', _enOpen: false });
+  items.push({ id: uid(), nickname: '', url: '', description: '', avatar: '', weight: 0 });
   renumber();
   render();
   const inputs = document.querySelectorAll('input[data-k="nickname"]');
@@ -371,21 +347,6 @@ function clearAll() {
   items = [];
   render();
   toast('已清空');
-}
-
-function toggleEn(id) {
-  const it = items.find(x => x.id === id);
-  if (!it) return;
-  it._enOpen = !it._enOpen;
-  const box = document.querySelector(`[data-en="${id}"]`);
-  if (box) box.classList.toggle('open', it._enOpen);
-  save();
-}
-
-function toggleEnAll() {
-  const anyOpen = items.some(x => !x._enOpen);
-  items.forEach(x => x._enOpen = anyOpen);
-  render();
 }
 
 function renumber() {
@@ -443,17 +404,13 @@ function ystr(s) {
   return '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
 }
 
-function buildYaml(lang) {
+function buildYaml() {
   const list = sortedItems();
-  const head = lang === 'en'
-    ? '# 友情链接数据（英文站 /en/friends/ 使用）\n# 由「友链管理器」生成；留空的英文名称会沿用中文。\n# 字段：nickname、url、description、avatar、weight\n\n'
-    : '# 友情链接数据\n# 由「友链管理器」生成。想改内容，打开 /tools/youlian.html 编辑后重新下载即可。\n# 字段：nickname（必填）、url（必填）、description、avatar（可省略）、weight（越大越靠前）\n\n';
+  const head = '# 友情链接数据\n# 由「友链管理器」生成。想改内容，打开 /tools/youlian.html 编辑后重新下载即可。\n# 字段：nickname（必填）、url（必填）、description、avatar（可省略）、weight（越大越靠前）\n\n';
   if (!list.length) return head + '[]\n';
   return head + list.map(it => {
-    const name = lang === 'en' ? (it.en_nickname || it.nickname) : it.nickname;
-    const desc = lang === 'en' ? (it.en_description || it.description) : it.description;
-    let s = `- nickname: ${ystr(name)}\n  url: ${ystr(it.url)}`;
-    if (desc) s += `\n  description: ${ystr(desc)}`;
+    let s = `- nickname: ${ystr(it.nickname)}\n  url: ${ystr(it.url)}`;
+    if (it.description) s += `\n  description: ${ystr(it.description)}`;
     if (it.avatar) s += `\n  avatar: ${ystr(it.avatar)}`;
     s += `\n  weight: ${Number(it.weight) || 0}`;
     return s;
@@ -461,20 +418,12 @@ function buildYaml(lang) {
 }
 
 function renderYaml() {
-  document.getElementById('yaml').textContent = buildYaml(tab);
-}
-
-function switchTab(t) {
-  tab = t;
-  document.getElementById('tab-zh').classList.toggle('active', t === 'zh');
-  document.getElementById('tab-en').classList.toggle('active', t === 'en');
-  renderPreview();
-  renderYaml();
+  document.getElementById('yaml').textContent = buildYaml();
 }
 
 function download() {
-  const name = tab === 'en' ? 'friends.en.yml' : 'friends.yml';
-  const blob = new Blob([buildYaml(tab)], { type: 'text/yaml;charset=utf-8' });
+  const name = 'friends.yml';
+  const blob = new Blob([buildYaml()], { type: 'text/yaml;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = name;
@@ -485,7 +434,7 @@ function download() {
 }
 
 function copyYaml() {
-  const txt = buildYaml(tab);
+  const txt = buildYaml();
   const done = () => toast('已复制到剪贴板');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(txt).then(done).catch(fallback);
@@ -519,7 +468,7 @@ function backupJson() {
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  toast('已备份，含中英文全部信息');
+  toast('已备份，下次换电脑可以导入这个文件');
 }
 
 function importJson(txt) {
@@ -530,8 +479,7 @@ function importJson(txt) {
       id: uid(),
       nickname: o.nickname || '', url: o.url || '',
       description: o.description || '', avatar: o.avatar || '',
-      weight: Number(o.weight) || 0,
-      en_nickname: o.en_nickname || '', en_description: o.en_description || ''
+      weight: Number(o.weight) || 0
     }));
     render();
     toast(`已从备份恢复 ${items.length} 条友链`);
@@ -561,9 +509,7 @@ function parseYaml(text) {
     url: o.url || '',
     description: o.description || '',
     avatar: o.avatar || '',
-    weight: parseInt(o.weight, 10) || 0,
-    en_nickname: o.en_nickname || '',
-    en_description: o.en_description || ''
+    weight: parseInt(o.weight, 10) || 0
   }));
   if (!list.length) { toast('没读到友链，请检查文件格式'); return; }
   items = list;
