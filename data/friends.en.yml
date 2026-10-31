@@ -1,0 +1,23 @@
+# 友情链接数据（英文站 /en/friends/ 使用）
+# 由「友链管理器」生成；留空的英文名称会沿用中文。
+# 字段：nickname、url、description、avatar、weight
+
+- nickname: "China Judgements Online"
+  url: "https://wenshu.court.gov.cn"
+  description: "Official platform for published court judgments — the first stop when researching similar cases"
+  weight: 100
+
+- nickname: "National Laws and Regulations Database"
+  url: "https://flk.npc.gov.cn"
+  description: "Statutes, administrative regulations and judicial interpretations in full text"
+  weight: 90
+
+- nickname: "Hugo"
+  url: "https://gohugo.io"
+  description: "The static site generator behind this site"
+  weight: 60
+
+- nickname: "FixIt Theme"
+  url: "https://fixit.lruihao.cn"
+  description: "Documentation and configuration reference for the theme used here"
+  weight: 50
