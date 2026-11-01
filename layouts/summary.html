@@ -62,17 +62,51 @@
     <a href="{{ .RelPermalink }}">{{ cond (.Param "capitalize_titles") (title .Title) .Title }}</a>
   </h2>
 
-  {{- /* Meta */ -}}
+  {{- /* Meta：左段（日期 + 收录于）可截断，右段（阅读量 / 评论数）固定不缩 */ -}}
   <div class="post-meta">
-    {{- partial "single/post-author.html" . -}}
+    <div class="post-meta-line">
+      {{- partial "single/post-author.html" . -}}
 
-    {{- with .PublishDate | dateFormat (.Site.Params.date_format | default "2006-01-02") -}}
-      &nbsp;<span class="post-publish" title='{{ "2006-01-02 15:04:05" | $.PublishDate.Format }}'>
-        {{- printf `<time datetime="%v">%v</time>` . . | dict "Date" | T "single.publishedOnDate" | safeHTML -}}
-      </span>
+      {{- with .PublishDate | dateFormat (.Site.Params.date_format | default "2006-01-02") -}}
+        &nbsp;<span class="post-publish" title='{{ "2006-01-02 15:04:05" | $.PublishDate.Format }}'>
+          {{- printf `<time datetime="%v">%v</time>` . . | dict "Date" | T "single.publishedOnDate" | safeHTML -}}
+        </span>
+      {{- end -}}
+
+      {{- partial "single/post-included-in.html" . -}}
+    </div>
+
+    {{- /*
+      阅读量与评论数
+      ---------------------------------------------------------------
+      Hugo 构建期拿不到这两个数字，所以这里只输出占位符（短横线），
+      由 assets/js/custom.js 的 initPostStats() 异步填充：
+        阅读量 ← VerCount  GET https://events.vercount.one/api/v2/log?url=<完整URL>
+        评论数 ← Twikoo    POST <env_id> {event:"GET_COMMENTS_COUNT", urls:[路径...]}
+
+      两个地址都取自站点自身已有的配置 / 服务，不需要额外部署：
+        · VerCount 就是 [busuanzi] 里 source 指向的那家，本站页脚访问量用的它
+        · Twikoo 取 [comment.twikoo].env_id，与文章页评论区同一个服务
+
+      想关掉这个功能：删掉下面这段 <div class="post-stats">，并把 custom.js 里
+      的 initPostStats() 调用去掉即可，其余不受影响。
+    */ -}}
+    {{- $twikooEnv := "" -}}
+    {{- with .Site.Params.comment.twikoo -}}
+      {{- if .enable -}}
+        {{- $twikooEnv = .env_id | default "" -}}
+      {{- end -}}
     {{- end -}}
-
-    {{- partial "single/post-included-in.html" . -}}
+    <div class="post-stats" data-twikoo-env="{{ $twikooEnv }}">
+      <span class="post-stat post-views" title="阅读量" data-views-url="{{ .Permalink }}">
+        <i class="fa-regular fa-eye" aria-hidden="true"></i><span class="post-stat-num">–</span>
+      </span>
+      {{- if $twikooEnv -}}
+        <a class="post-stat post-comments" href="{{ .RelPermalink }}#comments" title="评论数" data-comments-path="{{ .RelPermalink }}">
+          <i class="fa-regular fa-comments" aria-hidden="true"></i><span class="post-stat-num">–</span>
+        </a>
+      {{- end -}}
+    </div>
   </div>
 
   {{- /* Summary content */ -}}

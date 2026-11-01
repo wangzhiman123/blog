@@ -332,18 +332,56 @@
 
     .post-meta {
       grid-area: meta;
+      // 分左右两段：左段（发布日 + 收录于）可截断，右段（阅读量 / 评论数）固定
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
       margin: 0.45rem 0 0;
       font-size: 0.8rem;
       color: #8b949e;
       color: light-dark(#8b949e, #7d8590);
-      // 分类多的卡片 meta 会折行、把卡片顶高一截，单行截断保住等高
-      overflow: hidden;
+      // 分类多的卡片 meta 会折行、把卡片顶高一截，截断留给左段自己做
       white-space: nowrap;
-      text-overflow: ellipsis;
 
       // 首页每篇都是同一个作者，这个名字纯属占位
       .post-author {
         display: none;
+      }
+
+      .post-meta-line {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      // 阅读量与评论数：数字由 custom.js 异步填，接口失败时整项隐藏
+      .post-stats {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.85rem;
+
+        .post-stat {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.22rem;
+          color: inherit;
+          text-decoration: none;
+          font-variant-numeric: tabular-nums;
+
+          i {
+            font-size: 0.85em;
+          }
+
+          &.is-hidden {
+            display: none;
+          }
+        }
+
+        a.post-stat:hover {
+          color: light-dark(#0969da, #58a6ff);
+        }
       }
 
       // 标题的点击遮罩盖住了整张卡片，分类链接要抬到它上面才点得动
@@ -482,10 +520,12 @@
 
       .post-meta {
         font-size: 0.75rem;
-        // 手机上分类多时会折行，把卡片顶高，截断成一行保住等高
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        // 窄屏更窄，左右两段都收紧一点；截断仍由 .post-meta-line 负责
+        gap: 0.4rem;
+
+        .post-stats {
+          gap: 0.6rem;
+        }
       }
     }
 

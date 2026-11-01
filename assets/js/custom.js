@@ -289,10 +289,251 @@
     apply()
   }
 
+  // ---------------------------------------------------------------------------
+  // 列表卡片的阅读量与评论数
+  //
+  // Hugo 构建期拿不到这两个数字，模板只输出短横线占位，这里异步补齐：
+  //   阅读量 ← VerCount  GET  https://events.vercount.one/api/v2/log?url=<完整URL>
+  //   评论数 ← Twikoo    POST <env_id> {event:"GET_COMMENTS_COUNT", urls:[路径...]}
+  //
+  // 两家都是本站已经在用的服务（页脚访问量、文章页评论区），不需要额外部署。
+  // 结果缓存 5 分钟，翻页来回走不重复请求；接口挂了就把那一项藏起来，
+  // 不留一排短横线在卡片上。
+  // ---------------------------------------------------------------------------
+  var POST_STATS_KEY = 'post-stats:v1'
+  var POST_STATS_TTL = 5 * 60 * 1000
+
+  function readPostStatsCache() {
+    var empty = { ts: Date.now(), views: {}, comments: {} }
+    try {
+      var raw = window.localStorage.getItem(POST_STATS_KEY)
+      if (!raw)
+        return empty
+      var saved = JSON.parse(raw)
+      if (!saved || typeof saved.ts !== 'number' || !saved.views || !saved.comments)
+        return empty
+      // 过期就整份丢掉，重新查一遍
+      if (Date.now() - saved.ts > POST_STATS_TTL)
+        return empty
+      return saved
+    }
+    catch (e) {
+      // 无痕模式或禁用了本地存储时 localStorage 会抛错
+      return empty
+    }
+  }
+
+  function savePostStatsCache(cache) {
+    try {
+      cache.ts = Date.now()
+      window.localStorage.setItem(POST_STATS_KEY, JSON.stringify(cache))
+    }
+    catch (e) { /* 存不了就算了，不影响显示 */ }
+  }
+
+  /** 带超时的 fetch，任何失败都返回 null，绝不抛错 */
+  function fetchJson(url, options, timeout) {
+    if (typeof window.fetch !== 'function' || typeof window.AbortController !== 'function')
+      return Promise.resolve(null)
+
+    var controller = new window.AbortController()
+    var timer = window.setTimeout(function () { controller.abort() }, timeout || 6000)
+    var opts = options || {}
+    opts.signal = controller.signal
+    opts.mode = 'cors'
+    opts.credentials = 'omit'
+
+    return window.fetch(url, opts).then(function (res) {
+      return res.ok ? res.json() : null
+    }).catch(function () {
+      return null
+    }).then(function (data) {
+      window.clearTimeout(timer)
+      return data
+    })
+  }
+
+  /** 并发上限为 limit 的任务池；任务自身不 reject，所以不需要错误分支 */
+  function runLimitedPool(tasks, limit) {
+    return new Promise(function (resolve) {
+      if (!tasks.length) {
+        resolve()
+        return
+      }
+      var index = 0
+      var running = 0
+      var done = 0
+
+      function pump() {
+        while (running < limit && index < tasks.length) {
+          running++
+          tasks[index]().then(function () {
+            running--
+            done++
+            if (done === tasks.length)
+              resolve()
+            else
+              pump()
+          })
+          index++
+        }
+      }
+      pump()
+    })
+  }
+
+  /** 写入一个数字；value 为 null 表示没取到，隐藏整项 */
+  function applyStat(node, value) {
+    if (typeof value === 'number' && isFinite(value)) {
+      var num = node.querySelector('.post-stat-num')
+      if (num)
+        num.textContent = formatNumber(value)
+      node.classList.remove('is-hidden')
+    }
+    else {
+      node.classList.add('is-hidden')
+    }
+  }
+
+  function initPostStats() {
+    var viewNodes = document.querySelectorAll('.post-views[data-views-url]')
+    var commentNodes = document.querySelectorAll('.post-comments[data-comments-path]')
+    if (!viewNodes.length && !commentNodes.length)
+      return
+
+    var cache = readPostStatsCache()
+    var changed = false
+
+    // ---- 评论数：一次 POST 批量取全部路径 ----
+    var env = ''
+    var boxes = document.querySelectorAll('.post-stats[data-twikoo-env]')
+    for (var b = 0; b < boxes.length; b++) {
+      var candidate = boxes[b].getAttribute('data-twikoo-env')
+      if (candidate) {
+        env = candidate.replace(/\/+$/, '')
+        break
+      }
+    }
+
+    if (env && commentNodes.length) {
+      var wanted = []
+      var queued = {}
+      var pending = []
+
+      for (var c = 0; c < commentNodes.length; c++) {
+        var cNode = commentNodes[c]
+        var path = cNode.getAttribute('data-comments-path')
+        if (!path)
+          continue
+        if (typeof cache.comments[path] === 'number') {
+          applyStat(cNode, cache.comments[path])
+        }
+        else {
+          pending.push({ node: cNode, path: path })
+          if (!queued[path]) {
+            queued[path] = true
+            wanted.push(path)
+          }
+        }
+      }
+
+      if (wanted.length) {
+        fetchJson(env + '/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'GET_COMMENTS_COUNT', urls: wanted })
+        }, 8000).then(function (data) {
+          // 注意：Twikoo 成功时只返回 {data:[...], accessToken}，没有 code 字段；
+          // 出错时才给 {message:"..."}。所以这里只认 data 是不是数组。
+          var got = {}
+          if (data && Array.isArray(data.data)) {
+            for (var i = 0; i < data.data.length; i++) {
+              var row = data.data[i]
+              if (row && typeof row.url === 'string' && typeof row.count === 'number')
+                got[row.url] = row.count
+            }
+          }
+
+          var hit = false
+          for (var j = 0; j < pending.length; j++) {
+            var p = pending[j]
+            if (typeof got[p.path] === 'number') {
+              cache.comments[p.path] = got[p.path]
+              applyStat(p.node, got[p.path])
+              hit = true
+            }
+            else {
+              applyStat(p.node, null)
+            }
+          }
+          if (hit)
+            savePostStatsCache(cache)
+        })
+      }
+    }
+    else if (commentNodes.length) {
+      // 没启用 Twikoo 就别显示评论数，留个短横线没意义
+      for (var k = 0; k < commentNodes.length; k++)
+        applyStat(commentNodes[k], null)
+    }
+
+    // ---- 阅读量：一个地址一次请求，并发 3 条 ----
+    if (!viewNodes.length)
+      return
+
+    var todo = []
+    var seen = {}
+    for (var v = 0; v < viewNodes.length; v++) {
+      var vNode = viewNodes[v]
+      var url = vNode.getAttribute('data-views-url')
+      if (!url)
+        continue
+      if (typeof cache.views[url] === 'number')
+        applyStat(vNode, cache.views[url])
+      else if (!seen[url]) {
+        seen[url] = true
+        todo.push(url)
+      }
+    }
+
+    if (!todo.length)
+      return
+
+    var tasks = todo.map(function (url) {
+      return function () {
+        return fetchJson(
+          'https://events.vercount.one/api/v2/log?url=' + encodeURIComponent(url),
+          null,
+          6000
+        ).then(function (data) {
+          var pv = data && data.data && typeof data.data.page_pv === 'number'
+            ? data.data.page_pv
+            : null
+
+          if (pv !== null) {
+            cache.views[url] = pv
+            changed = true
+          }
+
+          for (var n = 0; n < viewNodes.length; n++) {
+            if (viewNodes[n].getAttribute('data-views-url') === url)
+              applyStat(viewNodes[n], pv)
+          }
+        })
+      }
+    })
+
+    runLimitedPool(tasks, 3).then(function () {
+      if (changed)
+        savePostStatsCache(cache)
+    })
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
     initPageJump()
+    initPostStats()
     initFriendAvatarFallback()
     initFriendSearch()
   }
