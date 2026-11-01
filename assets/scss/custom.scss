@@ -231,6 +231,29 @@
 }
 
 // -----------------------------------------------------------------------------
+// 友链卡片上的网址
+//   填了「网址」但卡片上只有名字和简介时，看不出对方是哪个站点、有没有填错，
+//   这里把 https:// 去掉单独显示一行；过长（带路径的）单行省略，不撑破卡片。
+// -----------------------------------------------------------------------------
+.friend-links[data-scheme] > .friend-link .friend-url {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.72em;
+  line-height: 1.4;
+  color: light-dark(#57606a, #adbac7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// note 样式本来就是单行列表，网址接在后面，不另起一行
+.friend-links[data-scheme="note"] > .friend-link .friend-url {
+  display: inline;
+  margin-top: 0;
+  margin-inline-start: 0.4rem;
+}
+
+// -----------------------------------------------------------------------------
 // 首页文章列表：等高卡片（左文右图）
 //   主题默认是「斜纹分隔线 + 顶部大图」，摘要长短不同，卡片高矮差别明显。
 //   这里改成卡片：标题固定两行、摘要固定两行，53 篇排出来高度整齐一致。

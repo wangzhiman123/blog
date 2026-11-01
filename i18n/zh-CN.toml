@@ -1,0 +1,10 @@
+# 只覆盖「由 xxx 强力驱动」这一条，其余文案仍用主题自带的（Hugo 会把站点 i18n
+# 与主题 i18n 按 key 合并，这里不需要把整份词典抄一遍）。
+#
+# 版本号来自模板变量，不用手改：
+#   .Hugo         Hugo 的链接
+#   .HugoVersion  当前构建用的 Hugo 版本，如 v0.169.0
+#   .Theme        主题链接
+#   .ThemeVersion 当前主题版本，如 v1.0.0-beta.4
+[footer]
+poweredBySome = "由 {{ .Hugo }} {{ .HugoVersion }} 强力驱动 | 主题 - {{ .Theme }} {{ .ThemeVersion }}"

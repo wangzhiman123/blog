@@ -40,18 +40,30 @@
   {{- end -}}
 {{- end -}}
 
+{{- /* 网址：去掉 https:// 和结尾斜杠，一眼能看出是哪个域名 */ -}}
+{{- $urlText := "" -}}
+{{- with $friend.url -}}
+  {{- $urlText = . | replaceRE `^https?://` "" | replaceRE `/+$` "" -}}
+{{- end -}}
+{{- $urlLine := "" -}}
+{{- with $urlText -}}
+  {{- if ne $scheme "mahjong" -}}
+    {{- $urlLine = printf `<span class="friend-url">%s</span>` (htmlEscape .) -}}
+  {{- end -}}
+{{- end -}}
+
 {{- /* 卡片内容 */ -}}
 {{- $content := "" -}}
 {{- if eq $scheme "domino" -}}
-  {{- $content = printf `%s<span class="friend-info">%s%s</span>` $avatar $nickname $description -}}
+  {{- $content = printf `%s<span class="friend-info">%s%s%s</span>` $avatar $nickname $description $urlLine -}}
 {{- else if eq $scheme "note" -}}
-  {{- $content = printf `%s%s` $nickname $description -}}
+  {{- $content = printf `%s%s%s` $nickname $description $urlLine -}}
 {{- else -}}
   {{- $content = printf `%s%s` $avatar $nickname -}}
 {{- end -}}
 
-{{- /* 搜索用的检索文本：名称 + 简介，统一小写 */ -}}
-{{- $search := lower (printf "%s %s" $friend.nickname ($friend.description | default "")) -}}
+{{- /* 搜索用的检索文本：名称 + 简介 + 网址，统一小写 */ -}}
+{{- $search := lower (printf "%s %s %s" $friend.nickname ($friend.description | default "") $urlText) -}}
 
 {{- /* 死链检测（仅开发模式） */ -}}
 {{- $isBroken := false -}}
