@@ -4,7 +4,7 @@ name: Hugo build and deploy
 # 版本锁（想长期稳定运行，就别让这些数字漂移）
 #
 #   Hugo         0.169.0     ← 本文件 vars.HUGO_VERSION || 默认值
-#   Dart Sass    1.107.1     ← 本文件 npm 安装行
+#   Dart Sass    action v1.0.1（其内部装最新 dart-sass，半浮动）
 #   主题 FixIt   22d86c1      ← git 子模块指针（themes/FixIt）
 #   Twikoo 客户端 随主题打包    ← themes/FixIt/assets/lib/twikoo
 #   Mermaid      12.2.0      ← config/_default/params.toml [mermaid] cdn
@@ -73,13 +73,12 @@ jobs:
           hugo-version: ${{ vars.HUGO_VERSION || '0.169.0' }}
           extended: true
       # 主题的 SCSS 走 dartsass 转译，Hugo 会去 PATH 里找 sass 可执行文件。
-      # 以前用社区 action（内部装 latest），现在自己装固定版本，升级时机由我们决定。
-      - name: Setup Node (for Dart Sass)
-        uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-      - name: Install Dart Sass 1.107.1
-        run: npm install --global sass@1.107.1 && sass --version
+      # 用固定的版本标签（v1.0.1），不要用 v1 这种浮动主标签：主标签会指到新代码上。
+      # 注意：这个 action 内部装的是当时最新的 dart-sass，所以 dart-sass 本身
+      # 仍是半浮动状态。要彻底钉死，需改成手工下载指定版本的 dart-sass；
+      # 但 2026-11-01 试过 npm 全局安装 sass@1.107.1，Hugo 构建会失败，先保持现状。
+      - name: Setup Dart Sass
+        uses: dw-labs-org/dart-sass-gha@v1.0.1
       - name: Hugo build
         run: hugo --gc --minify --logLevel info
       - name: Upload artifact
