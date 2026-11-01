@@ -1,11 +1,30 @@
 name: Update theme
 
-# Controls when the workflow will run
+# -------------------------------------------------------------------------------------
+# 主题版本已固定，不再自动跟随上游 main 分支。
+#
+# 当前冻结点位：FixIt v1.0.0-beta.5 时期（子模块 SHA 22d86c1）
+#
+# 为什么不是正式 release tag：
+#   FixIt 的 v1 线目前只有 beta 版本（最新 v1.0.0-beta.5，2026-10-26），
+#   还没有正式版 v1.0.0。0.4.x 线的最新正式版 v0.4.5 是旧架构，
+#   与本项目的 v1 配置（参数扁平化、SCSS、Dart Sass）不兼容，不能降级过去。
+#   所以这里的「固定」= 冻结在已验证可用的某个点位上，不再自动漂移。
+#
+# 需要升级时怎么操作：
+#   1. 先看上游有没有破坏性变更 https://github.com/hugo-fixit/FixIt/releases
+#   2. 到 GitHub 仓库的 Actions 页面，左侧选 Update theme，点 Run workflow
+#   3. 它会拉取上游最新代码、重新切分主题配置，并自动提交一次
+#   4. 等部署完成后打开网站看一眼，有问题就用 git revert 回滚那次提交
+# -------------------------------------------------------------------------------------
+
 on:
-  schedule:
-    # Update theme automatically every week at 00:00 on Sunday
-    - cron: '0 0 * * 0'
-  # Allows you to run this workflow manually from the Actions tab
+  # 原来这里有一个每周日 00:00 的定时任务，会让主题在无人审核的情况下自动升级、
+  # 提交到 main、并紧接着触发部署。已停用：beta 版本不值得承担这个风险。
+  # schedule:
+  #   - cron: '0 0 * * 0'
+  #
+  # 只保留手动触发，升级变成一件「你想做才做」的事。
   workflow_dispatch:
 
 jobs:

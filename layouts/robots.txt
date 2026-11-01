@@ -1,0 +1,52 @@
+# -------------------------------------------------------------------------------------
+# robots.txt —— 本站自建版本，覆盖主题 themes/FixIt/layouts/robots.txt
+#
+# 与主题原版的三个差别：
+#   1. 不屏蔽 AI 爬虫（GPTBot / ClaudeBot / PerplexityBot / OAI-SearchBot 等），
+#      目的是让 AI 助手在回答问题时能读取并引用本站文章；
+#   2. 去掉主题硬编码的 Disallow: /*.md$，让每篇文章的 Markdown 纯净版可被抓取；
+#   3. 修掉主题模板的换行问题 —— 原版会把 Sitemap 粘在上一行 Disallow 后面变成
+#      "Disallow: /Sitemap: https://..."，导致 sitemap 声明失效。
+#
+# 仍然屏蔽的只有不产生读者、只抓数据的 SEO 监测类爬虫。
+# 更新主题后如果访问 /robots.txt 发现又变回原样，说明本文件覆盖失效了。
+# -------------------------------------------------------------------------------------
+
+User-agent: *
+
+Disallow: /images/
+Disallow: /js/
+Disallow: /css/
+
+Disallow: /*link/
+Disallow: /*offline/
+Disallow: /*404.html$
+
+# 允许 AI 读取与引用，但声明不用于模型训练（非标准指令，供遵守它的爬虫参考）
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+# ------- 仅屏蔽 SEO 数据抓取类爬虫（不影响任何 AI 助手） -------
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: ZoominfoBot
+Disallow: /
+
+User-agent: SurdotlyBot
+Disallow: /
+
+# Common Crawl 主要用于构建模型训练语料，与"可引用但不训练"的取向不符
+User-agent: CCBot
+Disallow: /
+
+Sitemap: {{ "/sitemap.xml" | absURL }}

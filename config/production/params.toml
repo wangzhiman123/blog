@@ -27,6 +27,18 @@ logo = ""
 [home.profile]
 enable = true
 
+# 放开 AI 爬虫（2026-11-01 起）。
+#
+# 配合仓库根目录的 layouts/robots.txt 一起生效：
+#   - robots.txt 的实际内容由 layouts/robots.txt 决定（站点级覆盖了主题模板）；
+#   - 这个开关控制的是文章页里那段只有 AI 爬虫能看到的提示，
+#     它告诉 AI「本文的 Markdown 纯净版在哪个地址」，方便直接读取正文。
+#
+# 想改回屏蔽 AI 爬虫（例如不想被任何 AI 读取）：
+#   把下面改成 allow_crawlers = false，同时删掉 layouts/robots.txt。
+[robots]
+allow_crawlers = true
+
 # [custom_partials]
 # head = [
 #   "inject/fixit-docs-bookmark.html",
