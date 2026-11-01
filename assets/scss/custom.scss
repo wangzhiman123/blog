@@ -1144,3 +1144,8 @@ a.cat-group-name:hover {
     }
   }
 }
+
+// 文章页标题下方的「N 次阅读」：取不到数据时整项隐藏
+.comment-visitors.is-hidden {
+  display: none;
+}

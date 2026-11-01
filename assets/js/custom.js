@@ -529,11 +529,64 @@
     })
   }
 
+  // ---------------------------------------------------------------------------
+  // 文章页的阅读量
+  //
+  // 主题在标题下方留了 <span id="twikoo_visitors">-</span>，这个位置本来是给
+  // Twikoo 的 visitor 功能填的，但 FixIt 的 js/lib/twikoo.ts 只调用了 init() 和
+  // getCommentsCount()，从没调用过取阅读量的那个方法，所以它永远是短横线。
+  //
+  // 这里用与首页卡片同一套 VerCount 数据补齐，两处显示的数字才一致。
+  // （Twikoo 自己也有一个计数器，但它从没被调用过，历史数据是 0，换过去等于从零开始。）
+  // ---------------------------------------------------------------------------
+  function initArticleViews() {
+    var node = document.getElementById('twikoo_visitors')
+    if (!node)
+      return
+
+    // 优先用 canonical，它是构建期写死的完整地址，带不带 www、有没有尾斜杠都以它为准
+    var link = document.querySelector('link[rel="canonical"]')
+    var url = (link && link.getAttribute('href')) || window.location.href
+    var holder = node.closest ? node.closest('.comment-visitors') : null
+
+    function hide() {
+      // 取不到就整项藏掉，留个「– 次阅读」反而像坏了
+      if (holder)
+        holder.classList.add('is-hidden')
+    }
+
+    var cache = readPostStatsCache()
+    if (typeof cache.views[url] === 'number') {
+      node.textContent = formatNumber(cache.views[url])
+      return
+    }
+
+    fetchJson(
+      'https://events.vercount.one/api/v2/log?url=' + encodeURIComponent(url),
+      null,
+      6000
+    ).then(function (data) {
+      var pv = data && data.data && typeof data.data.page_pv === 'number'
+        ? data.data.page_pv
+        : null
+
+      if (pv === null) {
+        hide()
+        return
+      }
+
+      cache.views[url] = pv
+      savePostStatsCache(cache)
+      node.textContent = formatNumber(pv)
+    })
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
     initPageJump()
     initPostStats()
+    initArticleViews()
     initFriendAvatarFallback()
     initFriendSearch()
   }
