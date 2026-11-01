@@ -38,6 +38,7 @@ authors:
 5. github desktop，[GitHub桌面 |从桌面上进行简单的协作](https://github.com/apps/desktop),因为git是命令行形式的工具，小白使用起来非常不方便，还需要记忆代码命令，这个工具可以直接简化成图形化操作，使用鼠标即可点击操作。
 6. GitHub Desktop 中文汉化补丁工具,[GitHub Desktop 中文汉化补丁工具](https://github.com/lldwb/github-desktop-zh-cn)，因为github desktop软件是英文界面，英语不好的话使用起来会比较困难，这个工具可以将github desktop软件汉化，这样就方便使用了。
 7. Visual Studio Code,[Visual Studio Code - 代码编辑。重新定义](https://code.visualstudio.com/),因为源代码会有各种各样后缀的文件，例如.md，.yml，.xml，.html等等，使用这个软件可以很方便地打开查看、修改各种代码文件。
+8. Visual Studio Code汉化教程,[vscode怎么设置中文? vscode英文界面设置为简体中文的汉化过程](https://www.jb51.net/softjc/967253.html),Visual Studio Code软件有官方的简体中文安装包，具体操作可以自行百度搜索，这个是我搜到的教程之一，仅供参考。
 
 # 结语
 
