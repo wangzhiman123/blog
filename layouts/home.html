@@ -35,9 +35,10 @@
         {{- partial "home/profile.html" . -}}
       {{- end -}}
 
-      {{- /* 热门文章：只在第一页显示，翻页后不再重复出现 */ -}}
+      {{- /* 排行榜：热门 + 冷门并排，只在第一页显示。
+             div 内不加换行，两边都没数据时才能被 :empty 命中并整体隐藏 */ -}}
       {{- if and (ne $posts.enable false) (eq $.Paginator.PageNumber 1) -}}
-        {{- partial "custom/popular.html" . -}}
+        <div class="home-rankings">{{ partial "custom/popular.html" (dict "Mode" "hot") }}{{ partial "custom/popular.html" (dict "Mode" "cold") }}</div>
       {{- end -}}
 
       {{- /* Content */ -}}
@@ -52,9 +53,12 @@
 
     {{- /* Paginate rendering */ -}}
     {{- if ne $posts.enable false -}}
-      {{- range $pages.Pages -}}
-        {{- .Render "summary" -}}
-      {{- end -}}
+      {{- /* 包一层：卡片两列排布靠它做 grid，主题原本是逐个裸输出 */ -}}
+      <div class="home-post-list">
+        {{- range $pages.Pages -}}
+          {{- .Render "summary" -}}
+        {{- end -}}
+      </div>
       {{- partial "base/paginator.html" . -}}
     {{- end -}}
   </div>

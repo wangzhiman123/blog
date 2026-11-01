@@ -1588,3 +1588,15 @@ enable = true
 count = 5
 # Section title.
 title = "热门文章"
+
+# Home page unpopular posts.
+#
+# 与 [popular] 同一套数据，反过来取：阅读量从少到多，0 阅读的也算
+# （那才是真没人看过的）。同样受 data/pv.json 控制，抓不到数据时整块隐藏。
+[unpopular]
+# Whether to show the unpopular posts block on the home page.
+enable = true
+# Special amount of posts to show.
+count = 5
+# Section title.
+title = "冷门文章"

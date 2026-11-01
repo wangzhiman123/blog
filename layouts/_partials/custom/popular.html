@@ -1,22 +1,35 @@
 {{- /*
-  首页「热门文章」板块：按阅读量倒序取前 N 篇。
+  首页排行榜板块（热门 / 冷门各一个）。
+
+  用法：
+    {{ partial "custom/popular.html" (dict "Mode" "hot") }}
+    {{ partial "custom/popular.html" (dict "Mode" "cold") }}
+
+  Mode
+    hot  —— 阅读量从多到少，只列有阅读量的（0 阅读的进不来，否则冷门榜会全是 0）
+    cold —— 阅读量从少到多，0 阅读的也算（那才是真没人看）；同阅读量按发布日期升序，老文在前
 
   数据从哪来：
-    data/pv.json 由 tools/fetch-pv.py 在构建前抓取生成（见 deploy.yml），
-    结构是 {"generated": "...", "pages": {"/posts/xxx/": 13, ...}}。
+    data/pv.json 由 tools/fetch-pv.py 在构建前抓取生成，结构：
+      {"generated": "...", "pages": {"/posts/xxx/": 13, ...}}
+    里面记着全部文章的阅读量（含 0），所以冷门榜能取到 0 阅读的文章。
 
   为什么板块会自动消失：
-    data/pv.json 不存在（本地没跑脚本）、或所有文章阅读量都是 0 时不输出任何东西。
-    宁可不显示，也不显示一个「全是 0」的榜单。
+    两边的配置 enable = false、data/pv.json 不存在（本地没跑脚本）、
+    或筛完一篇不剩时，整块都不输出。宁可不显示，也不显示空榜单。
 
   路径怎么对上：
     pv.json 里存的是未编码的路径（中文目录名保持中文），
     Hugo 的 .RelPermalink 是百分号编码过的，所以用 urls.Parse 的 .Path 解回来再比。
 
-  开关：config/_default/params.toml 的 [popular] enable / count / title
+  开关：config/_default/params.toml 的 [popular] / [unpopular]
 */ -}}
 
-{{- $cfg := site.Params.popular -}}
+{{- $mode := .Mode | default "hot" -}}
+{{- $isCold := eq $mode "cold" -}}
+{{- /* 配置项整段删掉时用空 dict 兜底，否则读 .enable 会报 nil 错误 */ -}}
+{{- $cfg := cond $isCold site.Params.unpopular site.Params.popular | default dict -}}
+
 {{- if ne $cfg.enable false -}}
   {{- $pv := dict -}}
   {{- with site.Data.pv -}}
@@ -31,29 +44,44 @@
 
     {{- range where site.RegularPages "Section" "in" $mainSections -}}
       {{- $key := (urls.Parse .RelPermalink).Path -}}
-      {{- $views := index $pv $key -}}
-      {{- /* 0 在 Go 模板里也是假值，等于顺带过滤掉没阅读量的文章 */ -}}
-      {{- if $views -}}
-        {{- $items = $items | append (dict "Page" . "Views" $views) -}}
+      {{- if isset $pv $key -}}
+        {{- /* JSON 里的数字是 float64，直接 %d 会打印成 %!d(float64=19)，先转整数 */ -}}
+        {{- $views := int (index $pv $key) -}}
+        {{- /* 热门榜跳过 0 阅读；冷门榜相反，0 阅读正是要推荐的 */ -}}
+        {{- if or $isCold (gt $views 0) -}}
+          {{- /*
+            冷门榜的排序键：阅读量 + 发布日期拼成定长字符串。
+            直接 sort 只能按一个字段排，两次 sort 又会被后者打乱同分顺序，
+            所以拼成 "0000121697xxxxx" 这样的定长串，字典序即数值序。
+          */ -}}
+          {{- $sortKey := printf "%010d%012d" $views (.Date.Unix) -}}
+          {{- $items = $items | append (dict "Page" . "Views" $views "SortKey" $sortKey) -}}
+        {{- end -}}
       {{- end -}}
     {{- end -}}
 
     {{- if $items -}}
-      {{- $items = sort $items "Views" "desc" -}}
+      {{- if $isCold -}}
+        {{- $items = sort $items "SortKey" "asc" -}}
+      {{- else -}}
+        {{- $items = sort $items "Views" "desc" -}}
+      {{- end -}}
       {{- $items = first ($cfg.count | default 5) $items -}}
 
-      <section class="home-popular" aria-labelledby="home-popular-title">
-        <h2 class="home-popular__title" id="home-popular-title">
-          {{- $cfg.title | default "热门文章" -}}
+      <section class="home-rank home-rank--{{ $mode }}" aria-labelledby="home-rank-title-{{ $mode }}">
+        <h2 class="home-rank__title" id="home-rank-title-{{ $mode }}">
+          {{- $cfg.title | default (cond $isCold "冷门文章" "热门文章") -}}
         </h2>
-        <ol class="home-popular__list">
+        <ol class="home-rank__list">
           {{- range $i, $item := $items }}
-            <li class="home-popular__item">
-              <a class="home-popular__link" href="{{ $item.Page.RelPermalink }}">
-                <span class="home-popular__rank">{{ add $i 1 }}</span>
-                <span class="home-popular__name">{{ $item.Page.Title }}</span>
+            {{- /* 冷门榜多半是 0 阅读的文章，连排五个「0 阅读」像数据出错，换成「暂无阅读」 */ -}}
+            {{- $viewsText := cond (gt $item.Views 0) (printf "%d 阅读" $item.Views) "暂无阅读" -}}
+            <li class="home-rank__item">
+              <a class="home-rank__link" href="{{ $item.Page.RelPermalink }}">
+                <span class="home-rank__rank">{{ add $i 1 }}</span>
+                <span class="home-rank__name">{{ $item.Page.Title }}</span>
                 {{- /* data-short 给手机用：窄屏只显示数字，不显示「阅读」两字 */ -}}
-                <span class="home-popular__views" data-short="{{ $item.Views }}">{{ $item.Views }} 阅读</span>
+                <span class="home-rank__views" data-short="{{ $item.Views }}">{{ $viewsText }}</span>
               </a>
             </li>
           {{- end }}

@@ -1188,13 +1188,36 @@ a.cat-group-name:hover {
 }
 
 // -----------------------------------------------------------------------------
-// 首页「热门文章」板块（custom/popular.html）
-//   数据是构建时抓的阅读量，和文章卡片放在一起要像同一套东西：
-//   同样的白底、同样的 1px 边框和 0.75rem 圆角，不做成花哨的排行榜。
-//   前三名给一个淡暖色的序号块，往下依次变淡 —— 足够分辨名次，又不抢标题。
+// 首页画布：比正文宽一档
+//   两列卡片每张要同时放「标题 + 摘要 + 右侧缩略图」，正文那 708px 一分为二
+//   只剩 340px，标题会被截成半句。这里只把首页撑到 1040px，文章内页保持原样。
 // -----------------------------------------------------------------------------
-.home-popular {
-  margin-block: 0 1.6rem;
+main.fi-container > .page.home.posts {
+  // 这里不能写 width: 100%：.page 是 flex 项，100% 会被 flex 收缩规则算成
+  // viewport 的约 55%，实测 1366 视口下只有 756px。给固定值反而准确，
+  // 再用 max-width: 100% 兜住窄屏（flex: 0 1 auto 会继续收缩）。
+  width: 1040px !important;
+  max-width: 100% !important;
+}
+
+// -----------------------------------------------------------------------------
+// 首页「热门文章」+「冷门文章」双榜（custom/popular.html）
+//   并排两栏，共用一套卡片外观，只靠 --hot / --cold 区分序号配色：
+//   热门用暖红（热度），冷门用冷蓝（被冷落），一眼能分清左右。
+// -----------------------------------------------------------------------------
+.home-rankings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+// 两榜都没取到数据时（本地没跑抓取脚本）整块不占位
+.home-rankings:empty {
+  display: none;
+}
+
+.home-rank {
   padding: 1.05rem 1.2rem 0.55rem;
   // light-dark() 在旧内核（微信 X5 等）整条声明会失效，先给一份降级值
   background-color: #ffffff;
@@ -1234,7 +1257,7 @@ a.cat-group-name:hover {
     &:hover {
       background-color: light-dark(#f6f8fa, #262c34);
 
-      .home-popular__name {
+      .home-rank__name {
         color: light-dark(#0969da, #6cb6ff);
       }
     }
@@ -1255,7 +1278,7 @@ a.cat-group-name:hover {
     border-radius: 0.35rem;
   }
 
-  // 前三名：淡暖色底 + 深红字，暗色下换成低饱和的砖红
+  // 前三名：热门用淡暖色底 + 深红字
   &__item:nth-child(-n + 3) &__rank {
     color: light-dark(#b42318, #ff9b8a);
     background-color: light-dark(#fdeeec, #3b2422);
@@ -1282,13 +1305,65 @@ a.cat-group-name:hover {
   }
 }
 
+// 冷门榜前三名改冷色，避免和左边的热门榜看串
+.home-rank--cold {
+  .home-rank__item:nth-child(-n + 3) .home-rank__rank {
+    color: light-dark(#1d4ed8, #9ec5ff);
+    background-color: light-dark(#eaf0fe, #1e2a3f);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 首页文章列表：两列
+//   卡片内部本来就是 grid（标题 / 摘要 / meta 三行 + 右侧图），这里只是把
+//   外面再套一层网格。grid item 默认 stretch，同一行的卡片自动等高。
+// -----------------------------------------------------------------------------
+.page.home.posts .home-post-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+
+  > .summary {
+    // 卡片自带 margin-bottom，进格子后会和 gap 叠加，行距忽大忽小
+    margin-bottom: 0;
+    // 卡片被拉高时，内容贴着顶部，别让三行之间被拆散
+    align-content: start;
+  }
+}
+
+// 768–959px：两列已经偏窄，右侧缩略图会把标题挤掉，这一档先丢掉图
+@media (min-width: 768px) and (max-width: 959px) {
+  .page.home.posts .home-post-list > .summary.has-thumb {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'content'
+      'meta';
+
+    .featured-image-preview {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .home-rankings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page.home.posts .home-post-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 // 手机上把「阅读」两字省掉，只留数字，避免标题被挤得只剩几个字
 @media (max-width: 480px) {
-  .home-popular__views {
+  .home-rank__views {
     font-size: 0;
   }
 
-  .home-popular__views::after {
+  .home-rank__views::after {
     content: attr(data-short);
     font-size: 0.75rem;
   }
