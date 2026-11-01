@@ -6,8 +6,8 @@ categories:
 - 日常随笔
 tags:
 - 生活随笔
-summary: 和爱的人在一起，去经历生活每个瞬间，即是美好。
-description: 和爱的人在一起，去经历生活每个瞬间，即是美好。
+summary: "周末坐高铁去看妻子和孩子的路上，想到的一些关于陪伴和柴米油盐的琐事。"
+description: "周末坐高铁去看妻子和孩子的路上，想到的一些关于陪伴和柴米油盐的琐事。"
 featuredImage: https://q4.itc.cn/images01/20261011/c4563a7162654e76bddfefcfc4462a4f.jpeg?x-oss-process=image/resize,w_1000/format,webp
 images:
 - https://q4.itc.cn/images01/20261011/c4563a7162654e76bddfefcfc4462a4f.jpeg?x-oss-process=image/resize,w_1000/format,webp

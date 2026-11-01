@@ -7,8 +7,8 @@ categories:
 tags:
 - 个人博客
 - 网站模板
-summary: "自己为自己做一个网站的过程令人上瘾，这是我给自己做的第四版网站了。"
-description: "自己为自己做一个网站的过程令人上瘾，这是我给自己做的第四版网站了。"
+summary: "从 WordPress 服务器到 GitHub Pages 静态站，四版个人网站分别为什么换、各花了多少钱。"
+description: "从 WordPress 服务器到 GitHub Pages 静态站，四版个人网站分别为什么换、各花了多少钱。"
 authors:
 - 王志满律师
 ---

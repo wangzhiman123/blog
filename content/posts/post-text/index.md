@@ -8,8 +8,8 @@ tags:
 - 网站建设
 - Markdown
 - 文章排版
-summary: 摘要：这是一个示范文本，方便你对照着使用md文件格式写作。
-description: 摘要：这是一个示范文本，方便你对照着使用md文件格式写作。
+summary: "本站的 Markdown 排版示范：标题、列表、表格、代码块、提示块等各种写法的对照效果。"
+description: "本站的 Markdown 排版示范：标题、列表、表格、代码块、提示块等各种写法的对照效果。"
 math:
   enable: true
 authors:

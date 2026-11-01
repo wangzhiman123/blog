@@ -1,5 +1,6 @@
 ---
 title: 国产AI大模型Deepseek本地化部署教程（附所有下载资源）
+description: "在自己电脑上本地部署 DeepSeek 要什么配置、下哪些文件、怎么跑起来，附全部下载资源。"
 date: 2026-10-03T10:00:00+08:00
 categories:
 - 学习
