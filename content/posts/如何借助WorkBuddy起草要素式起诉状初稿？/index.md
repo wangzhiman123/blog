@@ -1,5 +1,6 @@
 ---
 title: 如何借助WorkBuddy起草要素式起诉状初稿？
+summary: "用 WorkBuddy 起草要素式起诉状的实测：哪类简单案子能用、哪类别用、初稿还要改多少。"
 description: "用 WorkBuddy 起草要素式起诉状的实测：哪类简单案子能用、哪类别用、初稿还要改多少。"
 date: 2026-10-28T00:00:00+08:00
 categories:

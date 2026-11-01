@@ -1,5 +1,6 @@
 ---
 title: 如何在WorkBuddy 安装元典法律数据MCP？
+summary: "在 WorkBuddy 里装元典法律数据 MCP 的三步：拿 API Key、装连接器、验证是否真的通了。"
 description: "在 WorkBuddy 里装元典法律数据 MCP 的三步：拿 API Key、装连接器、验证是否真的通了。"
 date: 2026-10-28T00:00:00+08:00
 categories:
