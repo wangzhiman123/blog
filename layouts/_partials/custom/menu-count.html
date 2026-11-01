@@ -1,0 +1,39 @@
+{{- /*
+  「分类」下拉里在分类名后面显示该分类的文章数。
+
+  用法：在 menus.toml 的对应条目里加 [main.params] count = true
+  本 partial 只对该条菜单生效，其余菜单项（归档、标签、友链…）不受影响。
+
+  取数顺序（两条路，防止任何一种失效时数字消失）：
+    1. 菜单项能解析到页面，且该页面是分类术语页（kind = term）→ 直接数它的文章
+    2. 否则从 url 末段取出分类名，去 site.Taxonomies.categories 里查条数
+
+  数为 0 或查不到时什么都不输出，避免菜单上出现「工作 0」这种观感更差的结果。
+*/ -}}
+
+{{- $entry := . -}}
+{{- $count := -1 -}}
+
+{{- if $entry.Params.count -}}
+  {{- /* 路一：术语页 */ -}}
+  {{- with $entry.Page -}}
+    {{- if eq .Kind "term" -}}
+      {{- $count = len .Pages -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- /* 路二：按 url 末段查 taxonomy */ -}}
+  {{- if lt $count 0 -}}
+    {{- $raw := $entry.URL | default "" -}}
+    {{- $slug := path.Base (strings.TrimSuffix "/" $raw) -}}
+    {{- if and $slug (ne $slug ".") (ne $slug "/") -}}
+      {{- with index site.Taxonomies.categories $slug -}}
+        {{- $count = .Count -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if gt $count 0 -}}
+  <span class="menu-count" title="{{ $count }} 篇文章">{{ $count }}</span>
+{{- end -}}

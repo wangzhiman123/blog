@@ -1172,3 +1172,17 @@ a.cat-group-name:hover {
 .comment-visitors.is-hidden {
   display: none;
 }
+
+// -----------------------------------------------------------------------------
+// 顶栏「分类」下拉里，分类名后面的文章数
+//   menus.toml 中该条目 params.count = true 时才会输出（见 custom/menu-count.html）。
+//   故意做得比分类名淡、比分类名小：是补充信息，不该抢主文字的注意力；
+//   tabular-nums 让三个数字竖直对齐，切换菜单时不跳动。
+// -----------------------------------------------------------------------------
+.menu-link .menu-count {
+  margin-inline-start: 0.35em;
+  font-size: 0.72em;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: light-dark(#6e7781, #9aa7b4);
+}
