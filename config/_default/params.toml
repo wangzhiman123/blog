@@ -19,7 +19,15 @@ keywords = []
 default_theme = "auto"
 # Which hash function used for SRI, when empty, no SRI is used.
 # Available values: ["sha256", "sha384", "sha512", "md5"]
-fingerprint = ""
+#
+# 2026-11-01 由 "" 改为 "sha256"。原因不是安全，是缓存：
+# PWA 的 Service Worker 对 css/js 采用 cache-first（主题 service-worker.template.js），
+# 而缓存名写死为 fixit-<主题版本>，部署后不会变。文件名又不带哈希，
+# 于是老访客一直读到旧的 custom.min.js / custom.min.css —— 改了等于没改。
+# 打开这个开关后资源名变成 main.min.<hash>.js，内容一变地址就变，
+# cache-first 才不会挡住更新。
+# 顺带的好处是真会输出 SRI 校验值；本站没有用任何 CDN，不存在跨域拦截问题。
+fingerprint = "sha256"
 # Date format.
 date_format = "2006-01-02"
 # Website images for Open Graph and Twitter Cards.
