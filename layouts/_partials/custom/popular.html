@@ -1,0 +1,64 @@
+{{- /*
+  首页「热门文章」板块：按阅读量倒序取前 N 篇。
+
+  数据从哪来：
+    data/pv.json 由 tools/fetch-pv.py 在构建前抓取生成（见 deploy.yml），
+    结构是 {"generated": "...", "pages": {"/posts/xxx/": 13, ...}}。
+
+  为什么板块会自动消失：
+    data/pv.json 不存在（本地没跑脚本）、或所有文章阅读量都是 0 时不输出任何东西。
+    宁可不显示，也不显示一个「全是 0」的榜单。
+
+  路径怎么对上：
+    pv.json 里存的是未编码的路径（中文目录名保持中文），
+    Hugo 的 .RelPermalink 是百分号编码过的，所以用 urls.Parse 的 .Path 解回来再比。
+
+  开关：config/_default/params.toml 的 [popular] enable / count / title
+*/ -}}
+
+{{- $cfg := site.Params.popular -}}
+{{- if ne $cfg.enable false -}}
+  {{- $pv := dict -}}
+  {{- with site.Data.pv -}}
+    {{- with .pages -}}
+      {{- $pv = . -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if $pv -}}
+    {{- $mainSections := site.Params.mainSections | default (slice "posts") -}}
+    {{- $items := slice -}}
+
+    {{- range where site.RegularPages "Section" "in" $mainSections -}}
+      {{- $key := (urls.Parse .RelPermalink).Path -}}
+      {{- $views := index $pv $key -}}
+      {{- /* 0 在 Go 模板里也是假值，等于顺带过滤掉没阅读量的文章 */ -}}
+      {{- if $views -}}
+        {{- $items = $items | append (dict "Page" . "Views" $views) -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if $items -}}
+      {{- $items = sort $items "Views" "desc" -}}
+      {{- $items = first ($cfg.count | default 5) $items -}}
+
+      <section class="home-popular" aria-labelledby="home-popular-title">
+        <h2 class="home-popular__title" id="home-popular-title">
+          {{- $cfg.title | default "热门文章" -}}
+        </h2>
+        <ol class="home-popular__list">
+          {{- range $i, $item := $items }}
+            <li class="home-popular__item">
+              <a class="home-popular__link" href="{{ $item.Page.RelPermalink }}">
+                <span class="home-popular__rank">{{ add $i 1 }}</span>
+                <span class="home-popular__name">{{ $item.Page.Title }}</span>
+                {{- /* data-short 给手机用：窄屏只显示数字，不显示「阅读」两字 */ -}}
+                <span class="home-popular__views" data-short="{{ $item.Views }}">{{ $item.Views }} 阅读</span>
+              </a>
+            </li>
+          {{- end }}
+        </ol>
+      </section>
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

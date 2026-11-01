@@ -1575,3 +1575,16 @@ github_corner_fill_dark = ""
 enable = false
 # Check for updates.
 c4u = false
+
+# Home page popular posts.
+#
+# 数据来源：构建前由 tools/fetch-pv.py 抓取 vercount（不蒜子兼容）的阅读量，
+# 写入 data/pv.json；模板按阅读量倒序取前 count 篇。
+# 抓不到数据（接口异常 / 本地没跑脚本）时，整个板块自动隐藏，不会出现空榜单。
+[popular]
+# Whether to show the popular posts block on the home page.
+enable = true
+# Special amount of posts to show.
+count = 5
+# Section title.
+title = "热门文章"

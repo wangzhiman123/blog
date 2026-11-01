@@ -6,3 +6,7 @@ resources/
 .hugo_build.lock
 _vendor
 jsconfig.json
+
+# 构建时由 tools/fetch-pv.py 抓取的阅读量快照（首页「热门文章」用）。
+# 每次构建现抓现用，不跟源代码一起提交，免得每天的几百个数字挤进提交历史。
+data/pv.json

@@ -42,6 +42,11 @@ on:
     types:
       - completed
   workflow_dispatch:
+  schedule:
+    # 每天 04:10（北京时间）重建一次。
+    # 首页「热门文章」的阅读量是构建时抓下来的快照，不重建就一直是旧的；
+    # 定时重建能让榜单在你不发文的日子也跟着更新。
+    - cron: '10 20 * * *'
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -79,6 +84,12 @@ jobs:
       # 但 2026-11-01 试过 npm 全局安装 sass@1.107.1，Hugo 构建会失败，先保持现状。
       - name: Setup Dart Sass
         uses: dw-labs-org/dart-sass-gha@v1.0.1
+      # 首页「热门文章」要先有阅读量数据：逐篇查 vercount 的只读接口（约 25 秒）。
+      # 故意不设 continue-on-error: false —— 接口偶尔抽风是常事，不能让它把整站发布卡死。
+      # 脚本失败时不写 data/pv.json，页面上的榜单自动隐藏（宁可不显示，也不显示全 0）。
+      - name: Fetch page views for popular posts
+        continue-on-error: true
+        run: python3 tools/fetch-pv.py
       - name: Hugo build
         run: hugo --gc --minify --logLevel info
       - name: Upload artifact
