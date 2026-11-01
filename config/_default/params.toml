@@ -245,7 +245,9 @@ highlight_list = []
 # When enabled, Mermaid diagrams are wrapped with diagram tabs and actions (pan/zoom, reset view, download as SVG).
 wrapper = true
 # Mermaid ESM module CDN source.
-cdn = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
+# 固定版本：不写版本号会永远加载最新主版本，mermaid 大版本升级会直接改坏图表渲染。
+# 升级时只改这里的版本号，改完打开一篇带图表的文章看一眼。
+cdn = "https://cdn.jsdelivr.net/npm/mermaid@12.2.0/dist/mermaid.esm.min.mjs"
 # ZenUML ESM module CDN source.
 # You can set it to a CDN source to enable ZenUML support.
 # Example: `https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs`.
@@ -357,7 +359,8 @@ error_color = "#ff4949"
 # MathJax server-side rendering.
 # See: [MathJax](https://www.mathjax.org) and [MathJax Options](https://docs.mathjax.org/en/latest/options/index.html)
 [math.mathjax]
-cdn = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+# 固定到具体小版本（当前数学公式用的是 KaTeX，这里只是备用渲染器）。
+cdn = "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"
 
 # MathJax packages config
 # Example:
