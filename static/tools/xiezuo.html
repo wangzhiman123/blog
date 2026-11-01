@@ -69,7 +69,7 @@
   textarea { resize: vertical; min-height: 90px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 400; margin: 10px 0 0; }
-  .check input { width: 16px; height: 16px; }
+  .check input { width: 16px; height: 16px; flex: 0 0 auto; }
   button {
     font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
     border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer;
@@ -96,6 +96,15 @@
   th { background: var(--bg); font-weight: 600; }
   code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
   .meta { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* 图片处理面板 */
+  .imgbox { margin-top: 10px; }
+  .imgbox .head { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+  .imgbox table { margin-top: 0; }
+  .imgbox td.st { white-space: nowrap; width: 82px; }
+  .imgbox td.u { word-break: break-all; font-size: 11.5px; color: var(--muted); }
+  .done { color: var(--brand); font-weight: 600; }
+  .skip { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -146,7 +155,7 @@
         <label>摘要 <span class="hint">可选。一到三句话，显示在文章列表里；不填会自动截取正文开头</span></label>
         <textarea id="summary" placeholder="用一两句话说清这篇文章解决什么问题。"></textarea>
 
-        <label>封面图网址 <span class="hint">可选。以 https:// 开头的图片地址</span></label>
+        <label>封面图网址 <span class="hint">可选。以 https:// 开头的图片地址（外链图床会自动加压缩参数）</span></label>
         <input type="url" id="cover" placeholder="https://...jpg">
 
         <div class="check"><input type="checkbox" id="pin"><label for="pin" style="margin:0">置顶这篇文章</label></div>
@@ -171,6 +180,23 @@
 
 ![图片说明](https://图片地址.jpg)"></textarea>
 
+        <div class="check">
+          <input type="checkbox" id="autoImg" checked>
+          <label for="autoImg" style="margin:0">自动给图片加压缩参数
+            <span class="hint">缩到宽 1000px、转 webp，体积通常能小一半以上</span></label>
+        </div>
+
+        <div class="btns">
+          <button id="btnImg">把参数写进正文</button>
+        </div>
+        <div class="msg" id="imgMsg"></div>
+        <div class="imgbox" id="imgBox" style="display:none"></div>
+
+        <div class="tips" style="font-size:12.5px">
+          只对认得出是<strong>对象存储图床</strong>的图片追加参数（目前认搜狐 <code>q*.itc.cn</code>、阿里云 OSS）。
+          站内图片（<code>/images/…</code>）和 <strong>GIF 动图</strong>不会动 —— 加了参数没用，动图还可能变成一张静止图。
+        </div>
+
         <details>
           <summary>正文写法速查（点开）</summary>
           <table>
@@ -180,7 +206,7 @@
             <tr><td>加粗</td><td><code>**要加粗的字**</code></td></tr>
             <tr><td>列表</td><td><code>- 第一项</code>（每行一个短横线加空格）</td></tr>
             <tr><td>引用</td><td><code>&gt; 引用的内容</code></td></tr>
-            <tr><td>插入图片</td><td><code>![图片说明](图片网址)</code></td></tr>
+            <tr><td>插入图片</td><td><code>![图片说明](图片网址)</code>　压缩参数自动加，不用手写</td></tr>
             <tr><td>插入链接</td><td><code>[显示的文字](https://网址)</code></td></tr>
             <tr><td>分割线</td><td><code>---</code></td></tr>
           </table>
@@ -196,6 +222,7 @@
         <div class="meta">
           <span id="statChars">字数：0</span>
           <span id="statRead">预计阅读：0 分钟</span>
+          <span id="statImgs">图片：0 张</span>
         </div>
         <div class="btns">
           <button class="primary" id="btnCopy">复制全文</button>
@@ -221,6 +248,7 @@
           ☐ 日期是你想让它显示的那天<br>
           ☐ 分类和标签用了逗号分隔，没有顿号<br>
           ☐ 图片地址以 https:// 开头，能直接在浏览器打开<br>
+          ☐ 截图下方写了说明文字（图片说明）<br>
           ☐ 摘要 2-3 句、说清了解决什么问题
         </div>
       </div>
@@ -242,6 +270,68 @@ var REPO  = "blog";
 var BRANCH = "main";
 var AUTHOR = "王志满律师";
 var SITE  = "https://2019527.xyz";
+
+/* ============ 图片自动压缩 ============ */
+/* 阿里云 OSS 系图片服务的处理参数：缩到宽 1000px，转 webp。
+   搜狐图床（q*.itc.cn）和阿里云 OSS 都支持这套写法。 */
+var OSS_PARAM = "x-oss-process=image/resize,w_1000/format,webp";
+
+/* 认得出支持该参数的域名（含其所有子域）。不在名单里的地址一律不动，
+   避免给不支持的图床加上无效参数、反而把图片搞挂。 */
+var OSS_HOSTS = ["itc.cn", "aliyuncs.com", "myqcloud.com"];
+
+var GIF_RE = /\.gif(?:$|[?#])/i;
+var MD_IMG_RE = /!\[([^\]]*)\]\(\s*([^()\s]+)(\s+"[^"]*")?\s*\)/g;
+
+function cleanUrl(u) {
+  return String(u == null ? "" : u).trim().replace(/^</, "").replace(/>$/, "");
+}
+
+function hostOf(url) {
+  var m = /^https?:\/\/([^/?#]+)/i.exec(url);
+  return m ? m[1].toLowerCase().replace(/:\d+$/, "") : "";
+}
+
+function isOssHost(host) {
+  for (var i = 0; i < OSS_HOSTS.length; i++) {
+    var d = OSS_HOSTS[i];
+    if (host === d || host.slice(-(d.length + 1)) === "." + d) return true;
+  }
+  return false;
+}
+
+/* 单张图片地址加参数。幂等：已经有参数的原样返回。 */
+function optimizeImageUrl(raw, enabled) {
+  var url = cleanUrl(raw);
+  if (enabled === false) return url;
+  if (!/^https?:\/\//i.test(url)) return url;          // 站内相对路径，不动
+  if (/[?&]x-oss-process=/i.test(url)) return url;      // 已经加过了
+  if (GIF_RE.test(url)) return url;                    // 动图不动，转了会变静止图
+  if (!isOssHost(hostOf(url))) return url;             // 不认识的图床，不动
+  return url + (url.indexOf("?") === -1 ? "?" : "&") + OSS_PARAM;
+}
+
+/* 扫一遍 Markdown 正文，只改 ![]() 里的图片地址，普通链接不碰。 */
+function optimizeImagesInMarkdown(md, enabled) {
+  MD_IMG_RE.lastIndex = 0;
+  return String(md == null ? "" : md).replace(MD_IMG_RE, function (all, alt, url, title) {
+    return "![" + alt + "](" + optimizeImageUrl(url, enabled) + (title || "") + ")";
+  });
+}
+
+/* 列出正文里所有图片及其处理结果，供界面展示与核对。 */
+function listImages(body, enabled) {
+  var out = [], m;
+  var text = String(body == null ? "" : body);
+  MD_IMG_RE.lastIndex = 0;
+  while ((m = MD_IMG_RE.exec(text)) !== null) {
+    var raw = cleanUrl(m[2]);
+    var fixed = optimizeImageUrl(raw, enabled);
+    out.push({ alt: m[1], raw: raw, url: fixed, changed: fixed !== raw });
+  }
+  MD_IMG_RE.lastIndex = 0;
+  return out;
+}
 
 /* ============ 纯函数：可单独测试 ============ */
 function pad2(n) { return (n < 10 ? "0" : "") + n; }
@@ -285,9 +375,10 @@ function buildFrontMatter(st) {
     lines.push("description: " + yamlStr(st.summary));
   }
   if (st.cover) {
-    lines.push("featuredImage: " + yamlStr(st.cover));
+    var cover = optimizeImageUrl(st.cover, st.optimizeImages !== false);
+    lines.push("featuredImage: " + yamlStr(cover));
     lines.push("images:");
-    lines.push("- " + yamlStr(st.cover));
+    lines.push("- " + yamlStr(cover));
   }
   lines.push("authors:");
   lines.push("- " + AUTHOR);
@@ -300,6 +391,7 @@ function buildFrontMatter(st) {
 function buildMarkdown(st) {
   var fm = buildFrontMatter(st);
   var body = String(st.body || "").replace(/\r\n/g, "\n").trim();
+  body = optimizeImagesInMarkdown(body, st.optimizeImages !== false);
   return fm + "\n\n" + (body ? body + "\n" : "");
 }
 
@@ -327,7 +419,9 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     slugify: slugify, splitList: splitList, buildFrontMatter: buildFrontMatter,
     buildMarkdown: buildMarkdown, dirName: dirName, postPath: postPath,
-    githubNewUrl: githubNewUrl, countCJKChars: countCJKChars, pad2: pad2
+    githubNewUrl: githubNewUrl, countCJKChars: countCJKChars, pad2: pad2,
+    optimizeImageUrl: optimizeImageUrl, optimizeImagesInMarkdown: optimizeImagesInMarkdown,
+    listImages: listImages, OSS_PARAM: OSS_PARAM
   };
 }
 
@@ -335,6 +429,12 @@ if (typeof module !== "undefined" && module.exports) {
 if (typeof document !== "undefined") {
   var $ = function (id) { return document.getElementById(id); };
   var FIELDS = ["title", "slug", "date", "time", "categories", "tags", "summary", "cover", "body"];
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
 
   function todayStr() {
     var d = new Date();
@@ -356,8 +456,31 @@ if (typeof document !== "undefined") {
       cover: $("cover").value.trim(),
       body: $("body").value,
       pin: $("pin").checked,
-      draft: $("draft").checked
+      draft: $("draft").checked,
+      optimizeImages: $("autoImg").checked
     };
+  }
+
+  function renderImageBox(imgs) {
+    var box = $("imgBox");
+    if (!imgs.length) {
+      box.style.display = "none";
+      box.innerHTML = "";
+      return;
+    }
+    var changed = imgs.filter(function (x) { return x.changed; }).length;
+    var rows = imgs.map(function (x, i) {
+      var state = x.changed
+        ? '<span class="done">已压缩</span>'
+        : (/[?&]x-oss-process=/i.test(x.raw) ? '<span class="skip">已有参数</span>'
+           : (GIF_RE.test(x.raw) ? '<span class="skip">动图跳过</span>' : '<span class="skip">未改动</span>'));
+      return "<tr><td>" + (i + 1) + "</td><td class=\"st\">" + state +
+             "</td><td class=\"u\">" + escapeHtml(x.url) + "</td></tr>";
+    }).join("");
+    box.style.display = "block";
+    box.innerHTML =
+      '<div class="head">正文图片 ' + imgs.length + " 张，本次会加压缩参数 " + changed + " 张</div>" +
+      "<table><tr><th>#</th><th>状态</th><th>生成后的地址</th></tr>" + rows + "</table>";
   }
 
   function render() {
@@ -369,8 +492,11 @@ if (typeof document !== "undefined") {
     $("dateWarn").style.display = st.dateStr > todayStr() ? "block" : "none";
 
     var n = countCJKChars(st.body);
+    var imgs = listImages(st.body, st.optimizeImages);
     $("statChars").textContent = "字数：" + n;
     $("statRead").textContent = "预计阅读：" + Math.max(1, Math.round(n / 400)) + " 分钟";
+    $("statImgs").textContent = "图片：" + imgs.length + " 张";
+    renderImageBox(imgs);
     return st;
   }
 
@@ -379,6 +505,13 @@ if (typeof document !== "undefined") {
     m.textContent = text;
     m.className = "msg " + (ok ? "ok" : "bad");
     if (ok) { setTimeout(function () { if (m.textContent === text) { m.textContent = ""; m.className = "msg"; } }, 4000); }
+  }
+
+  function sayImg(text, ok) {
+    var m = $("imgMsg");
+    m.textContent = text;
+    m.className = "msg " + (ok ? "ok" : "bad");
+    if (ok) { setTimeout(function () { if (m.textContent === text) { m.textContent = ""; m.className = "msg"; } }, 5000); }
   }
 
   function validate(st) {
@@ -429,11 +562,29 @@ if (typeof document !== "undefined") {
     say("已下载 index.md，可以上传到 GitHub 的文章目录里。", true);
   });
 
+  /* 把参数直接写回正文（可选操作）。
+     不点也照样生效 —— 复制/下载出去的内容已经带参数了。 */
+  $("btnImg").addEventListener("click", function () {
+    var before = $("body").value;
+    var after = optimizeImagesInMarkdown(before, true);
+    if (after === before) {
+      var imgs = listImages(before, true);
+      if (!imgs.length) { sayImg("正文里还没有图片。插入图片后这里会自动处理。", false); return; }
+      sayImg("正文 " + imgs.length + " 张图片都已经带参数了，不用再处理。", true);
+      return;
+    }
+    $("body").value = after;
+    render();
+    var n = listImages(after, true).filter(function (x) { return x.changed; }).length;
+    sayImg("已把压缩参数写进正文 " + n + " 张图片。这个操作重复点也不会加两次。", true);
+  });
+
   $("btnSave").addEventListener("click", function () {
     var data = {};
     FIELDS.forEach(function (f) { data[f] = $(f).value; });
     data.pin = $("pin").checked;
     data.draft = $("draft").checked;
+    data.autoImg = $("autoImg").checked;
     try {
       localStorage.setItem("fixit-draft", JSON.stringify(data));
       say("已存到这台电脑的浏览器里。换电脑不会同步。", true);
@@ -448,6 +599,7 @@ if (typeof document !== "undefined") {
     FIELDS.forEach(function (f) { if (data[f] != null) $(f).value = data[f]; });
     $("pin").checked = !!data.pin;
     $("draft").checked = !!data.draft;
+    $("autoImg").checked = data.autoImg == null ? true : !!data.autoImg;
     render();
     say("已恢复上次的草稿。", true);
   });
@@ -457,6 +609,7 @@ if (typeof document !== "undefined") {
     FIELDS.forEach(function (f) { $(f).value = ""; });
     $("pin").checked = false;
     $("draft").checked = false;
+    $("autoImg").checked = true;
     $("date").value = todayStr();
     $("time").value = "09:00";
     try { localStorage.removeItem("fixit-draft"); } catch (e) {}
@@ -467,6 +620,7 @@ if (typeof document !== "undefined") {
   FIELDS.forEach(function (f) { $(f).addEventListener("input", render); });
   $("pin").addEventListener("change", render);
   $("draft").addEventListener("change", render);
+  $("autoImg").addEventListener("change", render);
 
   // 目录名自动纠错：输入时立刻规范化（避免出现中文标点、空格、大写）
   $("slug").addEventListener("blur", function () {
