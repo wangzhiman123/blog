@@ -17,6 +17,7 @@
   url: https://wenshu.court.gov.cn
   description: 人民法院出版社主办，查询全国法院生效裁判文书的官方平台
   avatar: "https://wenshu.court.gov.cn/website/wenshu/images/logo.png"
+  avatar_fit: contain
   group: official
   weight: 100
 
@@ -46,6 +47,7 @@
   url: https://gohugo.io
   description: 本站使用的静态站点生成器
   avatar: "https://gohugo.io/images/hugo-logo-wide.svg"
+  avatar_fit: contain
   group: tools
   weight: 80
 
@@ -81,7 +83,7 @@
 - nickname: Exyone's Blog
   url: https://exyon.ee
   description: 莫道蓬门小，清幽胜琼楼。一隅藏天地，流水遇知音。
-  avatar: "https://exyon.ee/assets/img/avatar-v1.png"
+  avatar: https://exyon.ee/assets/img/avatar-v1.png
   group: blogs
   weight: 64
 
@@ -95,7 +97,7 @@
 - nickname: 个人成长计划
   url: https://blog.el9.cn/
   description: 上药三品，神与气精。
-  avatar: "https://img1.el9.cn//usr/uploads/2026/07/2998389502.png"
+  avatar: https://img1.el9.cn//usr/uploads/2026/07/2998389502.png
   group: blogs
   weight: 60
 
