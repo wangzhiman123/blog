@@ -9,6 +9,9 @@
 # section = ["html", "rss"]
 # taxonomy = ["html"]
 # term = ["html", "rss"]
+#
+# 自定义输出格式 LegacyFeed/LegacyRSS/LegacyAtom 定义在 hugo.toml 里
+# （outputFormats 不能写在本文件，否则会被当成一种 output kind 报错）。
 
 _merge = "shallow"
 home = [
@@ -18,7 +21,10 @@ home = [
   "search",
   "offline",
   "manifest",
-  "link"
+  "link",
+  "LegacyFeed",
+  "LegacyRSS",
+  "LegacyAtom"
 ]
 page = [
   "html",

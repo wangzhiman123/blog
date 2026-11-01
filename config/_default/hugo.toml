@@ -70,3 +70,32 @@ capitalizeListTitles = false
 #     "warning-partial-superfluous-prefix" - superfluous "partials/" prefix in partial call
 #     "warning-rendershortcodes-in-html" - .RenderShortcodes detected inside HTML block
 ignoreLogs = []
+
+# -------------------------------------------------------------------------------------
+# 旧 RSS 地址的输出格式（配合 config/_default/outputs.toml 里的 home 列表）
+#
+# 友链站、订阅工具常把本站 RSS 记成 /feed.xml、/rss.xml、/atom.xml，
+# 这些是约定俗成的旧地址，原来都 404，对方就一直显示「获取不到更新」。
+# 这里定义三个格式，让三个旧地址输出真正的 RSS，内容与 /index.xml 一致。
+#
+# 注意两件事：
+#   1. outputFormats 必须写在 hugo.toml（不能写进 outputs.toml，那里会被当成 kind 报错）
+#   2. 这些表必须放在文件最后，否则 TOML 会把后续顶层键吸进表里
+# -------------------------------------------------------------------------------------
+[outputFormats.LegacyFeed]
+mediaType = "application/rss+xml"
+baseName = "feed"
+rel = "alternate"
+notAlternative = true
+
+[outputFormats.LegacyRSS]
+mediaType = "application/rss+xml"
+baseName = "rss"
+rel = "alternate"
+notAlternative = true
+
+[outputFormats.LegacyAtom]
+mediaType = "application/rss+xml"
+baseName = "atom"
+rel = "alternate"
+notAlternative = true

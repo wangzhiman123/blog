@@ -120,6 +120,14 @@
   group: blogs
   weight: 54
 
+- nickname: "涵哲子居"
+  # 注意：url 里不要留空格，否则点进去会跳到 «空格+https» 这种坏地址
+  url: "https://iluc.cn"
+  description: "天哲地理，共公卿好"
+  avatar: "https://iluc.cn/logo.webp"
+  group: blogs
+  weight: 53
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/

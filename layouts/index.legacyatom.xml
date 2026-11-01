@@ -1,0 +1,4 @@
+{{- /* 旧 RSS 地址入口：内容与 /index.xml 一致，只为兼容把地址抄错/抄旧的友链站与订阅工具 */ -}}
+{{- $self := "" -}}
+{{- with .OutputFormats.Get "LegacyAtom" }}{{ $self = .Permalink }}{{ end -}}
+{{- partial "custom/rss-feed.xml" (dict "Page" . "Self" $self) -}}

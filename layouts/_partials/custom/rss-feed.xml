@@ -1,0 +1,49 @@
+{{- /*
+  标准 RSS 2.0 输出，供 /feed.xml、/rss.xml、/atom.xml 三个旧地址复用。
+
+  为什么不用 Hugo 内置模板：0.146 之后内置 RSS 模板不再能通过 template 调用，
+  所以这里自己写一份，字段与 /index.xml 保持一致（标题、链接、发布时间、摘要）。
+
+  入口文件：layouts/index.legacyfeed.xml / legacyrss.xml / legacyatom.xml
+*/ -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+{{- $ctx := .Page | default . -}}
+{{- $self := .Self | default "" -}}
+{{- $lang := $ctx.Site.Language.Locale | default $ctx.Site.Language.LanguageCode | default "zh-CN" -}}
+{{- $desc := $ctx.Site.Params.description | default $ctx.Site.Title -}}
+{{- /*
+  条目与 /index.xml 对齐：首页取「主内容区（默认是文章最多的那个栏目）」的最新 10 篇，
+  栏目页取该栏目自己的文章。不这样写的话，首页会把 /about/、/friends/ 这类
+  单页也塞进订阅，读者会收到一堆没意义的更新。
+*/ -}}
+{{- $pages := $ctx.RegularPages -}}
+{{- if $ctx.IsHome -}}
+  {{- $pages = where $ctx.Site.RegularPages "Section" "in" $ctx.Site.MainSections -}}
+{{- end -}}
+{{- /* 不额外排序：沿用 Hugo 的默认页面顺序（权重→日期→标题），这样条目顺序与 /index.xml 完全一致 */ -}}
+{{- $pages = first 10 $pages -}}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ $ctx.Site.Title }}</title>
+    <link>{{ $ctx.Permalink }}</link>
+    <description>{{ $desc }}</description>
+    <generator>Hugo</generator>
+    <language>{{ $lang }}</language>
+    <lastBuildDate>{{ now.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</lastBuildDate>
+    <atom:link href="{{ $self | default $ctx.Permalink }}" rel="self" type="application/rss+xml"/>
+    {{- range $pages }}
+    {{- $date := .PublishDate -}}
+    {{- if $date.IsZero }}{{ $date = .Date }}{{ end }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ $ctx.Permalink }}</link>
+      <pubDate>{{ $date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+      <guid>{{ .Permalink }}</guid>
+      {{- range .Params.categories }}
+      <category>{{ . }}</category>
+      {{- end }}
+      <description>{{ .Summary | transform.XMLEscape | safeHTML }}</description>
+    </item>
+    {{- end }}
+  </channel>
+</rss>
