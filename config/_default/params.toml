@@ -783,7 +783,9 @@ issue_tpl = "title=[BUG]%20{title}&body=|Field|Value|%0A|-|-|%0A|Title|{title}|%
 # App and PWA configuration.
 [app]
 # Whether to enable PWA support.
-pwa = false
+# 打开后浏览器地址栏会出现「安装应用」入口，可把本站装成独立窗口的桌面/手机应用。
+# 仅在 hugo.IsProduction 且非 server 模式时生效，本地预览不受影响。
+pwa = true
 # App name used for home screen and manifest (falls back to site title).
 name = ""
 # Optional short name for the manifest (falls back to name).
