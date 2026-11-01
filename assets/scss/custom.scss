@@ -1149,3 +1149,70 @@ a.cat-group-name:hover {
 .comment-visitors.is-hidden {
   display: none;
 }
+
+// -----------------------------------------------------------------------------
+// 「安装本站」悬浮按钮（PWA）
+//
+// 固定在左下角：右下角已经被主题的 .fixed-buttons（回到顶部等）占用。
+// 只在 Chrome/Edge 派发 beforeinstallprompt 后由 custom.js 插入，
+// 不支持安装的浏览器（Firefox、Safari 桌面版）看不到这个按钮。
+// -----------------------------------------------------------------------------
+.install-pill {
+  position: fixed;
+  inset-inline-start: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 40;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+
+  color: light-dark(#0969da, #58a6ff);
+  background: light-dark(#ffffff, #21262d);
+  border: 1px solid light-dark(rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.15));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
+
+  &:hover {
+    background: light-dark(#f6f8fa, #30363d);
+  }
+
+  svg {
+    flex: 0 0 auto;
+  }
+
+  // 装完或用户点了「不再提示」时淡出，再由脚本摘掉节点
+  &.is-hidden {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+  }
+
+  .install-pill-close {
+    padding: 0 0.1rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.55;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    inset-inline-start: 0.9rem;
+    bottom: 0.9rem;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.78rem;
+  }
+}

@@ -10,6 +10,128 @@
 (function () {
   'use strict'
 
+  // ---------------------------------------------------------------------------
+  // PWA 安装事件
+  //
+  // Chrome/Edge 判断"这个站可以装成应用"后会派发一次 beforeinstallprompt，
+  // 浏览器自己会在地址栏放个小图标，但那个入口太隐蔽，很多人根本找不到。
+  // 这里把它接住，换成页面左下角一个明确的「安装本站」按钮。
+  //
+  // 注意：这个事件只派发一次、不重放，所以监听必须在初始化之前挂上。
+  // ---------------------------------------------------------------------------
+  var installEvent = null
+  var INSTALL_DISMISS_KEY = 'pwa-install-dismissed:v1'
+  var INSTALL_DISMISS_DAYS = 30
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    // 不拦住的话浏览器会自己弹横幅，跟我们的按钮重复
+    e.preventDefault()
+    installEvent = e
+    initInstallPrompt()
+  })
+
+  window.addEventListener('appinstalled', function () {
+    rememberInstallDismissed()
+    removeInstallPill()
+  })
+
+  function rememberInstallDismissed() {
+    try {
+      window.localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now()))
+    }
+    catch (e) { /* 无痕模式存不了，下次再弹一次也无所谓 */ }
+  }
+
+  function installDismissed() {
+    try {
+      var raw = window.localStorage.getItem(INSTALL_DISMISS_KEY)
+      if (!raw)
+        return false
+      var ts = Number(raw)
+      if (!Number.isFinite(ts))
+        return false
+      return Date.now() - ts < INSTALL_DISMISS_DAYS * 24 * 60 * 60 * 1000
+    }
+    catch (e) {
+      return false
+    }
+  }
+
+  function removeInstallPill() {
+    var pill = document.querySelector('.install-pill')
+    if (!pill)
+      return
+    pill.classList.add('is-hidden')
+    window.setTimeout(function () {
+      if (pill.parentNode)
+        pill.parentNode.removeChild(pill)
+    }, 300)
+  }
+
+  /** 左下角的「安装本站」按钮，只在浏览器确认可安装时才出现 */
+  function initInstallPrompt() {
+    if (!installEvent)
+      return
+
+    // 事件可能在 body 就绪前就派发了，这种情况交给 init() 再调一次
+    if (!document.body)
+      return
+
+    // 已经在独立窗口里运行，说明装过了
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      return
+
+    if (installDismissed())
+      return
+
+    if (document.querySelector('.install-pill'))
+      return
+
+    var pill = document.createElement('div')
+    pill.className = 'install-pill'
+    pill.setAttribute('role', 'button')
+    pill.setAttribute('tabindex', '0')
+    pill.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"'
+      + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>'
+      + '<span>安装本站</span>'
+      + '<button type="button" class="install-pill-close" aria-label="不再提示">&times;</button>'
+
+    function start() {
+      // prompt() 只能调用一次，用过就作废，下次访问浏览器会重新派发
+      var ev = installEvent
+      installEvent = null
+      if (!ev || typeof ev.prompt !== 'function')
+        return
+
+      ev.prompt()
+      ev.userChoice.then(function (choice) {
+        if (choice && choice.outcome === 'accepted')
+          removeInstallPill()
+        else
+          removeInstallPill()
+      }).catch(function () {
+        removeInstallPill()
+      })
+    }
+
+    pill.querySelector('.install-pill-close').addEventListener('click', function (e) {
+      e.stopPropagation()
+      rememberInstallDismissed()
+      removeInstallPill()
+    })
+
+    pill.addEventListener('click', start)
+    pill.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        start()
+      }
+    })
+
+    document.body.appendChild(pill)
+  }
+
   /** 千分位格式化 */
   function formatNumber(raw) {
     var n = Number(raw)
@@ -587,6 +709,7 @@
     initPageJump()
     initPostStats()
     initArticleViews()
+    initInstallPrompt()
     initFriendAvatarFallback()
     initFriendSearch()
   }
