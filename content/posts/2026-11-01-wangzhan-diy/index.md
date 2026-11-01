@@ -31,13 +31,13 @@ authors:
 
 # 软件和工具
 
-1. workbuddy，[WorkBuddy - AI Agent 办公新范式]<https://www.workbuddy.cn/>，这个是腾讯旗下的ai软件，手机APP和电脑端软件都有，但是电脑端软件我感觉更强大，可以直接添加文件夹，然后给ai授权，可以直接修改编辑文件，全自动化交付成果，效率非常高。
-2. github，[GitHub]<https://github.com/>,这个是一个网站，全球最大的代码开源社区，我国的deepseek就是在这里开源的，里面有各种免费资源，个人网站也可以免费部署在这里，个人网站所需的代码模板也都可以在上面找到。
-3. Watt Toolkit，[瓦特工具箱(Steam++官网) - Watt Toolkit]<https://steampp.net/>,因为github在国内访问速度很慢，一般需要进行加速才能正常访问，否则会一直转圈，导致使用起来体验不好。这个工具是我在使用的，还是好用的。下载电脑软件打开后，勾选github，然后加速即可。不需要登录和注册账号，也不需要付费，使用很方便。每次先打开这个软件加速，然后就可以正常访问github网站了。
-4. git，[Git]<https://git-scm.com/>,这个是代码管理本地工具，下载后可以很方便地管理网站的源代码，网站后期的运行维护使用这个工具很方便，同时搭配ai，可以很方便地对网站进行搭建、维护。
-5. github desktop，[GitHub桌面 |从桌面上进行简单的协作]<https://github.com/apps/desktop>,因为git是命令行形式的工具，小白使用起来非常不方便，还需要记忆代码命令，这个工具可以直接简化成图形化操作，使用鼠标即可点击操作。
-6. GitHub Desktop 中文汉化补丁工具,[GitHub Desktop 中文汉化补丁工具]<https://github.com/lldwb/github-desktop-zh-cn>，因为github desktop软件是英文界面，英语不好的话使用起来会比较困难，这个工具可以将github desktop软件汉化，这样就方便使用了。
-7. Visual Studio Code,[Visual Studio Code - 代码编辑。重新定义]<https://code.visualstudio.com/>,因为源代码会有各种各样后缀的文件，例如.md，.yml，.xml，.html等等，使用这个软件可以很方便地打开查看、修改各种代码文件。
+1. workbuddy，[WorkBuddy - AI Agent 办公新范式](https://www.workbuddy.cn/)，这个是腾讯旗下的ai软件，手机APP和电脑端软件都有，但是电脑端软件我感觉更强大，可以直接添加文件夹，然后给ai授权，可以直接修改编辑文件，全自动化交付成果，效率非常高。
+2. github，[GitHub](https://github.com/),这个是一个网站，全球最大的代码开源社区，我国的deepseek就是在这里开源的，里面有各种免费资源，个人网站也可以免费部署在这里，个人网站所需的代码模板也都可以在上面找到。
+3. Watt Toolkit，[瓦特工具箱(Steam++官网) - Watt Toolkit](https://steampp.net/),因为github在国内访问速度很慢，一般需要进行加速才能正常访问，否则会一直转圈，导致使用起来体验不好。这个工具是我在使用的，还是好用的。下载电脑软件打开后，勾选github，然后加速即可。不需要登录和注册账号，也不需要付费，使用很方便。每次先打开这个软件加速，然后就可以正常访问github网站了。
+4. git，[Git](https://git-scm.com/),这个是代码管理本地工具，下载后可以很方便地管理网站的源代码，网站后期的运行维护使用这个工具很方便，同时搭配ai，可以很方便地对网站进行搭建、维护。
+5. github desktop，[GitHub桌面 |从桌面上进行简单的协作](https://github.com/apps/desktop),因为git是命令行形式的工具，小白使用起来非常不方便，还需要记忆代码命令，这个工具可以直接简化成图形化操作，使用鼠标即可点击操作。
+6. GitHub Desktop 中文汉化补丁工具,[GitHub Desktop 中文汉化补丁工具](https://github.com/lldwb/github-desktop-zh-cn)，因为github desktop软件是英文界面，英语不好的话使用起来会比较困难，这个工具可以将github desktop软件汉化，这样就方便使用了。
+7. Visual Studio Code,[Visual Studio Code - 代码编辑。重新定义](https://code.visualstudio.com/),因为源代码会有各种各样后缀的文件，例如.md，.yml，.xml，.html等等，使用这个软件可以很方便地打开查看、修改各种代码文件。
 
 # 结语
 
