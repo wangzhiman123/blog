@@ -106,6 +106,18 @@
   .done { color: var(--brand); font-weight: 600; }
   .skip { color: var(--muted); }
 </style>
+<!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
+     所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
+     以后要撤掉统计，三个 tools 页一起删这段即可。 -->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e51eb8fb09fb7d9dc6d496a7cf256c4f";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 </head>
 <body>
 <div class="wrap">

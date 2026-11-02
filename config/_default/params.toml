@@ -1306,8 +1306,13 @@ name = ""
 logo_url = ""
 
 # Analytics configuration.
+#
+# 2026-11-02 起接入百度统计（站点 2019527.xyz，站长账号 wangzhiman123）。
+# 开关放在这里，关闭全站统计只需把 enable 改回 false，不必删 id。
+# 开发环境（hugo server）已单独在 config/development/params.toml 里关掉，
+# 免得本地预览把自己刷进统计数据。
 [analytics]
-enable = false
+enable = true
 
 # Google Analytics.
 [analytics.google]
@@ -1322,8 +1327,12 @@ id = ""
 server = ""
 
 # Baidu Analytics.
+#
+# id 是百度统计后台「代码获取」页里 hm.js? 后面那一串（32 位小写十六进制），
+# 它对应唯一的站点，填错会把数据记到别人站上。本站在百度统计里的站点域名是 2019527.xyz。
+# 主题会自动渲染官方两段式代码（同步插入 hm.js，不阻塞首屏）。
 [analytics.baidu]
-id = ""
+id = "e51eb8fb09fb7d9dc6d496a7cf256c4f"
 
 # Umami Analytics.
 [analytics.umami]
@@ -1342,11 +1351,14 @@ src = ""
 token = ""
 
 # Cookie consent configuration.
-# 已关闭：本站只有「不蒜子」一个访问计数脚本，没有广告投放、没有用户画像、
-# 没有跨站追踪，属于《个人信息保护法》里不需要单独弹窗征得同意的情形。
-# 关掉后右下角不会再自动弹出授权条，页面更干净；相关处理规则已写在
-# /privacy/ 页（隐私政策第三节），读者知情权仍然有保障。
-# 将来如果接入第三方广告或跨站追踪脚本，把 enable 改回 true 即可。
+# 目前关闭（右下角不弹授权条）。站内会写 Cookie / 本地存储的只有两处：
+#   1. 不蒜子（Vercount）阅读计数：只在浏览器 localStorage 里存一个随机访客标识，不写 Cookie；
+#   2. 百度统计（2026-11-02 接入）：在 2019527.xyz 域下写 HMACCOUNT、Hm_lvt_*、Hm_lpvt_*
+#      三个 Cookie，用于区分访客、判断来源渠道，有效期分别约为 1 年 / 2 年 / 单次会话。
+# 两者用途都只是「哪篇文章有人读、读者从哪来」，没有广告投放、没有用户画像、
+# 不向第三方出售数据，本站也不设登录、不收集身份信息。
+# 已在 /privacy/ 第三节逐条写明 Cookie 名称、用途与拒绝方式（读者可自行屏蔽统计脚本）。
+# 若将来接入广告联盟，或需要逐项弹窗征得同意，把 enable 改回 true 即可。
 [cookieconsent]
 enable = false
 

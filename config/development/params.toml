@@ -36,3 +36,9 @@ enable = true
 # head = [
 #   "inject/fixit-docs-bookmark.html",
 # ]
+
+# 本地预览（hugo server）关掉百度统计。
+# 默认配置里已开启，若不在这里覆盖，每刷一次 localhost:1313 都会向百度统计发一次
+# 请求，虽然后台会按域名过滤掉，但没必要，且会让「实时访客」里出现无意义的来源。
+[analytics]
+enable = false
