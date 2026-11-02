@@ -355,15 +355,15 @@
 
     .post-meta {
       grid-area: meta;
-      // 分左右两段：左段（发布日 + 收录于）可截断，右段（阅读量 / 评论数）固定
+      // 三段：日期（不缩）／分类（可截）／阅读量（不缩）
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.55rem;
       margin: 0.45rem 0 0;
       font-size: 0.8rem;
       color: #8b949e;
       color: light-dark(#8b949e, #7d8590);
-      // 分类多的卡片 meta 会折行、把卡片顶高一截，截断留给左段自己做
+      // 分类多的卡片 meta 会折行、把卡片顶高一截，截断只留给分类自己
       white-space: nowrap;
 
       // 首页每篇都是同一个作者，这个名字纯属占位
@@ -371,11 +371,27 @@
         display: none;
       }
 
+      // 日期：永远完整，日历数字被拆行比截断更难看
       .post-meta-line {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
+        min-width: 0;
+      }
+
+      // 分类单独一段：桌面跟着日期占同一行，超长时截这一截，不再连累日期
+      .post-meta-cats {
+        flex: 0 1 auto;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        // 单个分类标签别被拆成两半
+        .post-category {
+          white-space: nowrap;
+        }
+      }
+
+      time {
+        white-space: nowrap;
       }
 
       // 阅读量与评论数：数字由 custom.js 异步填，接口失败时整项隐藏
@@ -541,13 +557,39 @@
         font-size: 0.875rem;
       }
 
+      // 手机：日期 + 阅读量占第一行，分类整段落到第二行。
+      // 横向塞不下时宁可多一行，也不能把日期和二级分类用省略号吃掉。
       .post-meta {
+        flex-wrap: wrap;
+        row-gap: 0.15rem;
         font-size: 0.75rem;
-        // 窄屏更窄，左右两段都收紧一点；截断仍由 .post-meta-line 负责
         gap: 0.4rem;
+        // 主题全局行高 2，两行信息会撑出 50px；这里按 1.5 收紧，卡片不至于被顶高
+        line-height: 1.5;
+        white-space: normal;
 
         .post-stats {
           gap: 0.6rem;
+          order: 1;
+          // 顶到最右，和日期分列两端，中间留白给日期
+          margin-inline-start: auto;
+        }
+
+        .post-meta-line {
+          flex: 1 1 auto;
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        // 分类独立成行，允许换行；不再 ellipsis
+        .post-meta-cats {
+          order: 2;
+          flex: 1 1 100%;
+          overflow: visible;
+          line-height: 1.6;
+          white-space: normal;
         }
       }
     }
@@ -1185,6 +1227,49 @@ a.cat-group-name:hover {
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   color: light-dark(#6e7781, #9aa7b4);
+}
+
+// -----------------------------------------------------------------------------
+// 手机抽屉菜单：给「分类」这类带二级的项做一个点得到的展开区
+//   主题的展开箭头只有 18×14 像素，手指按不准；而点「分类」两个字会直接
+//   跳到分类索引页，于是二级分类（工作 / 学习 / 生活）在手机上等于消失。
+//   这里把箭头撑成 44×40 的触控块，加一条分隔线明示「这块是按钮」。
+// -----------------------------------------------------------------------------
+#header-mobile {
+  .menu-item.has-children > .nested-item {
+    gap: 0.5rem;
+
+    .menu-link {
+      flex: 1 1 auto;
+      max-width: none;
+    }
+
+    .dropdown-icon {
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.5rem;
+      // 抵消 li 的 1rem 内边距，让触控区一直贴到抽屉右边缘
+      margin-inline: 0.25rem -1rem;
+      font-size: 0.8rem;
+      color: light-dark(#57606a, #9aa7b4);
+      border-inline-start: 1px solid light-dark(#eaecef, #3a4149);
+      transition: color 0.2s ease;
+
+      &.open {
+        color: light-dark(#0969da, #6cb6ff);
+      }
+    }
+  }
+
+  // 展开后的二级项：左边再退一格，视觉上归到上级名下。
+  // 选择器要带上 .menu：主题的 `#header-mobile .header-container .menu .menu-item`
+  // 优先级更高，只写 `.sub-menu .menu-item` 会被它压掉。
+  .menu .sub-menu > .menu-item {
+    padding-inline-start: 2.4rem;
+  }
 }
 
 // -----------------------------------------------------------------------------

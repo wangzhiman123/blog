@@ -232,7 +232,7 @@
           {{- if (eq .Params.Type "desktop") | or (and (eq .Params.Draft true) (ne $menuDraft "true")) -}}
             {{ continue }}
           {{- end -}}
-          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}">
+          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}{{ if .HasChildren }} has-children{{ end }}">
             {{- if .HasChildren -}}
               <span class="nested-item">
                 <a class="menu-link"

@@ -62,7 +62,11 @@
     <a href="{{ .RelPermalink }}">{{ cond (.Param "capitalize_titles") (title .Title) .Title }}</a>
   </h2>
 
-  {{- /* Meta：左段（日期 + 收录于）可截断，右段（阅读量 / 评论数）固定不缩 */ -}}
+  {{- /* Meta：日期 / 分类 / 阅读量三段彼此独立。
+         以前日期和分类挤在同一个可截断的容器里，窄屏上整行被省略号切掉，
+         日期只剩「2026-11-01…」、二级分类只剩半个字。
+         现在分类单独一段：桌面仍在同一行（超长时只截分类），
+         手机上自动落到第二行，日期与二级分类都能完整显示。 */ -}}
   <div class="post-meta">
     <div class="post-meta-line">
       {{- partial "single/post-author.html" . -}}
@@ -72,9 +76,13 @@
           {{- printf `<time datetime="%v">%v</time>` . . | dict "Date" | T "single.publishedOnDate" | safeHTML -}}
         </span>
       {{- end -}}
-
-      {{- partial "single/post-included-in.html" . -}}
     </div>
+
+    {{- if or .Params.categories .Params.collections }}
+      <div class="post-meta-cats">
+        {{- partial "single/post-included-in.html" . -}}
+      </div>
+    {{- end }}
 
     {{- /*
       阅读量与评论数
