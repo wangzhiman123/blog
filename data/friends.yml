@@ -151,6 +151,13 @@
   group: blogs
   weight: 50
 
+- nickname: " 乙未极客"
+  url: "https://www.yvii.cn"
+  description: "一万年太久只争朝夕"
+  avatar: "https://pic.yvii.cn/logo/favicon-20260328.png"
+  group: blogs
+  weight: 49
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
