@@ -137,6 +137,13 @@
   group: blogs
   weight: 52
 
+- nickname: "紫慕碎碎念"
+  url: "https://90zm.net"
+  description: "清澈、明净、优雅，愿以此为人生路上的航标！"
+  avatar: "https://90zm.net/picture/logo.jpg"
+  group: blogs
+  weight: 51
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
