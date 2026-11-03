@@ -24,7 +24,7 @@ post = ""
 name = "首页"
 url = "/"
 title = "回到首页"
-weight = 0
+weight = -1
 
 [main.params]
 class = ""
