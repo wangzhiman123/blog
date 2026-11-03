@@ -144,7 +144,7 @@
   group: blogs
   weight: 51
 
-  - nickname: "必练题 - I am"
+- nickname: "必练题 - I am"
   url: "https://imxcy.cn"
   description: "潇洒不是洒脱，自由但是有度"
   avatar: "https://imxcy.cn/logo.png"
