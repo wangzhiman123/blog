@@ -130,6 +130,13 @@
   group: blogs
   weight: 53
 
+- nickname: "雅余"
+  url: "https://yayu.net/"
+  description: "茶余饭后，闲情雅致"
+  avatar: "https://yayu.net/wp-content/themes/yayu/assets/images/logo.png"
+  group: blogs
+  weight: 52
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
