@@ -837,7 +837,7 @@ type = "image/png"
 enable = true
 # Type of search engine.
 # Available values: ["fuse", "algolia", "pagefind", "cse"]
-type = "fuse"
+type = "pagefind"
 # Max index length of the chunked content.
 content_length = 4000
 # Placeholder of the search bar.

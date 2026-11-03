@@ -15,6 +15,24 @@
 # 增删一级分类时，这里要同步改三处：identifier、name、pageRef。
 # -------------------------------------------------------------------------------------
 
+# ============ 首页 ============
+[[main]]
+identifier = "home"
+parent = ""
+pre = ""
+post = ""
+name = "首页"
+url = "/"
+title = "回到首页"
+weight = 0
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-house"
+type = ""
+divided = false
+
 # ============ 归档 ============
 [[main]]
 identifier = "archives"

@@ -92,6 +92,12 @@ jobs:
         run: python3 tools/fetch-pv.py
       - name: Hugo build
         run: hugo --gc --minify --logLevel info
+      # 生成 Pagefind 静态搜索索引（搜索框提速）。
+      # 用固定版本 1.4.0，避免浮动 latest 在将来引入破坏性变更。
+      # npx pagefind 默认下载 extended 版，对中文分词更友好，正适合本站。
+      # 索引会写进 public/pagefind/，随站点一起被下面这步上传部署。
+      - name: Build Pagefind search index
+        run: npx -y pagefind@1.4.0 --site public
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
