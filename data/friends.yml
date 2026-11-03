@@ -144,6 +144,13 @@
   group: blogs
   weight: 51
 
+  - nickname: "必练题 - I am"
+  url: "https://imxcy.cn"
+  description: "潇洒不是洒脱，自由但是有度"
+  avatar: "https://imxcy.cn/logo.png"
+  group: blogs
+  weight: 50
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
