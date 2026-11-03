@@ -300,7 +300,8 @@ function cleanUrl(u) {
 }
 
 function hostOf(url) {
-  var m = /^https?:\/\/([^/?#]+)/i.exec(url);
+  // 兼容协议相对地址（//q1.itc.cn/...），这类写法常见于从编辑器/网页直接粘贴图片
+  var m = /^(?:https?:)?\/\/([^/?#]+)/i.exec(url);
   return m ? m[1].toLowerCase().replace(/:\d+$/, "") : "";
 }
 
@@ -316,7 +317,7 @@ function isOssHost(host) {
 function optimizeImageUrl(raw, enabled) {
   var url = cleanUrl(raw);
   if (enabled === false) return url;
-  if (!/^https?:\/\//i.test(url)) return url;          // 站内相对路径，不动
+  if (!/^https?:\/\//i.test(url) && !/^\/\//i.test(url)) return url; // 站内相对路径（/images/ 之类），不动
   if (/[?&]x-oss-process=/i.test(url)) return url;      // 已经加过了
   if (GIF_RE.test(url)) return url;                    // 动图不动，转了会变静止图
   if (!isOssHost(hostOf(url))) return url;             // 不认识的图床，不动
