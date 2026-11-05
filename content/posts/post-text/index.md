@@ -107,7 +107,7 @@ data-toc-skip=''表示一个‌HTML自定义属性‌，告诉TOC生成脚本“
 
 ## 脚注
 
-点击可以跳转到脚注[^footnote]，这是另一个脚注[^fn-nth-2]。
+点击可以跳转到第一个脚注[^footnote]，这是第二个脚注[^fn-nth-2]。
 
 ## 代码高亮
 
@@ -201,12 +201,12 @@ $x = {-b \pm \sqrt{b^2-4ac} \over 2a}$
 
 {{< image src="https://q4.itc.cn/images01/20261011/c4563a7162654e76bddfefcfc4462a4f.jpeg?x-oss-process=image/resize,w_1000/format,webp" alt="高铁站" width="1212" height="668" >}}
 
-## Video
+## 视频
 
-{{< youtube Balreaj8Yqs >}}
+{{< bilibili id="BV1aW411172V" >}}
 
-## Reverse Footnote
+## 反向脚注
 
-[^footnote]: The footnote source
+[^footnote]: 第一个脚注来源
 
-[^fn-nth-2]: The 2nd footnote source
+[^fn-nth-2]: 第二个脚注来源
