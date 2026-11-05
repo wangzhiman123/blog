@@ -975,8 +975,11 @@ since = ""
 #    icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
 #
 # 提示：只填其中一项也可以，另一项空着不影响显示；两项都空则整行隐藏。
-gov = '<a href="https://beian.mps.gov.cn/#/query/webSearch?code=36010000000000" target="_blank" rel="noopener noreferrer"><img src="/images/gongan-beian.png" alt="公安备案" width="14" height="14" style="vertical-align:-2px" /> 赣公网安备 36010000000000 号</a>'
-icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
+#gov = '<a href="https://beian.mps.gov.cn/#/query/webSearch?code=36010000000000" target="_blank" rel="noopener noreferrer"><img src="/images/gongan-beian.png" alt="公安备案" width="14" height="14" style="vertical-align:-2px" /> 赣公网安备 36010000000000 号</a>'
+#icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
+gov = ""
+icp = ""
+
 # License info (HTML format is supported).
 license = ""
 
