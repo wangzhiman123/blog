@@ -1096,7 +1096,7 @@ enable = true
 # 首页列表是两列网格（assets/scss/custom.scss 的 .home-post-list），
 # 所以这里填的是「篇数 = 行数 × 2」：20 篇正好排 10 行。
 # 想要 5 行就改回 10，想要 15 行就填 30。
-paginate = 20
+paginate = 10
 # Whether to show featured image preview in home page post list.
 image_preview = true
 
