@@ -581,6 +581,41 @@
     })
   }
 
+  // ---------------------------------------------------------------------------
+  // 修复脚注「正文 → 文末」跳转失效
+  //
+  // FixIt 主题在 params.toml 开启 tooltip = true 时，会给脚注引用链接
+  // （a.footnote-ref）绑定 click 事件并 e.preventDefault() 拦截默认跳转，
+  // 目的是让悬停气泡正常工作，却连点击跳转也一起禁掉了。
+  // （文末 → 正文的 a.footnote-backref 不在拦截范围，所以那一向是好的。）
+  //
+  // 这里在「捕获阶段」手动完成跳转：捕获阶段先于冒泡阶段执行，
+  // 等主题那个 preventDefault 的监听器（冒泡阶段）轮到的时候，
+  // 我们已经在捕获阶段把 location.hash 设好了，跳转照常发生。
+  // 悬停气泡不受影响，点击跳转也恢复了，两边兼得。
+  // ---------------------------------------------------------------------------
+  function initFootnoteJump() {
+    document.addEventListener('click', function (e) {
+      var link = e.target && e.target.closest
+        ? e.target.closest('a.footnote-ref')
+        : null
+      if (!link)
+        return
+      var href = link.getAttribute('href')
+      // 只处理锚点跳转（如 #fn:1），忽略真正的外部链接
+      if (!href || href.charAt(0) !== '#')
+        return
+      var target = document.getElementById(href.slice(1))
+      if (!target)
+        return
+      e.preventDefault()
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // 同步更新地址栏的 hash，保持浏览器「前进/后退」行为一致
+      if (window.history && window.history.replaceState)
+        window.history.replaceState(null, '', href)
+    }, true)
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
@@ -589,6 +624,7 @@
     initArticleViews()
     initFriendAvatarFallback()
     initFriendSearch()
+    initFootnoteJump()
   }
 
   if (document.readyState === 'loading')

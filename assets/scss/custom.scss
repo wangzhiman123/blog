@@ -1453,3 +1453,9 @@ main.fi-container > .page.home.posts {
     font-size: 0.75rem;
   }
 }
+
+// 脚注跳转（custom.js 的 initFootnoteJump 用 scrollIntoView 定位到脚注条目），
+// 预留吸顶导航栏高度，避免跳转后脚注被顶栏遮住。
+.footnotes li[id^='fn:'] {
+  scroll-margin-top: 5rem;
+}
