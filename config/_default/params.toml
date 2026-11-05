@@ -1471,7 +1471,7 @@ expand_file_tree = false
 # Custom partials must be stored in the /layouts/_partials/ directory.
 # Depends on open custom blocks https://fixit.lruihao.cn/references/blocks/.
 [custom_partials]
-head = []
+head = ["custom/seo-verify.html"]  # 搜索引擎站长验证标签（必应 msvalidate.01 / 百度），见 layouts/_partials/custom/seo-verify.html
 # 页眉数据看板：文章数/字数/图片数/视频数 + 全站访问量
 menu_desktop = ["custom/header-stats.html"]
 menu_mobile = ["custom/header-stats-mobile.html"]

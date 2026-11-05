@@ -1,0 +1,22 @@
+{{- /*
+  搜索引擎站长验证标签（全站 <head> 注入）。
+
+  为什么单独抽一个 partial：
+    params.toml 里的 [custom_partials] head 列表会调用它，这是主题官方的
+    扩展点（themes/FixIt/layouts/_partials/custom.html 里把 custom-head
+    块转交给这里）。这样不用覆盖主题的 base/head/index.html（几百行，
+    主题一升级就冲突），改动只落在这个小文件里。
+
+  怎么加百度：
+    百度搜索资源平台 → 用户中心 → 站点管理 → 验证方式选「HTML 标签」，
+    会给你一段 <meta name="baidu-site-verification" content="codeva-xxx" />，
+    把 content 的值填进下面被注释的那行，去掉注释即可。
+*/ -}}
+
+{{- /* 必应 / Bing Webmaster Tools */ -}}
+<meta name="msvalidate.01" content="D28E071666372AE9C162B6CE3B3AA9A8">
+
+{{- /*
+  百度 / 百度搜索资源平台（拿到验证码后取消注释并填入）：
+  <meta name="baidu-site-verification" content="codeva-xxxxxxxxxx">
+*/ -}}

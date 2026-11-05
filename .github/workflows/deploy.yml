@@ -42,6 +42,11 @@ on:
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      push_all:
+        description: '把全部文章推给搜索引擎（首次收录时勾一次即可）'
+        type: boolean
+        default: false
   schedule:
     # 每天 04:10（北京时间）重建一次。
     # 首页「热门文章」的阅读量是构建时抓下来的快照，不重建就一直是旧的；
@@ -116,3 +121,24 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # 部署成功后把文章推给搜索引擎。
+  # 单独拆成一个 job 而不是塞进 deploy：推送失败不该让站点发布失败，
+  # 所以这里也加了 continue-on-error，站点已经上线才是最重要的。
+  submit:
+    runs-on: ubuntu-latest
+    needs: deploy
+    continue-on-error: true
+    # 每天 04:10 的定时重建也走这个流程，但那种重建不会产生新文章，
+    # 天天把同一批 URL 重推一遍没必要，还有被判定刷推送的风险。
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v7
+      - name: Push new URLs to Baidu and IndexNow
+        env:
+          # 百度主动推送 token：仓库 Settings → Secrets and variables → Actions
+          # 新建 BAIDU_TOKEN。没配就只推 IndexNow，脚本会自动跳过百度。
+          BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+          # 手动触发时勾了「推送全部文章」，就忽略 7 天时间窗口
+          PUSH_ALL: "${{ inputs.push_all && '1' || '' }}"
+        run: python3 tools/submit-urls.py
