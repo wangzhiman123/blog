@@ -975,8 +975,8 @@ since = ""
 #    icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
 #
 # 提示：只填其中一项也可以，另一项空着不影响显示；两项都空则整行隐藏。
-gov = ""
-icp = ""
+gov = '<a href="https://beian.mps.gov.cn/#/query/webSearch?code=36010000000000" target="_blank" rel="noopener noreferrer"><img src="/images/gongan-beian.png" alt="公安备案" width="14" height="14" style="vertical-align:-2px" /> 赣公网安备 36010000000000 号</a>'
+icp = '<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">赣ICP备2026000000号-1</a>'
 # License info (HTML format is supported).
 license = ""
 
@@ -1090,7 +1090,10 @@ disclaimer = ""
 [home.posts]
 enable = true
 # Special amount of posts in each home posts page.
-paginate = 6
+# 首页列表是两列网格（assets/scss/custom.scss 的 .home-post-list），
+# 所以这里填的是「篇数 = 行数 × 2」：20 篇正好排 10 行。
+# 想要 5 行就改回 10，想要 15 行就填 30。
+paginate = 20
 # Whether to show featured image preview in home page post list.
 image_preview = true
 
