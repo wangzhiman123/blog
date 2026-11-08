@@ -72,6 +72,7 @@
   }
 
   .cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; align-items: start; }
+  .cols > div { min-width: 0; }
   @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
   .card {
     background: var(--card);
@@ -189,6 +190,46 @@
   .subsec { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
   .subsec-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
   .warnline { color: var(--warn); font-size: 12px; margin-top: 6px; }
+
+  /* 快速导航：吸顶目录 + 右下角悬浮按钮，沿用 jump-btn 的白底灰边 / 绿底主按钮规范 */
+  html { scroll-behavior: smooth; }
+  .jump-target { scroll-margin-top: 84px; }
+  @keyframes navFlash {
+    0%   { box-shadow: 0 0 0 2px var(--brand), 0 0 0 6px var(--brand-weak); }
+    100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; }
+  }
+  .flash { animation: navFlash 1.3s ease-out; }
+  .jumpbar {
+    position: sticky; top: 8px; z-index: 60;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 9px 12px; margin-bottom: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: 0 4px 14px rgba(0,0,0,.07);
+  }
+  .jb-label { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+  .jb-sep { width: 1px; height: 22px; background: var(--line); margin: 0 2px; flex: 0 0 1px; }
+  .jumpbar a.jump-btn { padding: 6px 11px; font-size: 13px; }
+  .jumpbar a.jump-btn.jb-main { padding: 8px 14px; font-size: 14px; font-weight: 600; }
+  .floatbar {
+    position: fixed; right: 14px; bottom: 16px; z-index: 70;
+    display: flex; flex-direction: column; gap: 6px;
+    opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s;
+  }
+  .floatbar.show { opacity: 1; pointer-events: auto; transform: none; }
+  .floatbar button {
+    font-size: 12.5px; padding: 6px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    box-shadow: 0 3px 10px rgba(0,0,0,.12); white-space: nowrap;
+  }
+  .floatbar button.fb-main { color: #fff; background: var(--brand); border-color: var(--brand); font-weight: 600; }
+  .floatbar button:hover { filter: brightness(1.06); }
+  @media (prefers-color-scheme: dark) { .floatbar button.fb-main { color: #10241a; } }
+  @media (max-width: 620px) {
+    .jumpbar { flex-wrap: nowrap; overflow-x: auto; top: 0; padding: 8px 10px; scrollbar-width: thin; }
+    .jumpbar > * { flex: 0 0 auto; }
+    .floatbar { right: 8px; bottom: 10px; }
+    .floatbar button { padding: 5px 9px; font-size: 12px; }
+  }
 </style>
 <!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
      所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
@@ -204,17 +245,33 @@ var _hmt = _hmt || [];
 </script>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="page-top">
   <header class="page-head">
     <div class="page-head-text">
       <h1>友链管理器</h1>
       <div class="sub">粘贴识别网址、逐条管理、生成代码、打开后台，都在这一页完成。<br>填好 → 点「复制并打开后台 ↗」→ 粘到 <code>data/friends.yml</code> 末尾。分组下拉选，不用手写。<br>页面里的列表只是草稿，和线上文件不会自动同步；数据只存在你的浏览器里，不上传任何服务器。</div>
     </div>
     <div class="head-links">
+      <a class="jump-btn" href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer" title="在新标签页打开友情链接页面">友情链接页面 ↗</a>
       <a class="jump-btn primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">打开写作助手 ↗</a>
       <a class="jump-btn" href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer">HTML 转 Markdown ↗</a>
     </div>
   </header>
+
+  <nav class="jumpbar" aria-label="页面快速导航">
+    <span class="jb-label">快速跳到</span>
+    <a class="jump-btn primary jb-main" href="#sec-smart" onclick="goNav('smart');return false;" title="跳到第 1 步，光标直接落到输入框">⚡ 自动识别 · 粘贴内容</a>
+    <a class="jump-btn jb-main" href="#sec-list" onclick="goNav('manual');return false;" title="跳到第 2 步，自动新建一条空白友链并定位光标">✚ 手动输入 · 新增一条</a>
+    <span class="jb-sep"></span>
+    <a class="jump-btn" href="#sec-added" onclick="goNav('added');return false;">本次新增代码</a>
+    <a class="jump-btn" href="#sec-preview" onclick="goNav('preview');return false;">效果预览</a>
+    <a class="jump-btn" href="#sec-groups" onclick="goNav('groups');return false;">分组管理</a>
+    <a class="jump-btn" href="#sec-yaml" onclick="goNav('yaml');return false;">整份代码</a>
+    <a class="jump-btn" href="#sec-help" onclick="goNav('help');return false;">使用说明</a>
+    <span class="jb-sep"></span>
+    <a class="jump-btn" href="#page-top" onclick="goNav('top');return false;">↑ 顶部</a>
+    <a class="jump-btn" href="#page-bottom" onclick="goNav('bottom');return false;">↓ 底部</a>
+  </nav>
 
   <div class="toolbar">
     <button class="primary" onclick="addItem()">＋ 新增一条友链</button>
@@ -226,9 +283,9 @@ var _hmt = _hmt || [];
   </div>
 
   <div class="cols">
-    <!-- 左：友链列表 -->
+    <!-- 左：快速导入 -->
     <div>
-      <div class="card">
+      <div class="card jump-target" id="sec-smart">
         <h2><span class="num">1</span>快速导入：粘贴你复制到的内容</h2>
         <div class="label-row">
           <label for="smartInput">原始内容 <span class="hint">粘贴后点「识别并加入列表」；一次贴多条请用空行隔开</span></label>
@@ -249,10 +306,10 @@ var _hmt = _hmt || [];
         <label class="checkline"><input type="checkbox" id="smartContain"><span>头像完整显示（长条 logo 用，加 <code>avatar_fit: contain</code>）</span></label>
         <div class="btns"><button onclick="smartBulk()">把上面的设置应用到本次新增</button></div>
         <div class="note" style="margin-top:10px">
-          认得：<b>纯网址</b>、<b>名称 + 网址</b>、<b>Markdown 链接</b>、<b>别人友链页的卡片</b>（含图片）、<b>「站点名称：…」申请模板</b>、<b>title / imgurl / desc / siteurl 信息块</b>、<b>friends.yml 代码</b>、<b>JSON</b>。识别出来的条目直接进下面的「友链列表」，可以逐条改。
+          认得：<b>纯网址</b>、<b>名称 + 网址</b>、<b>Markdown 链接</b>、<b>别人友链页的卡片</b>（含图片）、<b>「站点名称：…」申请模板</b>、<b>title / imgurl / desc / siteurl 信息块</b>、<b>friends.yml 代码</b>、<b>JSON</b>。识别出来的条目直接进右侧的「友链列表」，可以逐条改。
         </div>
 
-        <div class="subsec">
+        <div class="subsec jump-target" id="sec-added">
           <div class="subsec-title">本次新增的代码 <span class="hint" id="addedCount"></span></div>
           <div class="note" style="margin-bottom:10px">只含这次识别加进来的条目，适合直接粘到后台文件末尾。刷新页面后这里会清空，但列表还在。</div>
           <pre class="out wrapable" id="addedYaml"></pre>
@@ -265,20 +322,21 @@ var _hmt = _hmt || [];
         </div>
       </div>
 
-      <div class="card">
+    </div>
+
+    <!-- 右：友链列表 / 预览 / 分组 / 输出 -->
+    <div>
+      <div class="card jump-target" id="sec-list">
         <h2><span class="num">2</span>友链列表 <span class="hint" id="count"></span></h2>
         <div class="list" id="list"></div>
       </div>
-    </div>
 
-    <!-- 右：预览 / 分组 / 输出 -->
-    <div>
-      <div class="card">
+      <div class="card jump-target" id="sec-preview">
         <h2><span class="num">3</span>效果预览</h2>
         <div class="preview" id="preview"></div>
       </div>
 
-      <div class="card">
+      <div class="card jump-target" id="sec-groups">
         <h2><span class="num">4</span>分组管理 <span class="hint">顺序即页面上从上到下的顺序</span></h2>
         <table class="gtable">
           <thead><tr><th>分组名称</th><th style="width:34%">标识（group）</th><th style="width:52px">条数</th><th style="width:96px"></th></tr></thead>
@@ -313,7 +371,7 @@ var _hmt = _hmt || [];
         </div>
       </div>
 
-      <div class="card">
+      <div class="card jump-target" id="sec-yaml">
         <h2><span class="num">5</span>整份代码</h2>
         <div class="note" style="margin-bottom:10px">想整体覆盖文件、或把全部友链按现在的分组与顺序重排时，用这一份。</div>
         <pre class="out" id="yaml"></pre>
@@ -325,8 +383,9 @@ var _hmt = _hmt || [];
         <div class="msg" id="yamlMsg"></div>
       </div>
 
-      <div class="card">
+      <div class="card jump-target" id="sec-help">
         <h2><span class="num">6</span>怎么粘贴</h2>
+        <div class="note" style="margin-bottom:8px">页面顶部「快速跳到」和右下角悬浮按钮，可以随时在<b>自动识别</b>与<b>手动输入</b>之间切换，不用往回翻页。</div>
         <ol class="steps">
           <li>在<b>第 1 步</b>粘贴内容并点「识别并加入列表」，或点最上面「＋ 新增一条友链」手动填</li>
           <li>点绿色 <b>「复制并打开后台 ↗」</b>：代码自动复制，浏览器新开一个标签页打开 GitHub 上的 <code>data/friends.yml</code>（没登录就先登录）</li>
@@ -341,12 +400,19 @@ var _hmt = _hmt || [];
     </div>
   </div>
 
-  <p style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
+  <p class="jump-target" id="page-bottom" style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
     其他工具（点开都是新标签页，当前页填的内容不会丢）：<a href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">写作助手</a>
     · <a href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">HTML 转 Markdown</a>
     · <a href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">友情链接页 ↗</a>
     <br>原「友链代码转换器」已并入本页，独立页面已删除。
   </p>
+</div>
+
+<div class="floatbar" id="floatbar" aria-label="悬浮快捷导航">
+  <button type="button" class="fb-main" onclick="goNav('smart')" title="跳到第 1 步自动识别">⚡ 自动识别</button>
+  <button type="button" onclick="goNav('manual')" title="跳到第 2 步手动输入">✚ 手动输入</button>
+  <button type="button" onclick="goNav('top')" title="回到页面顶部">↑ 顶部</button>
+  <button type="button" onclick="goNav('bottom')" title="跳到页面底部">↓ 底部</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1405,6 +1471,59 @@ document.getElementById('smartInput').addEventListener('input', function () {
     }
   }, 300);
 });
+
+/* ---------- 快速导航：目录 / 顶部 / 底部 / 两种录入方式 ---------- */
+var NAV_TARGETS = {
+  smart: 'sec-smart', added: 'sec-added', list: 'sec-list',
+  preview: 'sec-preview', groups: 'sec-groups', yaml: 'sec-yaml',
+  help: 'sec-help', bottom: 'page-bottom'
+};
+function flash(id) {
+  var el = document.getElementById(id);
+  if (!el || !(el.classList.contains('card') || el.classList.contains('subsec'))) return;
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  setTimeout(function () { el.classList.remove('flash'); }, 1400);
+}
+var navFocusTimer = null;
+function goNav(kind) {
+  clearTimeout(navFocusTimer);
+  if (kind === 'top') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  if (kind === 'manual') {
+    var last = items[items.length - 1];
+    if (!last || String(last.nickname || '').trim() || String(last.url || '').trim()) {
+      addItem();
+    } else {
+      var ins = document.querySelectorAll('input[data-k="nickname"]');
+      if (ins.length) {
+        var el = ins[ins.length - 1];
+        el.focus();
+        el.scrollIntoView({ block: 'center' });
+      }
+    }
+    flash('sec-list');
+    return;
+  }
+  var id = NAV_TARGETS[kind];
+  var target = id && document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  flash(id);
+  if (kind === 'smart') {
+    navFocusTimer = setTimeout(function () {
+      var ta = document.getElementById('smartInput');
+      if (!ta) return;
+      try { ta.focus({ preventScroll: true }); } catch (e) { ta.focus(); }
+    }, 420);
+  }
+}
+var floatbar = document.getElementById('floatbar');
+function updateFloatbar() {
+  if (floatbar) floatbar.classList.toggle('show', window.scrollY > 260);
+}
+window.addEventListener('scroll', updateFloatbar, { passive: true });
+updateFloatbar();
 
 /* ---------- 启动 ---------- */
 load();
