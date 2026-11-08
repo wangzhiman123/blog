@@ -267,14 +267,17 @@ var seq = 0;
 var toastTimer = null;
 
 var ALIAS = {
-  nickname: ['nickname', 'name', 'sitename', 'site_name', 'siteName', 'title', 'blogname', 'blog_name', '站点名称', '网站名称', '博客名称', '站点名', '站名', '名称'],
-  url: ['url', 'link', 'href', 'site', 'website', 'siteurl', 'site_url', 'homepage', '站点地址', '网站地址', '站点链接', '博客地址', '主页', '网址', '链接'],
-  description: ['description', 'desc', 'summary', 'intro', 'memo', '一句话简介', '站点简介', '站点描述', '简介', '描述', '说明'],
-  avatar: ['avatar', 'logo', 'icon', 'favicon', 'image', 'img', 'photo', '头像地址', '站点图标', '图标地址', '头像', '图标'],
+  nickname: ['nickname', 'name', 'sitename', 'site_name', 'title', 'blogname', 'blog_name', 'blog', 'blog_title', 'site_title', '站点名称', '网站名称', '博客名称', '站点名', '站名', '名称', '博客名', '网站名'],
+  url: ['url', 'link', 'href', 'site', 'website', 'siteurl', 'site_url', 'homepage', 'home', 'domain', '站点地址', '网站地址', '站点链接', '博客地址', '主页', '主页地址', '网址', '链接'],
+  description: ['description', 'desc', 'summary', 'intro', 'memo', 'slogan', 'motto', 'bio', 'about', '一句话简介', '站点简介', '站点描述', '简介', '描述', '说明', '签名'],
+  avatar: ['avatar', 'avatar_url', 'avatarurl', 'logo', 'logo_url', 'logourl', 'icon', 'icon_url', 'iconurl', 'favicon', 'image', 'image_url', 'imageurl', 'img', 'img_url', 'imgurl', 'photo', 'picture', '头像地址', '站点图标', '图标地址', '头像', '图标', 'logo地址'],
   group: ['group', '分组', '分类'],
   weight: ['weight', '权重', '排序'],
   avatar_fit: ['avatar_fit', '头像填充', '填充方式']
 };
+/* 友链信息里常见的无关字段：只忽略，不当成简介拼进结果 */
+var IGNORE_KEYS = /^(?:tags?|labels?|categories|category|rss|feed|author|email|owner|since|date|type|status|id|keywords?|lang|language)$/i;
+var FIELD_LINE = /^\s*-?\s*([A-Za-z_\u4e00-\u9fa5]+)\s*[:：]\s*(.*)$/;
 
 function $(id) { return document.getElementById(id); }
 function esc(v) {
@@ -334,6 +337,30 @@ function keyOf(k) {
     }
   });
   return found;
+}
+
+function keyLine(line) {
+  var m = line.match(FIELD_LINE);
+  /* https:// 之类的行不是「键: 值」，别把协议名当字段名 */
+  if (!m || /^(?:https?|ftp|file|mailto|tel)$/i.test(m[1])) return null;
+  return { key: m[1], field: keyOf(m[1]), val: cleanText(m[2]) };
+}
+function looksLikeFields(block) {
+  var hits = 0;
+  block.split(/\r?\n/).forEach(function (line) {
+    var k = keyLine(line);
+    if (k && k.field) hits++;
+  });
+  return hits > 0;
+}
+function unquote(v) {
+  v = cleanText(v);
+  if (/\s+#\s/.test(v)) v = cleanText(v.split(/\s+#\s/)[0]);
+  if (v.length > 1 && ((v.charAt(0) === '"' && v.charAt(v.length - 1) === '"') ||
+      (v.charAt(0) === "'" && v.charAt(v.length - 1) === "'"))) {
+    v = v.slice(1, -1);
+  }
+  return v;
 }
 
 function make(o) {
@@ -400,10 +427,16 @@ function parseHtml(text) {
 
 function parseKeyValue(text) {
   var lines = text.split(/\r?\n/);
-  var startRe = /^\s*-?\s*(?:nickname|站点名称|网站名称|博客名称|站点名|名称)\s*[:：]/i;
+  var listStartRe = /^\s*-\s*[A-Za-z_\u4e00-\u9fa5]+\s*[:：]/;
+  var nameStartRe = /^\s*-?\s*(?:nickname|name|title|sitename|site_name|blogname|blog|站点名称|网站名称|博客名称|站点名|站名|名称|博客名|网站名)\s*[:：]/i;
   var blocks = [], cur = null;
   lines.forEach(function (line) {
-    if (startRe.test(line)) { cur = []; blocks.push(cur); }
+    if (listStartRe.test(line) || nameStartRe.test(line)) {
+      cur = []; blocks.push(cur);
+    } else if (!cur) {
+      var first = keyLine(line);
+      if (first && first.field) { cur = []; blocks.push(cur); }
+    }
     if (cur) cur.push(line);
   });
   if (!blocks.length) blocks = [lines];
@@ -411,26 +444,20 @@ function parseKeyValue(text) {
     var o = { source: '字段模板' };
     var spare = [];
     block.forEach(function (line) {
-      var m = line.match(/^\s*-?\s*([A-Za-z_\u4e00-\u9fa5]+)\s*[:：]\s*(.*)$/);
-      if (m) {
-        var field = keyOf(m[1]);
-        var val = cleanText(m[2]);
-        if (/\s+#\s/.test(val)) val = cleanText(val.split(/\s+#\s/)[0]);
-        if ((val.charAt(0) === '"' && val.charAt(val.length - 1) === '"') ||
-            (val.charAt(0) === "'" && val.charAt(val.length - 1) === "'")) {
-          val = val.slice(1, -1);
-        }
-        if (field) o[field] = val;
-        else spare.push(val);
-      } else if (cleanText(line) && !/^\s*#/.test(line)) {
+      var k = keyLine(line);
+      if (k) {
+        var val = unquote(k.val);
+        if (k.field) o[k.field] = val;
+        else if (!IGNORE_KEYS.test(k.key) && !/^[\[{]/.test(val) && !/^https?:\/\//i.test(val)) spare.push(val);
+      } else if (cleanText(line) && !/^\s*#/.test(line) && !/^\s*-{3,}\s*$/.test(line)) {
         spare.push(cleanText(line));
       }
     });
-    if (!o.url) {
+    if (!o.url || !o.avatar) {
       var urls = findUrls(spare.join(' ') + ' ' + (o.nickname || ''));
       var web = urls.filter(function (u) { return !isImage(u); });
       var imgs = urls.filter(isImage);
-      if (web.length) o.url = web[0];
+      if (!o.url && web.length) o.url = web[0];
       if (!o.avatar && imgs.length) o.avatar = imgs[0];
     }
     if (!o.description && spare.length) {
@@ -447,7 +474,11 @@ function fromBlock(block) {
   var imgs = urls.filter(isImage);
   var text = block.replace(/https?:\/\/[^\s<>"'）)】\]]+/gi, ' ')
     .replace(/(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/\S*)?/gi, ' ');
-  var parts = text.split(/\r?\n/).map(function (s) { return stripTail(cleanText(s.replace(/^[\-*\s]+/, ''))); }).filter(Boolean);
+  var parts = text.split(/\r?\n/).map(function (s) {
+    var k = keyLine(s);
+    var line = k ? k.val : s;
+    return stripTail(unquote(line.replace(/^[\-*\s]+/, '')));
+  }).filter(Boolean);
   var name = parts.length ? parts.shift() : '';
   var desc = parts.join(' ').slice(0, 120);
   var nonEmpty = block.split(/\r?\n/).filter(function (s) { return cleanText(s); });
@@ -487,9 +518,8 @@ function parsePlain(text) {
 }
 
 function parseOneBlock(block) {
-  if (/^\s*-\s*nickname\s*[:：]/im.test(block) ||
-      /(?:站点名称|网站名称|站点地址|网站地址|一句话简介|头像地址|网址|简介)\s*[:：]/i.test(block) ||
-      /^\s*(?:nickname|url|name|link)\s*[:：]/im.test(block)) {
+  if (looksLikeFields(block) ||
+      /(?:站点名称|网站名称|站点地址|网站地址|一句话简介|头像地址|网址|简介)\s*[:：]/i.test(block)) {
     return { list: parseKeyValue(block), type: '字段模板 / yml 代码' };
   }
   return { list: parsePlain(block), type: '文本 / 网址' };
