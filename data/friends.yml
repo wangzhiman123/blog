@@ -226,4 +226,10 @@
   avatar: "https://www.janyoung.cn/tx_janyoung%20.jpg"
   group: blogs
   weight: 34
-  
+
+- nickname: "艾自由网"
+  url: "https://www.ifree6.cn/"
+  description: "分享医学知识，记录美好生活。"
+  avatar: "https://www.ifree6.cn/favicon.ico"
+  group: blogs
+  weight: 33  
