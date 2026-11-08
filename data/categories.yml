@@ -34,3 +34,8 @@
     - 日常随笔
     - 办事指南
     - 爱妻日常
+
+  name: 其他
+  icon: fa-solid fa-box-archive
+  desc: 其他的都在这里
+  children: []
