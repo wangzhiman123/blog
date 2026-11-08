@@ -4,15 +4,17 @@
 #
 # 结构：
 #   归档
-#   分类 ▾（鼠标移上去自动展开）→ 工作 / 学习 / 生活 / 其他
+#   分类 ▾（鼠标移上去自动展开）→ 自动读 data/categories.yml 的一级分类
 #   标签
 #   友链
 #   关于
 #
-# 「分类」下拉里的四项就是 data/categories.yml 里的一级分类，
-# 每项 params 里的 count = true 会让菜单上显示该分类的文章数（模板见
-# layouts/_partials/custom/menu-count.html）；不想显示就删掉那一行。
-# 增删一级分类时，这里要同步改三处：identifier、name、pageRef。
+# 「分类」下拉的子项不在本文件里写死，而由
+# layouts/_partials/custom/category-menu-items.html 直接读
+# data/categories.yml 生成（名称、图标、说明、顺序都取自那里），
+# 文章数由 layouts/_partials/custom/menu-count.html 自动统计。
+# 因此增删一级分类只需改 data/categories.yml 一个文件；
+# 本文件只保留「分类」这个父项，且 identifier 必须保持 "categories"。
 # -------------------------------------------------------------------------------------
 
 # ============ 首页 ============
@@ -68,86 +70,6 @@ draft = false
 icon = "fa-solid fa-folder-tree"
 type = ""
 divided = false
-
-# ---- 一级分类：工作 ----
-[[main]]
-identifier = "cat-work"
-parent = "categories"
-pre = ""
-post = ""
-name = "工作"
-pageRef = "/categories/工作"
-url = "categories/工作/"
-title = "合同、公司、劳动等实务文章"
-weight = 1
-
-[main.params]
-class = ""
-draft = false
-icon = "fa-solid fa-briefcase"
-type = ""
-divided = false
-count = true
-
-# ---- 一级分类：学习 ----
-[[main]]
-identifier = "cat-study"
-parent = "categories"
-pre = ""
-post = ""
-name = "学习"
-pageRef = "/categories/学习"
-url = "categories/学习/"
-title = "读书、备考与执业成长"
-weight = 2
-
-[main.params]
-class = ""
-draft = false
-icon = "fa-solid fa-graduation-cap"
-type = ""
-divided = false
-count = true
-
-# ---- 一级分类：生活 ----
-[[main]]
-identifier = "cat-life"
-parent = "categories"
-pre = ""
-post = ""
-name = "生活"
-pageRef = "/categories/生活"
-url = "categories/生活/"
-title = "日常随笔与生活记录"
-weight = 3
-
-[main.params]
-class = ""
-draft = false
-icon = "fa-solid fa-mug-hot"
-type = ""
-divided = false
-count = true
-
-# ---- 一级分类：其他 ----
-[[main]]
-identifier = "cat-other"
-parent = "categories"
-pre = ""
-post = ""
-name = "其他"
-pageRef = "/categories/其他"
-url = "categories/其他/"
-title = "未归入工作、学习、生活的文章"
-weight = 4
-
-[main.params]
-class = ""
-draft = false
-icon = "fa-solid fa-box-archive"
-type = ""
-divided = false
-count = true
 
 # ============ 标签 ============
 [[main]]

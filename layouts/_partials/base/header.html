@@ -57,6 +57,7 @@
     <nav>
       <ul class="menu">
         {{- range .Site.Menus.main -}}
+          {{- $isCatParent := and (eq .Identifier "categories") (gt (len (hugo.Data.categories | default slice)) 0) -}}
           {{- $url := .URL -}}
           {{- with $url -}}
             {{- $url = . | relLangURL -}}
@@ -67,7 +68,7 @@
           {{- if (eq .Params.Type "mobile") | or (and (eq .Params.Draft true) (ne $menuDraft "true")) -}}
             {{ continue }}
           {{- end -}}
-          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}{{ if .HasChildren }} has-children{{ end }}">
+          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}{{ if or .HasChildren $isCatParent }} has-children{{ end }}">
             <a class="menu-link"
               {{- with $url }} href="{{ $url }}"{{ else }} href="javascript:void(0);"{{ end }}
               {{- with .Title }} title="{{ . }}"{{ end }}
@@ -78,9 +79,12 @@
               {{- .Name }}{{- partial "custom/menu-count.html" . -}}
               {{- with .Post }} {{ . | safeHTML -}}{{- end -}}
             </a>
-            {{- if .HasChildren -}}
+            {{- if or .HasChildren $isCatParent -}}
               {{ dict "Class" "dropdown-icon fa-solid fa-chevron-down" | partial "plugin/icon.html" }}
               <ul class="sub-menu">
+                {{- if $isCatParent -}}
+                  {{- partial "custom/category-menu-items.html" $ -}}
+                {{- else -}}
                 {{- range $k, $v := .Children -}}
                   {{- $url := $v.URL -}}
                   {{- with $url -}}
@@ -107,6 +111,7 @@
                       {{- with $v.Post }} {{ . | safeHTML -}}{{- end -}}
                     </a>
                   </li>
+                {{- end -}}
                 {{- end -}}
               </ul>
             {{- end -}}
@@ -222,6 +227,7 @@
       <ul class="menu" id="menu-mobile">
         {{- $currentPage := . -}}
         {{- range .Site.Menus.main -}}
+          {{- $isCatParent := and (eq .Identifier "categories") (gt (len (hugo.Data.categories | default slice)) 0) -}}
           {{- $url := .URL -}}
           {{- with $url -}}
             {{- $url = . | relLangURL -}}
@@ -232,8 +238,8 @@
           {{- if (eq .Params.Type "desktop") | or (and (eq .Params.Draft true) (ne $menuDraft "true")) -}}
             {{ continue }}
           {{- end -}}
-          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}{{ if .HasChildren }} has-children{{ end }}">
-            {{- if .HasChildren -}}
+          <li class="menu-item{{ if $.IsMenuCurrent `main` . | or ($.HasMenuCurrent `main` .) | or (eq $.RelPermalink $url) }} active{{ end }}{{ with .Params.Class }} {{ . }}{{ end }}{{ if or .HasChildren $isCatParent }} has-children{{ end }}">
+            {{- if or .HasChildren $isCatParent -}}
               <span class="nested-item">
                 <a class="menu-link"
                   {{- with $url }} href="{{ $url }}"{{ else }} href="javascript:void(0);"{{ end }}
@@ -248,6 +254,9 @@
                 {{ dict "Class" "dropdown-icon fa-solid fa-chevron-right" | partial "plugin/icon.html" }}
               </span>
               <ul class="sub-menu">
+                {{- if $isCatParent -}}
+                  {{- partial "custom/category-menu-items.html" $ -}}
+                {{- else -}}
                 {{- range $k, $v := .Children -}}
                   {{- $url := $v.URL -}}
                   {{- with $url -}}
@@ -274,6 +283,7 @@
                       {{- with $v.Post }} {{ . | safeHTML -}}{{- end -}}
                     </a>
                   </li>
+                {{- end -}}
                 {{- end -}}
               </ul>
             {{- else -}}
