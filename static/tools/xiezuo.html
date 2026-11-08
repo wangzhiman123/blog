@@ -167,7 +167,7 @@ var _hmt = _hmt || [];
         <label>摘要 <span class="hint">可选。一到三句话，显示在文章列表里；不填会自动截取正文开头</span></label>
         <textarea id="summary" placeholder="用一两句话说清这篇文章解决什么问题。"></textarea>
 
-        <label>封面图网址 <span class="hint">可选。以 https:// 开头的图片地址（外链图床会自动加压缩参数）</span></label>
+        <label>封面图网址 <span class="hint">可选。以 https:// 开头的图片地址；填了会同时写进表头的 featured_image_preview 和 images 两处，不填则留空占位</span></label>
         <input type="url" id="cover" placeholder="https://...jpg">
 
         <div class="check"><input type="checkbox" id="pin"><label for="pin" style="margin:0">置顶这篇文章</label></div>
@@ -245,6 +245,11 @@ var _hmt = _hmt || [];
         <div class="tips">
           发布步骤：<strong>复制全文</strong> → 点<strong>去 GitHub 新建</strong> → 在网页里<strong>粘贴</strong>（Ctrl+V）→ 拉到底点绿色 <strong>Commit changes</strong>。约 2 分钟后网站上就能看到。
         </div>
+        <div class="tips">
+          表头里 <code>featured_image_preview</code> 管<strong>首页缩略图</strong>，<code>images</code> 管<strong>微信分享图</strong>；
+          填了左边的「封面图网址」就会自动写进这两处，用的是同一张图。没填时两行留空 <code>""</code>，网站自动用站点头像兜底，不会报错。
+          以后要补图，建议在左边输入框里填了重新生成，<strong>不要</strong>把网址直接塞进 <code>images: ""</code> 的引号里。
+        </div>
         <div class="btns">
           <button id="btnSave">保存草稿到本机</button>
           <button id="btnRestore">恢复上次草稿</button>
@@ -260,6 +265,7 @@ var _hmt = _hmt || [];
           ☐ 日期是你想让它显示的那天<br>
           ☐ 分类和标签用了逗号分隔，没有顿号<br>
           ☐ 图片地址以 https:// 开头，能直接在浏览器打开<br>
+          ☐ 封面图填在左边输入框里，没有手改生成结果里的 images 那行<br>
           ☐ 截图下方写了说明文字（图片说明）<br>
           ☐ 摘要 2-3 句、说清了解决什么问题
         </div>
@@ -387,11 +393,16 @@ function buildFrontMatter(st) {
     lines.push("summary: " + yamlStr(st.summary));
     lines.push("description: " + yamlStr(st.summary));
   }
-  if (st.cover) {
-    var cover = optimizeImageUrl(st.cover, st.optimizeImages !== false);
-    lines.push("featuredImage: " + yamlStr(cover));
+  /* 封面图两个字段（无论有没有填图都写进表头，方便以后补网址）：
+     featured_image_preview —— 新版 FixIt 首页列表缩略图只认这个名字（旧名 featuredImage 已失效）；
+     images —— 微信 / 微博分享卡片（og:image），主题要求写成列表；没填图时留空占位。 */
+  var cover = st.cover ? optimizeImageUrl(st.cover, st.optimizeImages !== false) : "";
+  lines.push("featured_image_preview: " + yamlStr(cover));
+  if (cover) {
     lines.push("images:");
     lines.push("- " + yamlStr(cover));
+  } else {
+    lines.push('images: ""');
   }
   lines.push("authors:");
   lines.push("- " + AUTHOR);
