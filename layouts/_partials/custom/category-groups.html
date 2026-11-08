@@ -1,0 +1,68 @@
+{{- /*
+  分类分组的统一数据源（自动同步）
+
+  合并两个来源，返回 [{name, icon, desc, children}]：
+    1. data/categories.yml —— 负责图标、说明、排列顺序，以及预留的空分类；
+    2. 所有文章 front matter 的 categories —— 第一个名字是一级分类，其余是二级分类。
+
+  因此：文章里写了一个新的一级分类，顶部菜单和分类总览页会自动多出一组；
+        写了新的二级分类，会自动挂到对应大类的标签里，不必再改 categories.yml。
+  想给新分类指定图标 / 说明 / 排序，再到 data/categories.yml 补一段即可（可选）。
+
+  调用方式：{{ $groups := partial "custom/category-groups.html" . }}
+*/ -}}
+
+{{- $config := hugo.Data.categories | default slice -}}
+
+{{- /* 收集文章里实际用到的分类：第 1 个是一级，其余是二级 */ -}}
+{{- $primary := slice -}}
+{{- $pairs := slice -}}
+{{- range site.RegularPages -}}
+  {{- $cats := .Params.categories | default slice -}}
+  {{- if reflect.IsSlice $cats -}}
+    {{- $parent := "" -}}
+    {{- range $i, $name := $cats -}}
+      {{- if eq $i 0 -}}
+        {{- $parent = $name -}}
+      {{- else -}}
+        {{- $pairs = $pairs | append (dict "parent" $parent "child" $name) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if $parent -}}
+      {{- if not (in $primary $parent) -}}{{- $primary = $primary | append $parent -}}{{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 一级分类顺序：先按 yml 的定义，再把文章里新出现的一级追加到末尾 */ -}}
+{{- $names := slice -}}
+{{- range $config -}}{{- $names = $names | append .name -}}{{- end -}}
+{{- range $primary -}}
+  {{- if not (in $names .) -}}{{- $names = $names | append . -}}{{- end -}}
+{{- end -}}
+
+{{- /* 逐组构建：yml 的图标 / 说明 / 预定义二级 + 文章里新出现的二级 */ -}}
+{{- $groups := slice -}}
+{{- range $names -}}
+  {{- $name := . -}}
+  {{- $icon := "fa-solid fa-folder" -}}
+  {{- $desc := "" -}}
+  {{- $kids := slice -}}
+  {{- range $config -}}
+    {{- if eq .name $name -}}
+      {{- $icon = .icon | default $icon -}}
+      {{- $desc = .desc | default "" -}}
+      {{- range (.children | default slice) -}}
+        {{- if not (in $kids .) -}}{{- $kids = $kids | append . -}}{{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $pairs -}}
+    {{- if eq .parent $name -}}
+      {{- if not (in $kids .child) -}}{{- $kids = $kids | append .child -}}{{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $groups = $groups | append (dict "name" $name "icon" $icon "desc" $desc "children" $kids) -}}
+{{- end -}}
+
+{{- return $groups -}}

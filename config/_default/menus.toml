@@ -4,16 +4,17 @@
 #
 # 结构：
 #   归档
-#   分类 ▾（鼠标移上去自动展开）→ 自动读 data/categories.yml 的一级分类
+#   分类 ▾（鼠标移上去自动展开）→ 自动读「yml 定义 + 文章实际分类」的一级分类
 #   标签
 #   友链
 #   关于
 #
 # 「分类」下拉的子项不在本文件里写死，而由
-# layouts/_partials/custom/category-menu-items.html 直接读
-# data/categories.yml 生成（名称、图标、说明、顺序都取自那里），
+# layouts/_partials/custom/category-menu-items.html 读取统一数据源
+# layouts/_partials/custom/category-groups.html 生成：
+# data/categories.yml 定图标 / 说明 / 顺序，文章里新写的一级分类自动追加，
 # 文章数由 layouts/_partials/custom/menu-count.html 自动统计。
-# 因此增删一级分类只需改 data/categories.yml 一个文件；
+# 因此新增一级分类只要在文章 front matter 里写名字，菜单就会自动出现；
 # 本文件只保留「分类」这个父项，且 identifier 必须保持 "categories"。
 # -------------------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ icon = "fa-solid fa-archive"
 type = ""
 divided = false
 
-# ============ 分类（父级，鼠标移上去自动展开三个一级分类） ============
+# ============ 分类（父级，鼠标移上去自动展开全部一级分类） ============
 [[main]]
 identifier = "categories"
 parent = ""

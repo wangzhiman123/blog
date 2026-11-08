@@ -2,11 +2,11 @@
   文章页「收录于 …」（覆盖主题 post-included-in.html）
 
   原来把 categories 里的两个名字平铺：收录于 📁 工作  📁 案例复盘
-  现在按 data/categories.yml 的层级输出：收录于 📁 工作 › 📁 案例复盘
+  现在按统一数据源（yml + 文章实际分类）的层级输出：收录于 📁 工作 › 📁 案例复盘
 
   文章 front matter 不用改，仍然是 [一级, 二级] 两个名字。
 */ -}}
-{{- $groups := hugo.Data.categories -}}
+{{- $groups := partial "custom/category-groups.html" . -}}
 {{- $terms := .GetTerms "categories" -}}
 {{- $byName := dict -}}
 {{- range $terms -}}
@@ -18,7 +18,7 @@
 {{- $used := slice -}}
 {{- $folderIcon := dict "Class" "fa-regular fa-folder" | partial "plugin/icon.html" -}}
 
-{{- /* 一级：按 data 里定义的顺序，缺的跳过 */ -}}
+{{- /* 一级：按统一数据源的顺序，缺的跳过 */ -}}
 {{- range $groups -}}
   {{- $g := . -}}
   {{- with index $byName $g.name -}}
@@ -35,7 +35,7 @@
   {{- end -}}
 {{- end -}}
 
-{{- /* 没写进 categories.yml 的分类，兜底显示在最后 */ -}}
+{{- /* 极少数未能归入层级的分类，兜底显示在最后 */ -}}
 {{- range $terms -}}
   {{- if not (in $used .LinkTitle) -}}
     {{- $subParts = $subParts | append (printf `<a href="%s" class="post-category" title="分类 - %s">%s %s</a>` (partial "function/escapeurl.html" .RelPermalink) .LinkTitle $folderIcon .LinkTitle) -}}

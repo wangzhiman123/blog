@@ -1,11 +1,12 @@
 {{- /*
   单个分类页顶部的层级导航
 
+  分组来自 custom/category-groups.html（yml + 文章实际分类），新增分类自动生效。
   一级分类（工作 / 学习 / 生活 / 其他）：面包屑「全部分类 › 工作」，下面列出它的二级分类
   二级分类（案例复盘等）：面包屑「全部分类 › 工作 › 案例复盘」，下面列出同级分类
 */ -}}
 {{- $title := .LinkTitle -}}
-{{- $groups := hugo.Data.categories -}}
+{{- $groups := partial "custom/category-groups.html" . -}}
 {{- $parent := "" -}}
 {{- $siblings := slice -}}
 

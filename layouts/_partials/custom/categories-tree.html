@@ -1,11 +1,12 @@
 {{- /*
   分类总览：一级分类成组，二级分类以标签形式挂在组内
 
-  层级关系来自 data/categories.yml。文章 front matter 里仍然写两个名字
-  （一级在前、二级在后），所以不用改文章，只改这一层展示就能得到：
+  层级关系来自统一数据源 custom/category-groups.html：
+  data/categories.yml 定图标 / 说明 / 顺序，文章 front matter 里写两个名字
+  （一级在前、二级在后），新增分类会自动出现在对应板块：
     工作  ›  非诉实务 / 案例复盘 / 诉讼实务 …
 */ -}}
-{{- $groups := hugo.Data.categories -}}
+{{- $groups := partial "custom/category-groups.html" . -}}
 {{- $tax := site.Taxonomies.categories -}}
 {{- $total := len $tax -}}
 
@@ -57,7 +58,7 @@
   {{- end -}}
 </div>
 
-{{- /* 兜底：数据文件里没登记的分类（比如以后新建了但忘了加进 categories.yml），
+{{- /* 兜底：极少数没能自动归入层级的分类（例如文章 categories 顺序写反了），
        单独列出来，避免文章「凭空消失」 */ -}}
 {{- $known := slice -}}
 {{- range $groups -}}
@@ -75,7 +76,7 @@
         {{- dict "Class" "fa-solid fa-circle-question" | partial "plugin/icon.html" -}}
         <span>未归入层级的分类</span>
       </span>
-      <p class="cat-group-desc">这些分类还没写进 <code>data/categories.yml</code>，补一行就会归到对应大类下。</p>
+      <p class="cat-group-desc">这些分类没能自动归入大类，请检查文章 front matter 里的 <code>categories</code> 顺序（一级在前、二级在后）。</p>
     </header>
     <div class="cat-chips">
       {{- range $unknown -}}

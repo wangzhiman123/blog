@@ -1,14 +1,15 @@
 {{- /*
-  顶部「分类」下拉的子项，直接读 data/categories.yml 生成。
+  顶部「分类」下拉的子项，读统一的分类数据源（data/categories.yml + 文章实际分类）。
 
   被 layouts/_partials/base/header.html 的桌面端、移动端各调用一次，
   传入的上下文必须是页面（$），用于判断当前分类是否高亮。
 
-  一级分类的 name / icon / desc 与排列顺序全部取自 data/categories.yml，
+  一级分类的名称与顺序来自统一数据源：yml 里登记的按 yml 顺序，
+  文章里新写的一级分类自动追加在末尾（默认文件夹图标）。
   文章数交给 custom/menu-count.html 按分类名自动统计（0 篇时不显示数字）。
-  以后增删或改名一级分类，只需改 data/categories.yml 这一个文件。
+  以后新增一级分类，只要在文章 front matter 里写名字，菜单就会自动出现。
 */ -}}
-{{- $groups := hugo.Data.categories | default slice -}}
+{{- $groups := partial "custom/category-groups.html" . -}}
 {{- range $groups -}}
   {{- $name := .name -}}
   {{- $url := printf "categories/%s/" $name | relLangURL -}}
