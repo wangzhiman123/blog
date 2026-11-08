@@ -81,6 +81,7 @@
   {{- $attr = printf `%s data-expired-label="%s"` $attr (T "friends.expired") -}}
 {{- end -}}
 
+{{- /* 友链一律新标签页打开：主题默认只给外链加 target，指向本站的工具页会在当前页跳走 */ -}}
 {{- $options := dict
   "Destination" $friend.url
   "Title" $friend.description
@@ -88,6 +89,8 @@
   "Class" $class
   "ExternalIcon" false
   "IsGuarded" $isGuarded
+  "Newtab" true
+  "Rel" (cond (strings.HasPrefix $friend.url site.BaseURL) "noopener noreferrer" "")
   "Attr" $attr
 -}}
 {{- partial "plugin/link.html" $options -}}
