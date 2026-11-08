@@ -4,12 +4,12 @@
 #
 # 结构：
 #   归档
-#   分类 ▾（鼠标移上去自动展开）→ 工作 / 学习 / 生活
+#   分类 ▾（鼠标移上去自动展开）→ 工作 / 学习 / 生活 / 其他
 #   标签
 #   友链
 #   关于
 #
-# 「分类」下拉里的三项就是 data/categories.yml 里的一级分类，
+# 「分类」下拉里的四项就是 data/categories.yml 里的一级分类，
 # 每项 params 里的 count = true 会让菜单上显示该分类的文章数（模板见
 # layouts/_partials/custom/menu-count.html）；不想显示就删掉那一行。
 # 增删一级分类时，这里要同步改三处：identifier、name、pageRef。
@@ -125,6 +125,26 @@ weight = 3
 class = ""
 draft = false
 icon = "fa-solid fa-mug-hot"
+type = ""
+divided = false
+count = true
+
+# ---- 一级分类：其他 ----
+[[main]]
+identifier = "cat-other"
+parent = "categories"
+pre = ""
+post = ""
+name = "其他"
+pageRef = "/categories/其他"
+url = "categories/其他/"
+title = "未归入工作、学习、生活的文章"
+weight = 4
+
+[main.params]
+class = ""
+draft = false
+icon = "fa-solid fa-box-archive"
 type = ""
 divided = false
 count = true
