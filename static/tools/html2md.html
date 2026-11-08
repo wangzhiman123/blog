@@ -58,6 +58,25 @@
     outline: 2px solid var(--brand); outline-offset: 3px;
   }
   .jump-note { font-size: 11.5px; font-weight: 400; opacity: .9; }
+  /* 页眉搜狐号快捷入口（图标加载失败时降级为「搜」字） */
+  a.jump-sohu {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px 6px 7px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--card);
+    color: var(--text); text-decoration: none;
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+  }
+  a.jump-sohu:hover { border-color: #e4392e; }
+  a.jump-sohu:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+  .sohu-icon {
+    display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px;
+    align-items: center; justify-content: center;
+    border-radius: 6px; background: #f3f4f6; overflow: hidden;
+  }
+  .sohu-icon img { width: 20px; height: 20px; object-fit: contain; display: block; }
+  .sohu-icon.fallback { background: #e4392e; color: #fff; font-size: 13px; font-weight: 700; }
+  .sohu-icon.fallback::after { content: "搜"; }
+
   a.jump-minor, a.jump-inline { color: var(--brand); text-decoration: none; font-size: 12.5px; white-space: nowrap; }
   a.jump-minor:hover, a.jump-inline:hover { text-decoration: underline; }
   a.jump-inline {
@@ -225,6 +244,12 @@ var _hmt = _hmt || [];
       <div class="sub">把网页、Word、公众号里复制的内容贴进来，右边立刻变成 Markdown，一键复制。不联网、不安装，双击就能用。</div>
     </div>
     <div class="head-links">
+      <a class="jump-sohu" href="https://mp.sohu.com/mpfe/v4/contentManagement/first/page" target="_blank" rel="noopener noreferrer" title="在新标签页打开搜狐号内容管理页">
+        <span class="sohu-icon">
+          <img src="https://mp.sohu.com/favicon.ico" alt="" width="20" height="20" onerror="this.style.display='none';this.parentNode.classList.add('fallback')">
+        </span>
+        <span>搜狐号 <span aria-hidden="true">↗</span></span>
+      </a>
       <a class="jump-primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">
         <span class="jump-title">打开写作助手 ↗</span>
         <span class="jump-note">复制后点这里，新开一页继续编辑</span>
