@@ -14,7 +14,7 @@
 
 User-agent: *
 
-Disallow: /images/
+# Disallow: /images/
 # Disallow: /js/
 # Disallow: /css/
 
