@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>友链代码转换器 · 王志满律师</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #656d76;
+    --line: #d8dee4;
+    --brand: #1a7f5a;
+    --brand-weak: #e8f5ef;
+    --warn: #9a6700;
+    --warn-bg: #fff8e5;
+    --danger: #cf222e;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c;
+      --card: #1f2228;
+      --text: #e6edf3;
+      --muted: #9aa4b2;
+      --line: #30363d;
+      --brand: #3fb950;
+      --brand-weak: #132a1e;
+      --warn: #d29922;
+      --warn-bg: #2b2413;
+      --danger: #f85149;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.7 -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  header.page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .page-head-text { flex: 1 1 420px; min-width: 0; }
+  .head-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  a.jump-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  a.jump-btn:hover { border-color: var(--muted); }
+  a.jump-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  a.jump-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  a.jump-btn.primary:hover { filter: brightness(1.08); }
+  @media (prefers-color-scheme: dark) { a.jump-btn.primary { color: #10241a; } }
+  @media (max-width: 620px) {
+    header.page-head { align-items: flex-start; }
+    .head-links { width: 100%; }
+  }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px 18px; margin-bottom: 16px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 span.num {
+    display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brand-weak); color: var(--brand);
+    font-size: 12px; align-items: center; justify-content: center; font-weight: 700;
+  }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+  label:first-of-type { margin-top: 0; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 4px; }
+  input[type=text], input[type=url], input[type=number], select, textarea {
+    width: 100%; padding: 9px 10px; font: inherit; font-size: 14px;
+    color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 7px;
+  }
+  textarea { min-height: 210px; resize: vertical; line-height: 1.6; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  input.bad { border-color: var(--danger); }
+  button {
+    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  button.primary:hover { filter: brightness(1.08); }
+  button.danger { color: var(--danger); }
+  button.danger:hover { border-color: var(--danger); }
+  button.mini { padding: 5px 9px; font-size: 12.5px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 620px) { .row { grid-template-columns: 1fr; } }
+  .checkline { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 10px; cursor: pointer; }
+  .checkline input { width: auto; }
+  pre.out {
+    margin: 0; padding: 12px; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; font: 12.5px/1.65 ui-monospace, Consolas, "Courier New", monospace;
+    white-space: pre-wrap; word-break: break-word; max-height: 380px; overflow: auto; tab-size: 2;
+  }
+  .msg { font-size: 13px; margin-top: 10px; min-height: 20px; }
+  .msg.ok { color: var(--brand); }
+  .msg.bad { color: var(--danger); }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .note b { color: var(--text); }
+  code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .tips { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-top: 12px; }
+  ol.steps { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: var(--muted); }
+  ol.steps li { margin-bottom: 6px; }
+
+  .list { display: flex; flex-direction: column; gap: 12px; }
+  .item { border: 1px solid var(--line); border-radius: 9px; padding: 12px 13px; background: var(--bg); }
+  .item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .idx { font-size: 11px; font-weight: 700; color: var(--brand); background: var(--brand-weak); border-radius: 999px; padding: 1px 8px; }
+  .badge { font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; background: var(--card); }
+  .spacer { flex: 1; }
+  .item label { margin: 8px 0 3px; font-size: 12px; }
+  .item input, .item select { padding: 6px 8px; font-size: 13px; }
+  .item .warnline { color: var(--warn); font-size: 12px; margin-top: 8px; }
+  .item .errline { color: var(--danger); font-size: 12px; margin-top: 8px; }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 24px 0; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+    background: var(--text); color: var(--card); padding: 10px 18px; border-radius: 8px;
+    font-size: 13px; opacity: 0; pointer-events: none; transition: .2s; z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+<!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
+     所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
+     以后要撤掉统计，各 tools 页一起删这段即可。 -->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e51eb8fb09fb7d9dc6d496a7cf256c4f";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-head">
+    <div class="page-head-text">
+      <h1>友链代码转换器</h1>
+      <div class="sub">复制到的网址、友链卡片、申请信息或已有的 yml 代码，往左边一贴，右边就变成能直接粘进 <code>data/friends.yml</code> 的代码。<br>识别结果可以逐条改；全部在本浏览器里完成，不上传任何服务器。</div>
+    </div>
+    <div class="head-links">
+      <a class="jump-btn primary" href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开友链管理器">友链管理器 ↗</a>
+      <a class="jump-btn" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer">写作助手 ↗</a>
+      <a class="jump-btn" href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer">HTML 转 Markdown ↗</a>
+    </div>
+  </header>
+
+  <div class="cols">
+    <div>
+      <div class="card">
+        <h2><span class="num">1</span>粘贴你复制到的内容</h2>
+        <label for="input">原始内容 <span class="hint">粘贴后自动识别；一次贴多条请用空行隔开</span></label>
+        <textarea id="input" spellcheck="false" placeholder="例如：&#10;站点名称：某某的博客&#10;站点地址：https://example.com&#10;一句话简介：写点法律与生活的记录&#10;头像地址：https://example.com/logo.png&#10;&#10;或者直接贴一个网址：https://example.com"></textarea>
+        <div class="btns">
+          <button class="primary" onclick="readClipboard()">读取剪贴板</button>
+          <button onclick="loadSample()">看个示例</button>
+          <button class="danger" onclick="clearAll()">清空</button>
+        </div>
+        <div class="msg" id="parseMsg"></div>
+        <div class="note">
+          认得这些格式：<b>纯网址</b>、<b>名称 + 网址</b>、<b>Markdown 链接</b>、<b>从别人友链页复制的网页卡片</b>（含图片）、<b>「站点名称：…」申请模板</b>、<b>已有的 friends.yml 代码</b>、<b>JSON</b>。一次贴多条也可以。
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>批量设置 <span class="hint">只对本次识别出来的条目生效</span></h2>
+        <div class="row">
+          <div>
+            <label for="bulkGroup">默认分组</label>
+            <select id="bulkGroup">
+              <option value="blogs">博友（blogs）</option>
+              <option value="tools">常用工具（tools）</option>
+              <option value="official">官方检索（official）</option>
+              <option value="circles">博客圈（circles）</option>
+            </select>
+          </div>
+          <div>
+            <label for="startWeight">起始权重 <span class="hint">越大越靠前</span></label>
+            <input type="number" id="startWeight" value="50">
+          </div>
+        </div>
+        <div class="btns">
+          <button onclick="applyBulk()">应用到全部</button>
+        </div>
+        <label class="checkline"><input type="checkbox" id="autoFavicon" checked onchange="renderYaml()"> 没有头像时，自动用「网址 + /favicon.ico」补上</label>
+        <label class="checkline"><input type="checkbox" id="fitContain" onchange="renderYaml()"> 头像改成完整显示（长条 logo 用，加 <code>avatar_fit: contain</code>）</label>
+        <div class="tips">
+          头像直接写对方的图片链接即可，不用下载到仓库。万一图片失效，网站会自动显示默认灰色头像。
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2><span class="num">2</span>识别结果 <span class="hint" id="count"></span></h2>
+        <div class="list" id="list"></div>
+        <div class="btns">
+          <button onclick="addBlank()">＋ 手动加一条</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">3</span>可直接粘贴的代码</h2>
+        <pre class="out" id="yaml"></pre>
+        <div class="btns">
+          <a class="jump-btn primary" id="btnCopyOpen" href="https://github.com/wangzhiman123/blog/edit/main/data/friends.yml" target="_blank" rel="noopener noreferrer" title="复制代码并在新标签页打开后台文件">复制并打开后台 ↗</a>
+          <button onclick="copyYaml()">复制代码</button>
+          <button onclick="download()">下载 .yml</button>
+        </div>
+        <div class="msg" id="yamlMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">4</span>怎么贴到网站后台</h2>
+        <ol class="steps">
+          <li>点绿色的 <b>「复制并打开后台 ↗」</b>，代码自动复制，浏览器会新开一个标签页打开 GitHub 上的 <code>data/friends.yml</code>（没登录就先登录 GitHub）。</li>
+          <li>在那个页面把光标点到<b>文件最末尾</b>，回车空出一行，按 <code>Ctrl+V</code> 粘贴。</li>
+          <li>拉到页面下方，点绿色的 <b>Commit changes</b> 按钮保存。</li>
+          <li>等 1～2 分钟，打开 <code>/friends/</code> 强刷一次（<code>Ctrl+F5</code>）就能看到新友链。</li>
+        </ol>
+        <div class="note" style="margin-top:10px">
+          同一分组里谁排前面只看 <b>weight</b>，跟写在文件第几行无关，所以直接粘到末尾最省事。想置顶就把权重填大一点。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
+    其他工具（点开都是新标签页，当前页填的内容不会丢）：<a href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">友链管理器</a>
+    · <a href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">写作助手</a>
+    · <a href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">HTML 转 Markdown</a>
+  </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+var GROUPS = [
+  { key: 'blogs', name: '博友' },
+  { key: 'tools', name: '常用工具' },
+  { key: 'official', name: '官方检索' },
+  { key: 'circles', name: '博客圈' }
+];
+var DEFAULT_GROUP = 'blogs';
+var DEFAULT_WEIGHT = 50;
+var items = [];
+var known = {};
+var seq = 0;
+var toastTimer = null;
+
+var ALIAS = {
+  nickname: ['nickname', 'name', 'sitename', 'site_name', 'siteName', 'title', 'blogname', 'blog_name', '站点名称', '网站名称', '博客名称', '站点名', '站名', '名称'],
+  url: ['url', 'link', 'href', 'site', 'website', 'siteurl', 'site_url', 'homepage', '站点地址', '网站地址', '站点链接', '博客地址', '主页', '网址', '链接'],
+  description: ['description', 'desc', 'summary', 'intro', 'memo', '一句话简介', '站点简介', '站点描述', '简介', '描述', '说明'],
+  avatar: ['avatar', 'logo', 'icon', 'favicon', 'image', 'img', 'photo', '头像地址', '站点图标', '图标地址', '头像', '图标'],
+  group: ['group', '分组', '分类'],
+  weight: ['weight', '权重', '排序'],
+  avatar_fit: ['avatar_fit', '头像填充', '填充方式']
+};
+
+function $(id) { return document.getElementById(id); }
+function esc(v) {
+  return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function ystr(s) { return '"' + String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'; }
+function yplain(s) { s = String(s == null ? '' : s); return /^[A-Za-z0-9_-]+$/.test(s) ? s : ystr(s); }
+function cleanText(s) { return String(s == null ? '' : s).replace(/\u00a0/g, ' ').trim(); }
+function stripTail(s) { return String(s).replace(/[，,。;；、：:）)\]】>}"'…\s]+$/, '').trim(); }
+
+function normUrl(u) {
+  u = cleanText(u);
+  u = u.replace(/^["'<（(【\[]+/, '').replace(/[>"'）)】\]\],，。;；、]+$/, '');
+  if (/^\/\//.test(u)) u = 'https:' + u;
+  if (!/^https?:\/\//i.test(u)) {
+    if (/^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?(?:[\/?#]|$)/i.test(u)) u = 'https://' + u;
+  }
+  return u;
+}
+function validUrl(u) { return /^https?:\/\/[^\s]+\.[^\s]+/i.test(u); }
+function isImage(u) { return /\.(?:png|jpe?g|gif|svg|webp|ico|bmp|avif)(?:\?|#|$)/i.test(u); }
+function hostKey(u) {
+  try {
+    var x = new URL(u);
+    return x.hostname.replace(/^www\./, '').toLowerCase() + x.pathname.replace(/\/+$/, '').toLowerCase();
+  } catch (e) { return String(u).toLowerCase().replace(/\/+$/, ''); }
+}
+function nameFromUrl(u) {
+  try {
+    var h = new URL(u).hostname.replace(/^www\./, '');
+    var p = h.split('.')[0];
+    return p.charAt(0).toUpperCase() + p.slice(1);
+  } catch (e) { return ''; }
+}
+function findUrls(text) {
+  var out = [], m;
+  var re = /https?:\/\/[^\s<>"'）)】\]]+/gi;
+  while ((m = re.exec(text)) !== null) out.push(normUrl(m[0]));
+  if (!out.length) {
+    var re2 = /(?:^|[\s（(【\[])((?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?(?:\/[^\s<>"'）)】\]]*)?)/gim;
+    while ((m = re2.exec(text)) !== null) {
+      var u = normUrl(m[1]);
+      var noext = u.split(/[?#]/)[0];
+      if (!/\.(?:yml|yaml|md|html?|js|css|txt|json|xml|png|jpe?g|gif|svg|webp|ico)$/i.test(noext)) out.push(u);
+    }
+  }
+  return out.filter(function (u, i, a) { return u && a.indexOf(u) === i; });
+}
+function keyOf(k) {
+  k = String(k || '').trim().toLowerCase().replace(/\s+/g, '');
+  var found = '';
+  Object.keys(ALIAS).forEach(function (field) {
+    if (found) return;
+    for (var i = 0; i < ALIAS[field].length; i++) {
+      if (k === ALIAS[field][i].toLowerCase()) { found = field; return; }
+    }
+  });
+  return found;
+}
+
+function make(o) {
+  var url = normUrl(o.url || '');
+  var avatar = normUrl(o.avatar || '');
+  if (url && isImage(url) && !avatar) { avatar = url; url = ''; }
+  var name = stripTail(cleanText(o.nickname || '')).replace(/^[「『"']+|[」』"']+$/g, '').slice(0, 60);
+  var desc = stripTail(cleanText(o.description || '')).slice(0, 120);
+  if (!name && url) name = nameFromUrl(url);
+  if (!name && avatar) name = '待填名称';
+  var group = cleanText(o.group || '');
+  if (!GROUPS.some(function (g) { return g.key === group; })) group = DEFAULT_GROUP;
+  var hasWeight = o.weight !== undefined && o.weight !== '' && o.weight !== null;
+  var weight = parseInt(o.weight, 10);
+  if (isNaN(weight)) weight = DEFAULT_WEIGHT;
+  return {
+    id: ++seq, nickname: name, url: url, description: desc, avatar: avatar,
+    group: group, weight: weight, avatar_fit: o.avatar_fit === 'contain' ? 'contain' : 'cover',
+    source: o.source || '', explicitWeight: hasWeight,
+    err: validUrl(url) ? '' : '网址没认出来，请在下面补上 https:// 开头的完整地址'
+  };
+}
+
+/* ---------- 各类输入解析 ---------- */
+
+function parseJson(text) {
+  var d = JSON.parse(text);
+  var arr = Array.isArray(d) ? d : (d.items || d.friends || d.links || [d]);
+  return arr.map(function (o) {
+    return make({
+      nickname: o.nickname || o.name || o.title || o.sitename || o.site_name || '',
+      url: o.url || o.link || o.href || o.site || o.website || '',
+      description: o.description || o.desc || o.summary || o.intro || '',
+      avatar: o.avatar || o.logo || o.icon || o.image || '',
+      group: o.group || '', weight: o.weight, avatar_fit: o.avatar_fit, source: 'JSON'
+    });
+  });
+}
+
+function parseHtml(text) {
+  var doc = new DOMParser().parseFromString(text, 'text/html');
+  var as = [].slice.call(doc.querySelectorAll('a[href]'));
+  var links = as.filter(function (a) {
+    var h = cleanText(a.getAttribute('href') || '');
+    return /^(?:https?:|\/\/|www\.)/i.test(h);
+  });
+  if (!links.length) return parsePlain(cleanText(doc.body ? doc.body.textContent : text));
+  var out = links.slice(0, 30).map(function (a) {
+    var url = normUrl(a.getAttribute('href'));
+    var img = a.querySelector('img') || (a.parentElement ? a.parentElement.querySelector('img') : null);
+    var avatar = img ? normUrl(img.getAttribute('src') || '') : '';
+    var name = cleanText(a.textContent) || (img ? cleanText(img.getAttribute('alt')) : '') || cleanText(a.getAttribute('title'));
+    var desc = cleanText(a.getAttribute('title')) || '';
+    if (!desc && a.parentElement) {
+      var pt = cleanText(a.parentElement.textContent);
+      var rest = pt.replace(name, '').trim();
+      if (rest && rest.length < 160 && !/https?:\/\//i.test(rest)) desc = rest;
+    }
+    return make({ nickname: name, url: url, description: desc, avatar: avatar, source: '网页卡片' });
+  });
+  if (links.length > 30) out.push(make({ nickname: '还有 ' + (links.length - 30) + ' 条没导入', url: '', source: '提示' }));
+  return out;
+}
+
+function parseKeyValue(text) {
+  var lines = text.split(/\r?\n/);
+  var startRe = /^\s*-?\s*(?:nickname|站点名称|网站名称|博客名称|站点名|名称)\s*[:：]/i;
+  var blocks = [], cur = null;
+  lines.forEach(function (line) {
+    if (startRe.test(line)) { cur = []; blocks.push(cur); }
+    if (cur) cur.push(line);
+  });
+  if (!blocks.length) blocks = [lines];
+  return blocks.map(function (block) {
+    var o = { source: '字段模板' };
+    var spare = [];
+    block.forEach(function (line) {
+      var m = line.match(/^\s*-?\s*([A-Za-z_\u4e00-\u9fa5]+)\s*[:：]\s*(.*)$/);
+      if (m) {
+        var field = keyOf(m[1]);
+        var val = cleanText(m[2]);
+        if (/\s+#\s/.test(val)) val = cleanText(val.split(/\s+#\s/)[0]);
+        if ((val.charAt(0) === '"' && val.charAt(val.length - 1) === '"') ||
+            (val.charAt(0) === "'" && val.charAt(val.length - 1) === "'")) {
+          val = val.slice(1, -1);
+        }
+        if (field) o[field] = val;
+        else spare.push(val);
+      } else if (cleanText(line) && !/^\s*#/.test(line)) {
+        spare.push(cleanText(line));
+      }
+    });
+    if (!o.url) {
+      var urls = findUrls(spare.join(' ') + ' ' + (o.nickname || ''));
+      var web = urls.filter(function (u) { return !isImage(u); });
+      var imgs = urls.filter(isImage);
+      if (web.length) o.url = web[0];
+      if (!o.avatar && imgs.length) o.avatar = imgs[0];
+    }
+    if (!o.description && spare.length) {
+      var rest = spare.join(' ').replace(/https?:\/\/\S+/g, '').trim();
+      if (rest && rest !== o.nickname) o.description = rest.slice(0, 120);
+    }
+    return make(o);
+  }).filter(function (it) { return it.url || it.avatar || it.nickname; });
+}
+
+function fromBlock(block) {
+  var urls = findUrls(block);
+  var web = urls.filter(function (u) { return !isImage(u); });
+  var imgs = urls.filter(isImage);
+  var text = block.replace(/https?:\/\/[^\s<>"'）)】\]]+/gi, ' ')
+    .replace(/(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/\S*)?/gi, ' ');
+  var parts = text.split(/\r?\n/).map(function (s) { return stripTail(cleanText(s.replace(/^[\-*\s]+/, ''))); }).filter(Boolean);
+  var name = parts.length ? parts.shift() : '';
+  var desc = parts.join(' ').slice(0, 120);
+  var nonEmpty = block.split(/\r?\n/).filter(function (s) { return cleanText(s); });
+  if (nonEmpty.length === 1 && web.length) {
+    var m = nonEmpty[0].match(/^\s*(.*?)\s*((?:https?:\/\/|www\.)[^\s]+)\s*(.*)$/i);
+    if (m) {
+      var before = stripTail(cleanText(m[1]).replace(/^[\-*\u2022\s]+/, ''));
+      var after = stripTail(cleanText(m[3]).replace(/^[\-*\u2022\s]+/, ''));
+      if (before) { name = before; desc = after.slice(0, 120); }
+    }
+  }
+  return make({
+    nickname: name, url: web[0] || '', avatar: imgs[0] || '',
+    description: desc, source: '文本 / 网址'
+  });
+}
+
+function parsePlain(text) {
+  var blocks = text.split(/\n\s*\n+/).map(cleanText).filter(Boolean);
+  var out = [];
+  blocks.forEach(function (block) {
+    var md = /\[([^\]]+)\]\(\s*(https?:\/\/[^\s)]+)(?:\s+["'\u201c]([^"'\u201d]+)["'\u201d])?\s*\)/g, m, found = false;
+    while ((m = md.exec(block)) !== null) {
+      out.push(make({ nickname: m[1], url: m[2], description: m[3] || '', source: 'Markdown 链接' }));
+      found = true;
+    }
+    if (found) return;
+    var lines = block.split(/\r?\n/).map(cleanText).filter(Boolean);
+    var everyLineHasUrl = lines.length > 1 && lines.every(function (l) { return findUrls(l).length > 0; });
+    if (everyLineHasUrl) {
+      lines.forEach(function (l) { out.push(fromBlock(l)); });
+    } else {
+      out.push(fromBlock(block));
+    }
+  });
+  return out;
+}
+
+function parseOneBlock(block) {
+  if (/^\s*-\s*nickname\s*[:：]/im.test(block) ||
+      /(?:站点名称|网站名称|站点地址|网站地址|一句话简介|头像地址|网址|简介)\s*[:：]/i.test(block) ||
+      /^\s*(?:nickname|url|name|link)\s*[:：]/im.test(block)) {
+    return { list: parseKeyValue(block), type: '字段模板 / yml 代码' };
+  }
+  return { list: parsePlain(block), type: '文本 / 网址' };
+}
+
+function parseInput(text) {
+  text = cleanText(text);
+  if (!text) return { list: [], type: '' };
+  if (/^[\[{]/.test(text)) {
+    try { return { list: parseJson(text), type: 'JSON' }; } catch (e) { /* 继续按文本处理 */ }
+  }
+  if (/<a\s/i.test(text)) return { list: parseHtml(text), type: '网页卡片' };
+  var blocks = text.split(/\n\s*\n+/).map(cleanText).filter(Boolean);
+  var list = [], types = [];
+  blocks.forEach(function (block) {
+    var r = parseOneBlock(block);
+    if (types.indexOf(r.type) < 0) types.push(r.type);
+    list = list.concat(r.list);
+  });
+  return { list: list, type: types.join(' + ') };
+}
+
+/* ---------- 渲染 ---------- */
+
+function groupOptions(sel) {
+  return GROUPS.map(function (g) {
+    return '<option value="' + g.key + '"' + (g.key === sel ? ' selected' : '') + '>' + g.name + '（' + g.key + '）</option>';
+  }).join('');
+}
+
+function effAvatar(it) {
+  if (it.avatar) return it.avatar;
+  if (!$('autoFavicon').checked || !validUrl(it.url)) return '';
+  try { return new URL(it.url).origin + '/favicon.ico'; } catch (e) { return ''; }
+}
+
+function itemHtml(it, i) {
+  var dup = it.url && known[hostKey(it.url)] ? '<div class="warnline">⚠ 本站友链页里已经有这个网址，别重复添加</div>' : '';
+  var auto = !it.avatar && $('autoFavicon').checked && effAvatar(it)
+    ? '<div class="warnline">未识别到头像，已自动补：' + esc(effAvatar(it)) + '</div>' : '';
+  return '<div class="item">'
+    + '<div class="item-head"><span class="idx">第 ' + (i + 1) + ' 条</span>'
+    + '<span class="badge">' + esc(it.source || '手动') + '</span><span class="spacer"></span>'
+    + '<button class="mini danger" onclick="removeItem(' + it.id + ')">删除</button></div>'
+    + '<div class="row"><div><label>站点名称</label><input type="text" value="' + esc(it.nickname) + '" data-id="' + it.id + '" data-k="nickname" oninput="onEdit(this)"></div>'
+    + '<div><label>站点地址</label><input type="text" value="' + esc(it.url) + '" data-id="' + it.id + '" data-k="url" oninput="onEdit(this)"' + (it.err ? ' class="bad"' : '') + '></div></div>'
+    + '<div class="row"><div><label>一句话简介</label><input type="text" value="' + esc(it.description) + '" data-id="' + it.id + '" data-k="description" oninput="onEdit(this)"></div>'
+    + '<div><label>头像地址 <span class="hint">可留空</span></label><input type="text" value="' + esc(it.avatar) + '" data-id="' + it.id + '" data-k="avatar" oninput="onEdit(this)"></div></div>'
+    + '<div class="row"><div><label>分组</label><select data-id="' + it.id + '" data-k="group" onchange="onEdit(this)">' + groupOptions(it.group) + '</select></div>'
+    + '<div><label>权重</label><input type="number" value="' + esc(it.weight) + '" data-id="' + it.id + '" data-k="weight" oninput="onEdit(this)"></div></div>'
+    + (it.err ? '<div class="errline">' + esc(it.err) + '</div>' : '')
+    + dup + auto
+    + '</div>';
+}
+
+function render() {
+  $('count').textContent = items.length ? '共 ' + items.length + ' 条' : '';
+  $('list').innerHTML = items.length
+    ? items.map(itemHtml).join('')
+    : '<div class="empty">在左边粘贴内容，识别结果会出现在这里</div>';
+  renderYaml();
+}
+
+function buildYaml() {
+  return items.map(function (it) {
+    var av = effAvatar(it);
+    var s = '- nickname: ' + ystr(it.nickname) + '\n  url: ' + ystr(it.url);
+    if (it.description) s += '\n  description: ' + ystr(it.description);
+    if (av) s += '\n  avatar: ' + ystr(av);
+    if ($('fitContain').checked || it.avatar_fit === 'contain') s += '\n  avatar_fit: contain';
+    s += '\n  group: ' + yplain(it.group);
+    s += '\n  weight: ' + (parseInt(it.weight, 10) || 0);
+    return s;
+  }).join('\n\n');
+}
+
+function renderYaml() {
+  var text = buildYaml();
+  $('yaml').textContent = text;
+  if (!text) $('yamlMsg').textContent = '';
+}
+
+/* ---------- 交互 ---------- */
+
+function parseFromInput() {
+  var r = parseInput($('input').value);
+  items = r.list;
+  var start = parseInt($('startWeight').value, 10);
+  if (isNaN(start)) start = DEFAULT_WEIGHT;
+  items.forEach(function (it, i) {
+    if (!it.explicitWeight) it.weight = start - i;
+    if (it.group === DEFAULT_GROUP && !it.source) it.group = $('bulkGroup').value;
+  });
+  if (r.type) {
+    $('parseMsg').className = 'msg ok';
+    $('parseMsg').textContent = '已识别 ' + items.length + ' 条（' + r.type + '）。下面可以逐条修改，右边代码会跟着变。';
+  } else {
+    $('parseMsg').className = 'msg';
+    $('parseMsg').textContent = '';
+  }
+  render();
+}
+
+function onEdit(el) {
+  var id = Number(el.getAttribute('data-id'));
+  var k = el.getAttribute('data-k');
+  var it = items.find(function (x) { return x.id === id; });
+  if (!it) return;
+  it[k] = el.value;
+  if (k === 'url') {
+    it.url = normUrl(el.value);
+    it.err = validUrl(it.url) ? '' : '网址没认出来，请在下面补上 https:// 开头的完整地址';
+  }
+  if (k === 'weight') it.explicitWeight = true;
+  renderYaml();
+}
+
+function removeItem(id) {
+  items = items.filter(function (x) { return x.id !== id; });
+  render();
+}
+
+function addBlank() {
+  items.push(make({ nickname: '', url: '', group: $('bulkGroup').value, weight: DEFAULT_WEIGHT, source: '手动' }));
+  render();
+  toast('已加一条空记录，填好网址即可');
+}
+
+function applyBulk() {
+  var g = $('bulkGroup').value;
+  var start = parseInt($('startWeight').value, 10);
+  if (isNaN(start)) start = DEFAULT_WEIGHT;
+  items.forEach(function (it, i) { it.group = g; it.weight = start - i; it.explicitWeight = true; });
+  render();
+  toast('已把 ' + items.length + ' 条都设为「' + g + '」，权重从 ' + start + ' 递减');
+}
+
+function validate() {
+  if (!items.length) { toast('先在左边粘贴内容'); return false; }
+  var bad = items.findIndex(function (it) { return !validUrl(it.url); });
+  if (bad >= 0) {
+    msg('yamlMsg', '第 ' + (bad + 1) + ' 条网址不完整，请在上面补好或删掉这条再复制', 'bad');
+    return false;
+  }
+  return true;
+}
+
+function copyText(txt, okMsg) {
+  var done = function () { toast(okMsg || '已复制到剪贴板'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(fallback);
+  } else fallback();
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动选中右边代码复制'); }
+    ta.remove();
+  }
+}
+
+function copyYaml() {
+  if (!validate()) return;
+  copyText(buildYaml(), '代码已复制，粘到 data/friends.yml 末尾即可');
+  msg('yamlMsg', '已复制 ' + items.length + ' 条。打开后台文件，拉到最末尾空一行粘贴。', 'ok');
+}
+
+function download() {
+  if (!validate()) return;
+  var blob = new Blob([buildYaml() + '\n'], { type: 'text/yaml;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'friends-add.yml';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast('已下载 friends-add.yml');
+}
+
+function readClipboard() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    toast('这个浏览器不支持自动读取，点一下左边输入框，按 Ctrl+V 粘贴即可');
+    $('input').focus();
+    return;
+  }
+  navigator.clipboard.readText().then(function (t) {
+    if (!cleanText(t)) { toast('剪贴板里没有文字'); return; }
+    $('input').value = t;
+    parseFromInput();
+    toast('已读取剪贴板并识别');
+  }).catch(function () {
+    toast('浏览器没给读取权限，点一下左边输入框，按 Ctrl+V 粘贴即可');
+    $('input').focus();
+  });
+}
+
+function clearAll() {
+  $('input').value = '';
+  items = [];
+  $('bulkGroup').value = DEFAULT_GROUP;
+  $('startWeight').value = DEFAULT_WEIGHT;
+  $('parseMsg').textContent = '';
+  $('yamlMsg').textContent = '';
+  render();
+  toast('已清空');
+}
+
+function loadSample() {
+  $('input').value = '站点名称：某某的博客\n站点地址：https://example.com\n一句话简介：写点法律与生活的记录\n头像地址：https://example.com/logo.png\n\n[另一个博客](https://another.dev "记录建站笔记")\n\nhttps://third.site';
+  parseFromInput();
+  toast('已填入示例，看看右边生成的代码');
+}
+
+function msg(id, text, cls) {
+  var el = $(id);
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'msg ' + (cls || '');
+}
+function toast(text) {
+  var t = $('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+}
+
+/* 线上打开时，自动读一次本站友链页，用于提示「这个网址已经加过了」 */
+function loadKnown() {
+  if (!/^https?:$/.test(location.protocol)) return;
+  fetch('/friends/?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var as = doc.querySelectorAll('a[class*=friend-link]');
+    [].slice.call(as).forEach(function (a) {
+      var h = a.getAttribute('href');
+      if (h) known[hostKey(normUrl(h))] = 1;
+    });
+    if (items.length) render();
+  }).catch(function () { /* 读不到不影响使用 */ });
+}
+
+var inputTimer = null;
+$('input').addEventListener('input', function () {
+  clearTimeout(inputTimer);
+  inputTimer = setTimeout(parseFromInput, 180);
+});
+$('btnCopyOpen').addEventListener('click', function () {
+  if (!validate()) return;
+  copyText(buildYaml(), '代码已复制，后台在新标签页打开，按 Ctrl+V 粘贴');
+  msg('yamlMsg', '已复制 ' + items.length + ' 条。后台页面打开后，拉到文件最末尾空一行，按 Ctrl+V。', 'ok');
+});
+$('bulkGroup').addEventListener('change', function () {
+  if (!items.length) return;
+  items.forEach(function (it) { if (!it.explicitWeight) it.group = $('bulkGroup').value; });
+  render();
+});
+
+render();
+loadKnown();
+</script>
+</body>
+</html>
