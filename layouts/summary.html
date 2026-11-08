@@ -12,11 +12,28 @@
   {{- $hasCover = or $cover.Source (gt (len $cover.Matches) 0) -}}
 {{- end -}}
 
-{{- /* 摘要：抓首图 + 去图 */ -}}
+{{- /* 摘要：去图，避免图片撑高卡片 */ -}}
 {{- $raw := string .Summary -}}
 {{- $thumb := "" -}}
-{{- with findRESubmatch `<img[^>]+src=["']([^"']+)["']` $raw 1 -}}
-  {{- $thumb = index (index . 0) 1 -}}
+{{- if ne .Site.Params.home.posts.image_preview false -}}
+  {{- /* 缩略图来源（依次兜底）：
+         1. 正文 .Content 里的第一张外链图。本站文章大多只在正文插图、没写封面字段；
+            而且 front matter 写了 summary 后 .Summary 就是那段纯文字，
+            原来「从摘要里抓 img」永远抓不到，导致首页全部没有缩略图。
+            新版主题的 get-cover 只认 featured_image_preview / featured_image，
+            也匹配不到本站早期用的驼峰字段。
+         2. 早期文章用过的 featuredImage 字段。
+         3. 方形默认封面 static/images/thumb-default.png，保证无插图文章也有缩略图。
+         只取 http(s) 开头的图，避开文章末尾的站内二维码等装饰图。 */ -}}
+  {{- with findRESubmatch `<img[^>]+src=["'](https?://[^"']+)["']` (string .Content) 1 -}}
+    {{- $thumb = index (index . 0) 1 -}}
+  {{- end -}}
+  {{- if not $thumb -}}
+    {{- with .Params.featuredImage -}}{{- $thumb = . -}}{{- end -}}
+  {{- end -}}
+  {{- if not $thumb -}}
+    {{- $thumb = "/images/thumb-default.png" | absURL -}}
+  {{- end -}}
 {{- end -}}
 {{- $raw = replaceRE `(?s)<p[^>]*>\s*<a[^>]*>\s*<img[^>]*>\s*</a>\s*</p>` "" $raw -}}
 {{- $raw = replaceRE `(?s)<p[^>]*>\s*<img[^>]*>\s*</p>` "" $raw -}}
