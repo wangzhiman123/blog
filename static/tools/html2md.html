@@ -42,54 +42,31 @@
   header { margin-bottom: 18px; }
   h1 { font-size: 22px; margin: 0 0 6px; }
   .sub { color: var(--muted); font-size: 13px; }
-  /* 页眉工具快捷入口（三个工具页统一：点击都在新标签页打开） */
+  /* 跳转入口：与页面按钮同一套规范（primary 绿实心 = 复制全文，其余白底灰边） */
   header.page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .page-head-text { flex: 1 1 420px; min-width: 0; }
-  .head-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  a.jump-primary {
-    display: inline-flex; flex-direction: column; gap: 1px;
-    padding: 9px 16px; border-radius: 9px;
-    background: var(--brand); color: #fff; text-decoration: none;
-    font-size: 14px; font-weight: 700; line-height: 1.45;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  .head-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  a.jump-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    text-decoration: none; cursor: pointer; white-space: nowrap;
   }
-  a.jump-primary:hover { filter: brightness(1.08); }
-  a.jump-primary:focus-visible, a.jump-minor:focus-visible, a.jump-inline:focus-visible {
-    outline: 2px solid var(--brand); outline-offset: 3px;
-  }
-  .jump-note { font-size: 11.5px; font-weight: 400; opacity: .9; }
-  /* 页眉搜狐号快捷入口（图标加载失败时降级为「搜」字） */
-  a.jump-sohu {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 6px 12px 6px 7px; border-radius: 9px;
-    border: 1px solid var(--line); background: var(--card);
-    color: var(--text); text-decoration: none;
-    font-size: 13px; font-weight: 600; white-space: nowrap;
-  }
-  a.jump-sohu:hover { border-color: #e4392e; }
-  a.jump-sohu:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+  a.jump-btn:hover { border-color: var(--muted); }
+  a.jump-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  a.jump-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  a.jump-btn.primary:hover { filter: brightness(1.08); }
+  @media (prefers-color-scheme: dark) { a.jump-btn.primary { color: #10241a; } }
   .sohu-icon {
-    display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px;
-    align-items: center; justify-content: center;
-    border-radius: 6px; background: #f3f4f6; overflow: hidden;
+    display: inline-flex; width: 18px; height: 18px; flex: 0 0 18px;
+    align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;
   }
-  .sohu-icon img { width: 20px; height: 20px; object-fit: contain; display: block; }
-  .sohu-icon.fallback { background: #e4392e; color: #fff; font-size: 13px; font-weight: 700; }
+  .sohu-icon img { width: 18px; height: 18px; object-fit: contain; display: block; }
+  .sohu-icon.fallback { background: #e4392e; color: #fff; font-size: 12px; font-weight: 700; }
   .sohu-icon.fallback::after { content: "搜"; }
-
-  a.jump-minor, a.jump-inline { color: var(--brand); text-decoration: none; font-size: 12.5px; white-space: nowrap; }
-  a.jump-minor:hover, a.jump-inline:hover { text-decoration: underline; }
-  a.jump-inline {
-    padding: 5px 10px; border: 1px dashed var(--brand); border-radius: 999px;
-    background: var(--brand-weak); font-weight: 600;
-  }
   @media (max-width: 620px) {
     header.page-head { align-items: flex-start; }
     .head-links { width: 100%; }
-    a.jump-primary { flex: 1 1 100%; }
-  }
-  @media (prefers-color-scheme: dark) {
-    a.jump-primary { color: #10241a; }
   }
 
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
@@ -244,17 +221,12 @@ var _hmt = _hmt || [];
       <div class="sub">把网页、Word、公众号里复制的内容贴进来，右边立刻变成 Markdown，一键复制。不联网、不安装，双击就能用。</div>
     </div>
     <div class="head-links">
-      <a class="jump-sohu" href="https://mp.sohu.com/mpfe/v4/contentManagement/first/page" target="_blank" rel="noopener noreferrer" title="在新标签页打开搜狐号内容管理页">
-        <span class="sohu-icon">
-          <img src="https://mp.sohu.com/favicon.ico" alt="" width="20" height="20" onerror="this.style.display='none';this.parentNode.classList.add('fallback')">
-        </span>
-        <span>搜狐号 <span aria-hidden="true">↗</span></span>
+      <a class="jump-btn" href="https://mp.sohu.com/mpfe/v4/contentManagement/first/page" target="_blank" rel="noopener noreferrer" title="在新标签页打开搜狐号内容管理页">
+        <span class="sohu-icon"><img src="https://mp.sohu.com/favicon.ico" alt="" width="18" height="18" onerror="this.style.display='none';this.parentNode.classList.add('fallback')"></span>
+        搜狐号 ↗
       </a>
-      <a class="jump-primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">
-        <span class="jump-title">打开写作助手 ↗</span>
-        <span class="jump-note">复制后点这里，新开一页继续编辑</span>
-      </a>
-      <a class="jump-minor" href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer">友链管理器 ↗</a>
+      <a class="jump-btn primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">打开写作助手 ↗</a>
+      <a class="jump-btn" href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer">友链管理器 ↗</a>
     </div>
   </header>
 
@@ -301,7 +273,7 @@ var _hmt = _hmt || [];
             <button type="button" data-view="source">源码</button>
           </div>
           <span class="grow"></span>
-          <a class="jump-inline" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">复制后 → 写作助手 ↗</a>
+          <a class="jump-btn" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">写作助手 ↗</a>
           <button class="primary btn-sm" id="btnCopy">复制</button>
         </div>
 
