@@ -219,3 +219,11 @@
   avatar_fit: contain
   group: circles
   weight: 35
+
+- nickname: "医路前行"
+  url: "https://www.janyoung.cn"
+  description: "一个医学博士的思想碎片"
+  avatar: "https://www.janyoung.cn/tx_janyoung%20.jpg"
+  group: blogs
+  weight: 34
+  
