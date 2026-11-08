@@ -1,0 +1,21 @@
+{{- /*
+  顶部「分类」下拉的子项，直接读 data/categories.yml 生成。
+
+  被 layouts/_partials/base/header.html 的桌面端、移动端各调用一次，
+  传入的上下文必须是页面（$），用于判断当前分类是否高亮。
+
+  一级分类的 name / icon / desc 与排列顺序全部取自 data/categories.yml，
+  文章数交给 custom/menu-count.html 按分类名自动统计（0 篇时不显示数字）。
+  以后增删或改名一级分类，只需改 data/categories.yml 这一个文件。
+*/ -}}
+{{- $groups := hugo.Data.categories | default slice -}}
+{{- range $groups -}}
+  {{- $name := .name -}}
+  {{- $url := printf "categories/%s/" $name | relLangURL -}}
+  <li class="menu-item{{ if eq $.RelPermalink $url }} active{{ end }}">
+    <a class="menu-link" href="{{ $url }}"{{ with .desc }} title="{{ . }}"{{ end }}>
+      {{- with .icon -}}{{ dict "Class" (printf "%v fa-sm" .) | partial "plugin/icon.html" }} {{ end }}
+      {{- $name }}{{- partial "custom/menu-count.html" (dict "Params" (dict "count" true) "URL" (printf "categories/%s/" $name)) -}}
+    </a>
+  </li>
+{{- end -}}
