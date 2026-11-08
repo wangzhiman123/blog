@@ -273,7 +273,7 @@ var _hmt = _hmt || [];
             <button type="button" data-view="source">源码</button>
           </div>
           <span class="grow"></span>
-          <a class="jump-btn" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">写作助手 ↗</a>
+          <a class="jump-btn" id="btnCopyAndOpen" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="复制转换结果并打开写作助手（新标签页）">写作助手 ↗</a>
           <button class="primary btn-sm" id="btnCopy">复制</button>
         </div>
 
@@ -1257,14 +1257,25 @@ if (typeof document !== "undefined") {
     return Promise.resolve();
   }
 
-  $("btnCopy").addEventListener("click", function () {
+  /* 复制转换结果。okText 可自定义成功提示，供「复制」与「写作助手」两个按钮共用 */
+  function copyResult(okText) {
     var md = render();
     if (!md) { say("还没有可复制的内容。", false); return; }
     copyText(md).then(function () {
-      say("已复制 " + md.length + " 个字符，直接粘到 md 文件里就行。", true);
+      say(okText || ("已复制 " + md.length + " 个字符，直接粘到 md 文件里就行。"), true);
     }, function (err) {
       say(err && err.message ? err.message : "复制失败，请手动选中右侧内容。", false);
     });
+  }
+
+  $("btnCopy").addEventListener("click", function () {
+    copyResult();
+  });
+
+  /* 「写作助手」按钮：点击时先复制结果；链接自带 target=_blank，
+     由浏览器自己在新标签页打开，不用 window.open，避免被弹窗拦截 */
+  $("btnCopyAndOpen").addEventListener("click", function () {
+    copyResult("已复制转换结果，写作助手已在新标签页打开，按 Ctrl+V 粘贴即可。");
   });
 
   $("btnDownload").addEventListener("click", function () {
