@@ -147,25 +147,92 @@
   .spacer { flex: 1; }
   .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 24px 0; }
 
-  /* 预览 */
-  .preview { display: flex; flex-direction: column; gap: 10px; }
-  .pv-group { font-size: 12px; font-weight: 700; color: var(--muted); margin: 6px 0 0; letter-spacing: .02em; }
-  .pv-group:first-child { margin-top: 0; }
+  /* 效果预览：与网站 /friends/ 的 domino 卡片、分组标题保持同一套视觉 */
+  .preview {
+    --pv-bg: #f5f2ec; --pv-line: #ccc5b5; --pv-inner: #ddd7ca;
+    --pv-av-line: #e8e3d8; --pv-name: #1677ff; --pv-desc: #57606a;
+    --pv-url: #57606a; --pv-count: #8b949e; --pv-text: #1f2328;
+    --pv-shadow: rgba(0,0,0,.06); --pv-inset: rgba(255,255,255,.7);
+  }
+  @media (prefers-color-scheme: dark) {
+    .preview {
+      --pv-bg: #252c36; --pv-line: #3e4a5a; --pv-inner: #354050;
+      --pv-av-line: #3a4555; --pv-name: #69b1ff; --pv-desc: #9aa4b2;
+      --pv-url: #adbac7; --pv-count: #9aa4b2; --pv-text: #e6edf3;
+      --pv-shadow: rgba(0,0,0,.2); --pv-inset: rgba(255,255,255,.04);
+    }
+  }
+  .pv-section { margin-top: 1.3rem; }
+  .pv-section:first-child { margin-top: 0; }
+  .pv-group {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem;
+    margin: 0 0 .85rem; font-size: 1.02rem; font-weight: 600; color: var(--pv-text);
+  }
+  .pv-gname { position: relative; padding-left: .6rem; }
+  .pv-gname::before {
+    content: ""; position: absolute; top: .15em; bottom: .15em; left: 0;
+    width: 3px; background: #c2a86f; border-radius: 2px;
+  }
+  .pv-gcount {
+    padding: 0 .4rem; font-size: .72rem; font-weight: 500; line-height: 1.5;
+    color: var(--pv-count); background: rgba(140,140,140,.14); border-radius: 999px;
+  }
+  .pv-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 1rem; }
   .pv {
-    display: flex; gap: 10px; align-items: center;
-    border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: var(--bg);
+    display: flex; flex-direction: row; align-items: center;
+    width: 100%; max-width: 380px; height: 120px; gap: .75rem; padding: 0 .75rem;
+    background: var(--pv-bg); border: 1.5px solid var(--pv-line);
+    box-shadow: 0 1px 4px var(--pv-shadow), inset 0 1px var(--pv-inset);
+    outline: 1px solid var(--pv-inner); outline-offset: -5px;
+    border-radius: 10px; box-sizing: border-box; overflow: hidden;
+    justify-self: center; color: var(--pv-text);
   }
   .pv .av {
-    width: 40px; height: 40px; border-radius: 50%; flex: 0 0 40px;
-    background: var(--brand-weak); color: var(--brand);
+    width: 90px; min-width: 90px; height: 90px; flex: 0 0 90px;
+    border-radius: 50%; border: 2px solid var(--pv-av-line); padding: 2px;
+    background: rgba(140,140,140,.12); color: var(--pv-desc);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 15px; overflow: hidden;
+    font-weight: 700; font-size: 26px; overflow: hidden; box-sizing: border-box;
   }
-  .pv .av img { width: 100%; height: 100%; object-fit: cover; }
-  .pv .av.fit-contain img { object-fit: contain; }
-  .pv .t { font-weight: 600; font-size: 14px; }
-  .pv .d { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
-  .pv .u { font-size: 11.5px; color: var(--brand); word-break: break-all; }
+  .pv .av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+  .pv .av.fit-contain img {
+    object-fit: contain; padding: 7px; box-sizing: border-box; background: rgba(140,140,140,.12);
+  }
+  .pv-info { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; overflow: hidden; flex: 1; min-width: 0; }
+  .pv .t {
+    display: block; max-width: 100%; color: var(--pv-name); font-weight: 700;
+    font-size: .9rem; letter-spacing: .02em; line-height: 1.8;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pv .d {
+    margin-top: .15rem; color: var(--pv-desc); font-size: .8rem; line-height: 1.5; text-align: left;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+  }
+  .pv .u {
+    margin-top: .15rem; color: var(--pv-url); font-size: .72rem; line-height: 1.4;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  }
+  @media (max-width: 620px) {
+    .pv { height: auto; min-height: 110px; }
+    .pv .av { width: 52px; min-width: 52px; height: 52px; flex-basis: 52px; font-size: 16px; }
+  }
+  /* 按网站宽度查看：两列，和线上 /friends/ 一样 */
+  .pv-modal {
+    position: fixed; inset: 0; z-index: 120; display: none;
+    align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.45);
+  }
+  .pv-modal-inner {
+    width: min(900px, 100%); max-height: 88vh; display: flex; flex-direction: column;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.25); overflow: hidden;
+  }
+  .pv-modal-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14px;
+  }
+  .pv-modal-body { padding: 18px 20px 24px; overflow: auto; }
+  .pv-modal-body .pv-links { grid-template-columns: repeat(2, minmax(0, 380px)); }
+  @media (max-width: 700px) { .pv-modal-body .pv-links { grid-template-columns: 1fr; } }
 
   /* 分组管理 */
   .gform { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
@@ -357,7 +424,8 @@ var _hmt = _hmt || [];
       </div>
 
       <div class="card jump-target" id="sec-preview">
-        <h2><span class="num">3</span>效果预览</h2>
+        <h2><span class="num">3</span>效果预览 <button class="mini" style="margin-left:auto" onclick="openWidePreview()" title="按网站宽度查看两列排布">🖥 按网站宽度查看</button></h2>
+        <div class="note" style="margin-bottom:10px">按网站 <code>/friends/</code> 上同样的卡片和分组标题显示；这一栏较窄，点右上按钮可以看网站上的两列画面。</div>
         <div class="preview" id="preview"></div>
       </div>
 
@@ -431,6 +499,13 @@ var _hmt = _hmt || [];
     · <a href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">友情链接页 ↗</a>
     <br>原「友链代码转换器」已并入本页，独立页面已删除。
   </p>
+</div>
+
+<div class="pv-modal" id="pvModal" role="dialog" aria-label="网站宽屏效果预览">
+  <div class="pv-modal-inner">
+    <div class="pv-modal-head"><b>网站上的效果（宽屏两列）</b><button class="mini" onclick="closeWidePreview()">✕ 关闭</button></div>
+    <div class="preview pv-modal-body" id="pvWide"></div>
+  </div>
 </div>
 
 <div class="floatbar" id="floatbar" aria-label="悬浮快捷导航">
@@ -700,6 +775,14 @@ function renderGroups() {
   if (customCount) document.getElementById('toml').textContent = buildToml();
 }
 
+/* 与 layouts/friends.html 里的 placeholder 完全相同的默认头像 */
+var PV_FACE = '<svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" style="width:100%;height:100%;display:block">'
+  + '<rect width="100" height="100" rx="8" fill="currentColor" opacity="0.08"/>'
+  + '<circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>'
+  + '<circle cx="38" cy="42" r="3" opacity="0.5"/><circle cx="62" cy="42" r="3" opacity="0.5"/>'
+  + '<path d="M36 58c4 6 24 6 28 0" stroke="currentColor" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>'
+  + '</svg>';
+
 function renderPreview() {
   var box = document.getElementById('preview');
   if (!items.length) { box.innerHTML = '<div class="empty">暂无预览</div>'; return; }
@@ -708,19 +791,23 @@ function renderPreview() {
     var list = items.filter(function (x) { return x.group === g.key; })
       .slice().sort(function (a, b) { return (Number(b.weight) || 0) - (Number(a.weight) || 0); });
     if (!list.length) return;
-    html += '<div class="pv-group">' + esc(g.name) + ' · ' + list.length + ' 条</div>';
-    html += list.map(function (it) {
-      var name = it.nickname;
-      var initial = (name || '?').trim().charAt(0).toUpperCase();
-      var av = it.avatar
-        ? '<div class="av' + (it.avatar_fit === 'contain' ? ' fit-contain' : '') + '"><img src="' + esc(it.avatar) + '" alt="" onerror="this.style.display=\'none\'"></div>'
-        : '<div class="av">' + esc(initial) + '</div>';
-      return '<div class="pv">' + av + '<div>'
-        + '<div class="t">' + esc(name || '（未命名）') + '</div>'
-        + (it.description ? '<div class="d">' + esc(it.description) + '</div>' : '')
-        + '<div class="u">' + esc(it.url || '') + '</div>'
-        + '</div></div>';
-    }).join('');
+    html += '<div class="pv-section">'
+      + '<div class="pv-group"><span class="pv-gname">' + esc(g.name) + '</span>'
+      + '<span class="pv-gcount">' + list.length + '</span></div>'
+      + '<div class="pv-links">'
+      + list.map(function (it) {
+        var name = it.nickname;
+        var av = it.avatar
+          ? '<div class="av' + (it.avatar_fit === 'contain' ? ' fit-contain' : '') + '"><img src="' + esc(it.avatar) + '" alt="" referrerpolicy="no-referrer"></div>'
+          : '<div class="av">' + PV_FACE + '</div>';
+        var url = String(it.url || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        return '<div class="pv">' + av + '<div class="pv-info">'
+          + '<div class="t">' + esc(name || '（未命名）') + '</div>'
+          + (it.description ? '<div class="d">' + esc(it.description) + '</div>' : '')
+          + (url ? '<div class="u">' + esc(url) + '</div>' : '')
+          + '</div></div>';
+      }).join('')
+      + '</div></div>';
   });
   box.innerHTML = html || '<div class="empty">暂无预览</div>';
 }
@@ -1541,6 +1628,32 @@ document.getElementById('addedYaml').addEventListener('input', function () {
   var st = document.getElementById('codeState');
   if (st) { st.textContent = '✎ 你手动改过，复制以框里内容为准'; st.style.color = 'var(--warn)'; }
   save();
+});
+/* 头像外链打不开时，换成和网站一样的默认头像（预览区与宽屏浮层共用） */
+function bindPvFallback(root) {
+  root.addEventListener('error', function (e) {
+    var img = e.target;
+    if (img && img.tagName === 'IMG' && img.parentNode && img.parentNode.classList.contains('av')) {
+      img.parentNode.innerHTML = PV_FACE;
+    }
+  }, true);
+}
+bindPvFallback(document.getElementById('preview'));
+bindPvFallback(document.getElementById('pvWide'));
+
+/* 按网站宽度查看两列画面 */
+function openWidePreview() {
+  document.getElementById('pvWide').innerHTML = document.getElementById('preview').innerHTML;
+  document.getElementById('pvModal').style.display = 'flex';
+}
+function closeWidePreview() {
+  document.getElementById('pvModal').style.display = 'none';
+}
+document.getElementById('pvModal').addEventListener('click', function (e) {
+  if (e.target === this) closeWidePreview();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeWidePreview();
 });
 document.getElementById('smartInput').addEventListener('input', function () {
   clearTimeout(smartTimer);
