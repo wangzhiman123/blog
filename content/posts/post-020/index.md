@@ -7,7 +7,7 @@ categories:
 - 学习
 - 工具教程
 tags:
-- AI本地部署
+- AI 工具
 - 实务教程
 ---
 

@@ -5,8 +5,7 @@ categories:
 - 学习
 - 建站笔记
 tags:
-- 网站建设
-- Markdown
+- 建站笔记
 - 文章排版
 summary: "本站的 Markdown 排版示范：标题、列表、表格、代码块、提示块等各种写法的对照效果。"
 description: "本站的 Markdown 排版示范：标题、列表、表格、代码块、提示块等各种写法的对照效果。"

@@ -5,8 +5,7 @@ categories:
 - 学习
 - 建站笔记
 tags:
-- 个人博客
-- 网站模板
+- 建站笔记
 summary: "从 WordPress 服务器到 GitHub Pages 静态站，四版个人网站分别为什么换、各花了多少钱。"
 description: "从 WordPress 服务器到 GitHub Pages 静态站，四版个人网站分别为什么换、各花了多少钱。"
 authors:

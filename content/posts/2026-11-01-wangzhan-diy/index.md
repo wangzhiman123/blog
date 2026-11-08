@@ -5,10 +5,9 @@ categories:
 - 学习
 - 建站笔记
 tags:
-- github
-- workbuddy
-- 个人网站
-- 博客
+- GitHub
+- WorkBuddy
+- 建站笔记
 summary: "分享最近搭建网站的常用软件和工具，做一次总结，diy个人网站其实很容易，希望大家都可以建好自己的个人网站。"
 description: "分享最近搭建网站的常用软件和工具，做一次总结，diy个人网站其实很容易，希望大家都可以建好自己的个人网站。"
 authors:

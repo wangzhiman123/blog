@@ -9,7 +9,7 @@ categories:
 tags:
 - 诉讼费
 - 立案
-- 办案笔记
+- 实务教程
 ---
 
 ![文章配图-1](https://q6.itc.cn/images01/20261007/a8534c9d7a6f4b9f9e441d4b26d23046.png?x-oss-process=image/resize,w_1000/format,webp)
