@@ -232,4 +232,20 @@
   description: "分享医学知识，记录美好生活。"
   avatar: "https://www.ifree6.cn/favicon.ico"
   group: blogs
-  weight: 33  
+  weight: 33 
+
+- nickname: "ScophireSpace"
+  url: "https://scophire.space/"
+  description: "Flint Scophire 的个人博客"
+  avatar: "https://scophire.space/logo/icon.png"
+  group: blogs
+  weight: 32
+
+- nickname: "秋记Autumn"
+  url: "https://zhyok.cn"
+  description: "80后个人博客、网络日杂、生活记录"
+  avatar: "https://zhyok.cn/logo.png"
+  group: blogs
+  weight: 31
+
+  
