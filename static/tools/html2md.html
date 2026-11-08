@@ -42,6 +42,37 @@
   header { margin-bottom: 18px; }
   h1 { font-size: 22px; margin: 0 0 6px; }
   .sub { color: var(--muted); font-size: 13px; }
+  /* 页眉工具快捷入口（三个工具页统一：点击都在新标签页打开） */
+  header.page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .page-head-text { flex: 1 1 420px; min-width: 0; }
+  .head-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  a.jump-primary {
+    display: inline-flex; flex-direction: column; gap: 1px;
+    padding: 9px 16px; border-radius: 9px;
+    background: var(--brand); color: #fff; text-decoration: none;
+    font-size: 14px; font-weight: 700; line-height: 1.45;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  }
+  a.jump-primary:hover { filter: brightness(1.08); }
+  a.jump-primary:focus-visible, a.jump-minor:focus-visible, a.jump-inline:focus-visible {
+    outline: 2px solid var(--brand); outline-offset: 3px;
+  }
+  .jump-note { font-size: 11.5px; font-weight: 400; opacity: .9; }
+  a.jump-minor, a.jump-inline { color: var(--brand); text-decoration: none; font-size: 12.5px; white-space: nowrap; }
+  a.jump-minor:hover, a.jump-inline:hover { text-decoration: underline; }
+  a.jump-inline {
+    padding: 5px 10px; border: 1px dashed var(--brand); border-radius: 999px;
+    background: var(--brand-weak); font-weight: 600;
+  }
+  @media (max-width: 620px) {
+    header.page-head { align-items: flex-start; }
+    .head-links { width: 100%; }
+    a.jump-primary { flex: 1 1 100%; }
+  }
+  @media (prefers-color-scheme: dark) {
+    a.jump-primary { color: #10241a; }
+  }
+
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
   @media (max-width: 960px) { .cols { grid-template-columns: 1fr; } }
   .card {
@@ -188,9 +219,18 @@ var _hmt = _hmt || [];
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>HTML 转 Markdown</h1>
-    <div class="sub">把网页、Word、公众号里复制的内容贴进来，右边立刻变成 Markdown，一键复制。不联网、不安装，双击就能用。</div>
+  <header class="page-head">
+    <div class="page-head-text">
+      <h1>HTML 转 Markdown</h1>
+      <div class="sub">把网页、Word、公众号里复制的内容贴进来，右边立刻变成 Markdown，一键复制。不联网、不安装，双击就能用。</div>
+    </div>
+    <div class="head-links">
+      <a class="jump-primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">
+        <span class="jump-title">打开写作助手 ↗</span>
+        <span class="jump-note">复制后点这里，新开一页继续编辑</span>
+      </a>
+      <a class="jump-minor" href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer">友链管理器 ↗</a>
+    </div>
   </header>
 
   <div class="cols">
@@ -236,6 +276,7 @@ var _hmt = _hmt || [];
             <button type="button" data-view="source">源码</button>
           </div>
           <span class="grow"></span>
+          <a class="jump-inline" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">复制后 → 写作助手 ↗</a>
           <button class="primary btn-sm" id="btnCopy">复制</button>
         </div>
 
@@ -285,7 +326,7 @@ var _hmt = _hmt || [];
   </div>
 
   <footer class="tools">
-    其他工具：<a href="/tools/xiezuo.html">写作助手</a> · <a href="/tools/youlian.html">友链生成器</a> · <a href="/friends/">友情链接</a>
+    其他工具（点开都是新标签页，当前页填的内容不会丢）：<a href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer">写作助手</a> · <a href="https://2019527.xyz/tools/youlian.html" target="_blank" rel="noopener noreferrer">友链生成器</a> · <a href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer">友情链接</a>
   </footer>
 </div>
 

@@ -44,6 +44,37 @@
   header { margin-bottom: 20px; }
   h1 { font-size: 22px; margin: 0 0 6px; }
   .sub { color: var(--muted); font-size: 13px; }
+  /* 页眉工具快捷入口（三个工具页统一：点击都在新标签页打开） */
+  header.page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .page-head-text { flex: 1 1 420px; min-width: 0; }
+  .head-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  a.jump-primary {
+    display: inline-flex; flex-direction: column; gap: 1px;
+    padding: 9px 16px; border-radius: 9px;
+    background: var(--brand); color: #fff; text-decoration: none;
+    font-size: 14px; font-weight: 700; line-height: 1.45;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  }
+  a.jump-primary:hover { filter: brightness(1.08); }
+  a.jump-primary:focus-visible, a.jump-minor:focus-visible, a.jump-inline:focus-visible {
+    outline: 2px solid var(--brand); outline-offset: 3px;
+  }
+  .jump-note { font-size: 11.5px; font-weight: 400; opacity: .9; }
+  a.jump-minor, a.jump-inline { color: var(--brand); text-decoration: none; font-size: 12.5px; white-space: nowrap; }
+  a.jump-minor:hover, a.jump-inline:hover { text-decoration: underline; }
+  a.jump-inline {
+    padding: 5px 10px; border: 1px dashed var(--brand); border-radius: 999px;
+    background: var(--brand-weak); font-weight: 600;
+  }
+  @media (max-width: 620px) {
+    header.page-head { align-items: flex-start; }
+    .head-links { width: 100%; }
+    a.jump-primary { flex: 1 1 100%; }
+  }
+  @media (prefers-color-scheme: dark) {
+    a.jump-primary { color: #10241a; }
+  }
+
   .cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; align-items: start; }
   @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
   .card {
@@ -166,9 +197,18 @@ var _hmt = _hmt || [];
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>友链管理器</h1>
-    <div class="sub">填好一条 → 点「复制代码」→ 粘到 <code>data/friends.yml</code> 末尾。分组在这里下拉选，不用手写。<br>页面里的列表只是草稿，和线上文件不会自动同步；数据只存在你的浏览器里，不上传任何服务器。</div>
+  <header class="page-head">
+    <div class="page-head-text">
+      <h1>友链管理器</h1>
+      <div class="sub">填好一条 → 点「复制代码」→ 粘到 <code>data/friends.yml</code> 末尾。分组在这里下拉选，不用手写。<br>页面里的列表只是草稿，和线上文件不会自动同步；数据只存在你的浏览器里，不上传任何服务器。</div>
+    </div>
+    <div class="head-links">
+      <a class="jump-primary" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">
+        <span class="jump-title">打开写作助手 ↗</span>
+        <span class="jump-note">新开一页，继续写文章</span>
+      </a>
+      <a class="jump-minor" href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer">HTML 转 Markdown ↗</a>
+    </div>
   </header>
 
   <div class="toolbar">
@@ -237,6 +277,7 @@ var _hmt = _hmt || [];
         <pre class="out" id="yaml"></pre>
         <div class="btns">
           <button class="primary" onclick="copyYaml()">复制整份</button>
+          <a class="jump-inline" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">去写作助手 ↗</a>
           <button onclick="download()">下载 friends.yml</button>
         </div>
         <div class="msg" id="yamlMsg"></div>
@@ -257,8 +298,8 @@ var _hmt = _hmt || [];
   </div>
 
   <p style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
-    其他工具：<a href="/tools/xiezuo.html" style="color:var(--brand);text-decoration:none">写作助手</a>
-    · <a href="/tools/html2md.html" style="color:var(--brand);text-decoration:none">HTML 转 Markdown</a>
+    其他工具（点开都是新标签页，当前页填的内容不会丢）：<a href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">写作助手</a>
+    · <a href="https://2019527.xyz/tools/html2md.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">HTML 转 Markdown</a>
   </p>
 </div>
 
