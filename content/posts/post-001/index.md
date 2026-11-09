@@ -11,7 +11,7 @@ tags:
 - 原告方
 summary: "签了认购书、交了定金，正式合同没谈成，开发商能不能没收定金？附起诉思路和类案裁判要旨。"
 description: "签了认购书、交了定金，正式合同没谈成，开发商能不能没收定金？附起诉思路和类案裁判要旨。"
-featuredImage: https://q6.itc.cn/images01/20261006/25768341f0884b699b06787fcf367da9.jpeg?x-oss-process=image/resize,w_1000/format,webp
+featured_image_preview: https://q6.itc.cn/images01/20261006/25768341f0884b699b06787fcf367da9.jpeg?x-oss-process=image/resize,w_1000/format,webp
 images:
 - https://q6.itc.cn/images01/20261006/25768341f0884b699b06787fcf367da9.jpeg?x-oss-process=image/resize,w_1000/format,webp
 authors:

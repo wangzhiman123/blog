@@ -248,4 +248,9 @@
   group: blogs
   weight: 31
 
-  
+- nickname: "织梦岁月"
+  url: "https://zhujianlin.com"
+  description: "记录老朱的工作与生活点滴"
+  avatar: "https://zhujianlin.com/logo.jpg"
+  group: blogs
+  weight: 30
