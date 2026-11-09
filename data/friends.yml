@@ -65,6 +65,12 @@
   group: tools
   weight: 74
 
+- nickname: "友链管理器"
+  url: "https://2019527.xyz/tools/youlian.html"
+  description: 本站的友链管理工具之一
+  group: tools
+  weight: 73
+
 # ============ 博友 ============
 - nickname: 买四个萝卜
   url: https://blog.msglbo.cn
@@ -165,6 +171,41 @@
   group: blogs
   weight: 49
 
+- nickname: "医路前行"
+  url: "https://www.janyoung.cn"
+  description: "一个医学博士的思想碎片"
+  avatar: "https://www.janyoung.cn/tx_janyoung%20.jpg"
+  group: blogs
+  weight: 34
+
+- nickname: "艾自由网"
+  url: "https://www.ifree6.cn/"
+  description: "分享医学知识，记录美好生活。"
+  avatar: "https://www.ifree6.cn/favicon.ico"
+  group: blogs
+  weight: 33 
+
+- nickname: "ScophireSpace"
+  url: "https://scophire.space/"
+  description: "Flint Scophire 的个人博客"
+  avatar: "https://scophire.space/logo/icon.png"
+  group: blogs
+  weight: 32
+
+- nickname: "秋记Autumn"
+  url: "https://zhyok.cn"
+  description: "80后个人博客、网络日杂、生活记录"
+  avatar: "https://zhyok.cn/logo.png"
+  group: blogs
+  weight: 31
+
+- nickname: "织梦岁月"
+  url: "https://zhujianlin.com"
+  description: "记录老朱的工作与生活点滴"
+  avatar: "https://zhujianlin.com/logo.jpg"
+  group: blogs
+  weight: 30
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
@@ -220,37 +261,3 @@
   group: circles
   weight: 35
 
-- nickname: "医路前行"
-  url: "https://www.janyoung.cn"
-  description: "一个医学博士的思想碎片"
-  avatar: "https://www.janyoung.cn/tx_janyoung%20.jpg"
-  group: blogs
-  weight: 34
-
-- nickname: "艾自由网"
-  url: "https://www.ifree6.cn/"
-  description: "分享医学知识，记录美好生活。"
-  avatar: "https://www.ifree6.cn/favicon.ico"
-  group: blogs
-  weight: 33 
-
-- nickname: "ScophireSpace"
-  url: "https://scophire.space/"
-  description: "Flint Scophire 的个人博客"
-  avatar: "https://scophire.space/logo/icon.png"
-  group: blogs
-  weight: 32
-
-- nickname: "秋记Autumn"
-  url: "https://zhyok.cn"
-  description: "80后个人博客、网络日杂、生活记录"
-  avatar: "https://zhyok.cn/logo.png"
-  group: blogs
-  weight: 31
-
-- nickname: "织梦岁月"
-  url: "https://zhujianlin.com"
-  description: "记录老朱的工作与生活点滴"
-  avatar: "https://zhujianlin.com/logo.jpg"
-  group: blogs
-  weight: 30
