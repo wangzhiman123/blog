@@ -207,6 +207,13 @@
   group: blogs
   weight: 30
 
+- nickname: "思迈时光"
+  url: "https://blog.sdsml.top"
+  description: "于思考中前行，于时光里生长"
+  avatar: "https://cdn.sdsml.top/2026/01/22/69719301af086.jpg"
+  group: blogs
+  weight: 29
+
 # ============ 博客圈 ============
 - nickname: 若梦博客
   url: https://www.rmbk.cc/
