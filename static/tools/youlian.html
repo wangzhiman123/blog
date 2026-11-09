@@ -258,59 +258,70 @@
   .subsec-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
   .warnline { color: var(--warn); font-size: 12px; margin-top: 6px; }
 
-  /* 快速导航：吸顶目录 + 右下角悬浮按钮，沿用 jump-btn 的白底灰边 / 绿底主按钮规范 */
+  /* 快捷导航：右侧固定侧边栏（沿用 jump-btn 的白底灰边 / 绿底主按钮规范） */
   html { scroll-behavior: smooth; }
-  .jump-target { scroll-margin-top: 84px; }
+  .jump-target { scroll-margin-top: 16px; }
   @keyframes navFlash {
     0%   { box-shadow: 0 0 0 2px var(--brand), 0 0 0 6px var(--brand-weak); }
     100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; }
   }
   .flash { animation: navFlash 1.3s ease-out; }
-  .jumpbar {
-    position: sticky; top: 8px; z-index: 60;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    padding: 9px 12px; margin-bottom: 16px;
+  .sidenav {
+    position: fixed; right: 14px; top: 50%; transform: translateY(-50%);
+    z-index: 70; width: 132px; padding: 10px;
+    display: flex; flex-direction: column; gap: 7px;
     background: var(--card); border: 1px solid var(--line);
-    border-radius: var(--radius); box-shadow: 0 4px 14px rgba(0,0,0,.07);
+    border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.10);
   }
-  .jb-label { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-  .jb-sep { width: 1px; height: 22px; background: var(--line); margin: 0 2px; flex: 0 0 1px; }
-  .jumpbar a.jump-btn { padding: 6px 11px; font-size: 13px; }
-  .jumpbar a.jump-btn.jb-main { padding: 8px 14px; font-size: 14px; font-weight: 600; }
-  .floatbar {
-    position: fixed; right: 14px; bottom: 16px; z-index: 70;
-    display: flex; flex-direction: column; gap: 6px;
-    opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s;
+  .sn-title { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+  .sn-body { display: flex; flex-direction: column; gap: 7px; }
+  .sidenav a.jump-btn {
+    width: 100%; justify-content: center; padding: 6px 5px;
+    font-size: 12.5px; line-height: 1.35; border-radius: 7px;
   }
-  .floatbar.show { opacity: 1; pointer-events: auto; transform: none; }
-  .floatbar button {
-    font-size: 12.5px; padding: 6px 11px; border-radius: 999px;
+  .sidenav a.jump-btn.jb-main { padding: 8px 5px; font-size: 13px; font-weight: 600; }
+  .sn-sep { height: 1px; background: var(--line); margin: 1px 0; }
+  .sn-mini { display: flex; gap: 6px; }
+  .sn-mini a.jump-btn { flex: 1 1 0; min-width: 0; padding: 5px 3px; font-size: 12px; }
+  .sn-toggle {
+    display: none; font: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 9px 14px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--line); background: var(--card); color: var(--text);
-    box-shadow: 0 3px 10px rgba(0,0,0,.12); white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,.14);
   }
-  .floatbar button.fb-main { color: #fff; background: var(--brand); border-color: var(--brand); font-weight: 600; }
-  .floatbar button:hover { filter: brightness(1.06); }
-  @media (prefers-color-scheme: dark) { .floatbar button.fb-main { color: #10241a; } }
-  @media (max-width: 620px) {
-    .jumpbar { flex-wrap: nowrap; overflow-x: auto; top: 0; padding: 8px 10px; scrollbar-width: thin; }
-    .jumpbar > * { flex: 0 0 auto; }
-    .floatbar { right: 8px; bottom: 10px; }
-    .floatbar button { padding: 5px 9px; font-size: 12px; }
+  /* 大屏：给侧栏留出空白，内容不会被遮住 */
+  @media (min-width: 1200px) { body { padding-right: 166px; } }
+  /* 中小屏：侧栏收成右下角一个「☰ 目录」，点开才展开 */
+  @media (max-width: 1199px) {
+    .sidenav {
+      right: 10px; top: auto; bottom: 12px; transform: none;
+      width: auto; padding: 0; gap: 0; align-items: flex-end;
+      background: transparent; border: 0; box-shadow: none;
+    }
+    .sn-toggle { display: inline-flex; }
+    .sn-title, .sn-body { display: none; }
+    .sidenav.open {
+      width: 150px; padding: 10px; gap: 8px;
+      background: var(--card); border: 1px solid var(--line);
+      box-shadow: 0 6px 22px rgba(0,0,0,.18);
+    }
+    .sidenav.open .sn-title, .sidenav.open .sn-body { display: flex; }
+    .sidenav.open .sn-body { max-height: calc(100vh - 90px); overflow-y: auto; }
   }
 
   /* 页面最上方：「处理后的友链代码」审核区 */
   .code-card { border-left: 3px solid var(--brand); }
   .code-card h2 { margin-bottom: 8px; }
   .code-card .code-box {
-    width: 100%; height: 165px; min-height: 120px; resize: vertical;
+    width: 100%; height: 108px; min-height: 84px; resize: vertical;
     font: 12.5px/1.65 ui-monospace, Consolas, "Courier New", monospace;
     white-space: pre; overflow: auto; tab-size: 2;
     color: var(--text); background: var(--bg);
     border: 1px solid var(--line); border-radius: 8px; padding: 12px;
   }
   .code-card .code-box:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
-  .code-card .btns { margin-top: 10px; }
-  @media (max-width: 620px) { .code-card .code-box { height: 140px; } }
+  .code-card .btns { margin-top: 8px; }
+  @media (max-width: 620px) { .code-card .code-box { height: 100px; } }
 </style>
 <!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
      所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
@@ -330,7 +341,7 @@ var _hmt = _hmt || [];
   <header class="page-head">
     <div class="page-head-text">
       <h1>友链管理器</h1>
-      <div class="sub">粘贴识别网址、逐条管理、生成代码、打开后台，都在这一页完成。<br>填好 → 在最上方「处理后的友链代码」里审核/改字 → 点「复制并打开后台 ↗」→ 粘到 <code>data/friends.yml</code> 末尾。分组下拉选，不用手写。<br>页面里的列表只是草稿，和线上文件不会自动同步；数据只存在你的浏览器里，不上传任何服务器。</div>
+      <div class="sub">粘贴识别 → 在上方代码框审核改字 → 点「复制并打开后台 ↗」粘到 <code>data/friends.yml</code> 末尾。列表只是草稿，数据只存在你的浏览器里。快捷导航在页面右侧（手机上点右下角「☰ 目录」）。</div>
     </div>
     <div class="head-links">
       <a class="jump-btn" href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer" title="在新标签页打开友情链接页面">友情链接页面 ↗</a>
@@ -339,27 +350,10 @@ var _hmt = _hmt || [];
     </div>
   </header>
 
-  <nav class="jumpbar" aria-label="页面快速导航">
-    <span class="jb-label">快速跳到</span>
-    <a class="jump-btn primary jb-main" href="#sec-smart" onclick="goNav('smart');return false;" title="跳到第 1 步，光标直接落到输入框">⚡ 自动识别 · 粘贴内容</a>
-    <a class="jump-btn jb-main" href="#sec-list" onclick="goNav('manual');return false;" title="跳到第 2 步，自动新建一条空白友链并定位光标">✚ 手动输入 · 新增一条</a>
-    <span class="jb-sep"></span>
-    <a class="jump-btn" href="#sec-added" onclick="goNav('added');return false;" title="跳到页面最上方的代码审核区">处理后的代码</a>
-    <a class="jump-btn" href="#sec-preview" onclick="goNav('preview');return false;">效果预览</a>
-    <a class="jump-btn" href="#sec-groups" onclick="goNav('groups');return false;">分组管理</a>
-    <a class="jump-btn" href="#sec-yaml" onclick="goNav('yaml');return false;">整份代码</a>
-    <a class="jump-btn" href="#sec-help" onclick="goNav('help');return false;">使用说明</a>
-    <span class="jb-sep"></span>
-    <a class="jump-btn" href="#page-top" onclick="goNav('top');return false;">↑ 顶部</a>
-    <a class="jump-btn" href="#page-bottom" onclick="goNav('bottom');return false;">↓ 底部</a>
-  </nav>
-
   <section class="card code-card jump-target" id="sec-added" aria-label="处理后的友链代码">
     <h2><span class="num">★</span>处理后的友链代码 <span class="hint" id="addedCount"></span><span class="hint" id="codeState" style="margin-left:auto"></span></h2>
     <div class="note" style="margin-bottom:8px">
-      识别完的代码就在这里，<b>可以直接在框里改字</b>；在右侧「友链列表」里改，这里会自动同步。
-      复制 / 下载 / 打开后台，都以框里显示的内容为准。手动改过之后，列表再变动不会覆盖你改的内容，
-      点「↺ 按列表重新生成」才会重新同步（手动改代码时，缩进和冒号要自己留意）。
+      识别完的代码就在这里，<b>可以直接在框里改字</b>；在列表里改会自动同步，手动改过之后点「↺ 按列表重新生成」才覆盖。复制 / 下载 / 打开后台都以框里内容为准。
     </div>
     <textarea id="addedYaml" class="code-box" spellcheck="false" placeholder="还没有处理过友链。到下面第 1 步粘贴内容，点「识别并加入列表」，代码会自动出现在这里。"></textarea>
     <div class="btns">
@@ -367,19 +361,11 @@ var _hmt = _hmt || [];
       <button onclick="copyAdded()">复制当前代码</button>
       <button onclick="downloadAdded()">下载 .yml</button>
       <button onclick="regenCode()" title="放弃手动修改，按友链列表重新生成代码">↺ 按列表重新生成</button>
+      <button id="btnCodeExpand" onclick="toggleCodeBox()" title="把代码框拉高，方便一次审核多条">⤢ 展开代码框</button>
       <button onclick="goNav('smart')">↓ 去粘贴识别</button>
     </div>
     <div class="msg" id="addedMsg"></div>
   </section>
-
-  <div class="toolbar">
-    <button class="primary" onclick="addItem()">＋ 新增一条友链</button>
-    <button onclick="document.getElementById('file').click()">导入（yml / 备份 json）</button>
-    <button onclick="backupJson()">备份为 json</button>
-    <button onclick="renumber()">按分组重排权重</button>
-    <button class="danger" onclick="clearAll()">清空</button>
-    <input type="file" id="file" accept=".yml,.yaml,.txt,.json" style="display:none" onchange="importFile(event)">
-  </div>
 
   <div class="cols">
     <!-- 左：快速导入 -->
@@ -420,6 +406,14 @@ var _hmt = _hmt || [];
     <div>
       <div class="card jump-target" id="sec-list">
         <h2><span class="num">2</span>友链列表 <span class="hint" id="count"></span></h2>
+        <div class="toolbar">
+          <button class="primary" onclick="addItem()">＋ 新增一条友链</button>
+          <button onclick="document.getElementById('file').click()">导入（yml / 备份 json）</button>
+          <button onclick="backupJson()">备份为 json</button>
+          <button onclick="renumber()">按分组重排权重</button>
+          <button class="danger" onclick="clearAll()">清空</button>
+          <input type="file" id="file" accept=".yml,.yaml,.txt,.json" style="display:none" onchange="importFile(event)">
+        </div>
         <div class="list" id="list"></div>
       </div>
 
@@ -508,13 +502,24 @@ var _hmt = _hmt || [];
   </div>
 </div>
 
-<div class="floatbar" id="floatbar" aria-label="悬浮快捷导航">
-  <button type="button" class="fb-main" onclick="goNav('smart')" title="跳到第 1 步自动识别">⚡ 自动识别</button>
-  <button type="button" onclick="goNav('manual')" title="跳到第 2 步手动输入">✚ 手动输入</button>
-  <button type="button" onclick="goNav('top')" title="回到页面顶部">↑ 顶部</button>
-  <button type="button" onclick="goNav('bottom')" title="跳到页面底部">↓ 底部</button>
-</div>
-
+<aside class="sidenav" id="sidenav" aria-label="页面快捷导航">
+  <button type="button" class="sn-toggle" id="snToggle" aria-expanded="false" aria-controls="snBody" onclick="toggleSideNav()" title="展开 / 收起快捷导航">☰ 目录</button>
+  <div class="sn-title">快速跳到</div>
+  <div class="sn-body" id="snBody">
+    <a class="jump-btn primary jb-main" href="#sec-smart" onclick="goNav('smart');closeSideNav();return false;" title="跳到第 1 步，光标直接落到输入框">⚡ 自动识别</a>
+    <a class="jump-btn jb-main" href="#sec-list" onclick="goNav('manual');closeSideNav();return false;" title="跳到第 2 步，自动新建一条空白友链并定位光标">✚ 手动输入</a>
+    <div class="sn-sep"></div>
+    <a class="jump-btn" href="#sec-added" onclick="goNav('added');closeSideNav();return false;" title="跳到页面最上方的代码审核区">处理后的代码</a>
+    <a class="jump-btn" href="#sec-preview" onclick="goNav('preview');closeSideNav();return false;" title="跳到效果预览">效果预览</a>
+    <a class="jump-btn" href="#sec-groups" onclick="goNav('groups');closeSideNav();return false;" title="跳到分组管理">分组管理</a>
+    <a class="jump-btn" href="#sec-yaml" onclick="goNav('yaml');closeSideNav();return false;" title="跳到整份代码">整份代码</a>
+    <a class="jump-btn" href="#sec-help" onclick="goNav('help');closeSideNav();return false;" title="跳到使用说明">使用说明</a>
+    <div class="sn-mini">
+      <a class="jump-btn" href="#page-top" onclick="goNav('top');closeSideNav();return false;" title="回到页面顶部">↑ 顶部</a>
+      <a class="jump-btn" href="#page-bottom" onclick="goNav('bottom');closeSideNav();return false;" title="跳到页面底部">↓ 底部</a>
+    </div>
+  </div>
+</aside>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1710,12 +1715,34 @@ function goNav(kind) {
     }, 420);
   }
 }
-var floatbar = document.getElementById('floatbar');
-function updateFloatbar() {
-  if (floatbar) floatbar.classList.toggle('show', window.scrollY > 260);
+/* 侧边栏：大屏常驻，中小屏由「☰ 目录」展开 */
+var sidenav = document.getElementById('sidenav');
+var snToggle = document.getElementById('snToggle');
+function closeSideNav() {
+  if (!sidenav) return;
+  sidenav.classList.remove('open');
+  if (snToggle) snToggle.setAttribute('aria-expanded', 'false');
 }
-window.addEventListener('scroll', updateFloatbar, { passive: true });
-updateFloatbar();
+function toggleSideNav() {
+  if (!sidenav) return;
+  var open = sidenav.classList.toggle('open');
+  if (snToggle) snToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+document.addEventListener('click', function (e) {
+  if (sidenav && sidenav.classList.contains('open') && !sidenav.contains(e.target)) closeSideNav();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSideNav(); });
+
+/* 代码审核框：默认紧凑，点一下拉高方便一次审核多条 */
+function toggleCodeBox() {
+  var box = document.getElementById('addedYaml');
+  var btn = document.getElementById('btnCodeExpand');
+  if (!box) return;
+  var big = box.getAttribute('data-big') === '1';
+  if (big) { box.style.height = ''; box.setAttribute('data-big', '0'); }
+  else { box.style.height = '320px'; box.setAttribute('data-big', '1'); }
+  if (btn) btn.textContent = big ? '⤢ 展开代码框' : '⤡ 收起代码框';
+}
 
 /* ---------- 启动 ---------- */
 load();
