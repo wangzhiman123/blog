@@ -269,3 +269,9 @@
   group: circles
   weight: 35
 
+- nickname: "笔墨迹"
+  url: "https://blogscn.fun/"
+  description: "链接博客，也保留博客本来的样子。"
+  avatar: "https://photo.xiangming.site/img/blogscn_icon.png"
+  group: circles
+  weight: 34
