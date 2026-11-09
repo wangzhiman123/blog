@@ -79,9 +79,9 @@
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 13px 16px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
-  .card h2 { font-size: 15px; margin: 0 0 9px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .card h2 { font-size: 15px; margin: 0 0 7px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
   .card h2 span.num {
     display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
     background: var(--brand-weak); color: var(--brand);
@@ -118,7 +118,8 @@
     white-space: pre; word-break: normal; max-height: 340px; overflow: auto; tab-size: 2;
   }
   pre.out.wrapable { white-space: pre-wrap; word-break: break-word; }
-  .msg { font-size: 13px; margin-top: 10px; min-height: 20px; }
+  .msg { font-size: 13px; margin-top: 6px; min-height: 0; }
+  .msg:empty { display: none; }
   .msg.ok { color: var(--brand); }
   .msg.bad { color: var(--danger); }
   .tips { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-top: 12px; }
@@ -130,6 +131,9 @@
   code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
   .meta { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
   ol.steps { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: var(--muted); }
+  .help-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; align-items: start; }
+  .help-side { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  @media (max-width: 780px) { .help-grid { grid-template-columns: 1fr; } }
   ol.steps li { margin-bottom: 6px; }
   .note { font-size: 12.5px; color: var(--muted); }
   .note b { color: var(--text); }
@@ -223,8 +227,8 @@
   }
 
   /* 页面最上方：「友链代码」主舞台；每行代码短但行数多，行距放宽、一屏看更多行 */
-  .code-card { border-left: 4px solid var(--brand); box-shadow: 0 2px 14px rgba(26,127,90,.08); }
-  .code-card h2 { margin-bottom: 8px; font-size: 16px; }
+  .code-card { border-left: 4px solid var(--brand); box-shadow: 0 2px 14px rgba(26,127,90,.08); padding-bottom: 10px; }
+  .code-card h2 { margin-bottom: 6px; font-size: 16px; }
   .cc-title { color: var(--brand); font-weight: 700; }
   .code-state {
     margin-left: auto; font-size: 12px; font-weight: 600; white-space: nowrap;
@@ -239,7 +243,7 @@
     border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px;
   }
   .code-card .code-box:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
-  .code-card .btns { margin-top: 8px; }
+  .code-card .btns { margin-top: 6px; }
   @media (max-width: 620px) { .code-card .code-box { height: 200px; } }
 </style>
 <!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
@@ -271,7 +275,7 @@ var _hmt = _hmt || [];
 
   <section class="card code-card jump-target" id="sec-added" aria-label="友链代码">
     <h2><span class="num">★</span><span class="cc-title">友链代码</span><span class="hint" id="addedCount"></span><span class="code-state" id="codeState"></span></h2>
-    <div class="note" style="margin-bottom:8px">
+    <div class="note" style="margin-bottom:6px">
       <b>整页的中心</b>：新增或修改友链，这里立刻同步更新，复制走就能粘到 <code>data/friends.yml</code>。
       也可以直接在框里改字（改列表、刷新或点「↺ 按列表重新生成」后会按列表重建）；这里只放本次新增的条目，整理全部友链请用「整份代码」。
     </div>
@@ -317,7 +321,7 @@ var _hmt = _hmt || [];
 
     </div>
 
-    <!-- 右：友链列表 / 分组 / 整份代码 / 使用说明 -->
+    <!-- 右：友链列表（第 3 项起在下方通栏） -->
     <div>
       <div class="card jump-target" id="sec-list">
         <h2><span class="num">2</span>友链列表 <span class="hint">改这里 → 上方代码实时更新</span><span class="hint" id="count"></span></h2>
@@ -332,56 +336,61 @@ var _hmt = _hmt || [];
         <div class="list" id="list"></div>
       </div>
 
-      <div class="card jump-target" id="sec-groups">
-        <h2><span class="num">3</span>分组管理 <span class="hint">顺序即页面上从上到下的顺序</span></h2>
-        <table class="gtable">
-          <thead><tr><th>分组名称</th><th style="width:34%">标识（group）</th><th style="width:52px">条数</th><th style="width:96px"></th></tr></thead>
-          <tbody id="gbody"></tbody>
-        </table>
-        <div class="btns">
-          <button onclick="showGroupForm()">＋ 新建分组</button>
-          <button id="btnToml" onclick="copyToml()" style="display:none">复制新增分组的站点配置</button>
-        </div>
+    </div>
+  </div>
 
-        <div class="gform" id="gForm" style="display:none">
-          <label>分组名称 <span class="hint">显示在友链页上的标题，例如「同好」</span></label>
-          <input type="text" id="gName" placeholder="例如 同好" oninput="suggestKey()">
-          <label>分组标识 <span class="hint">写进 friends.yml 的 group 值，只能英文小写、数字、短横线；留空自动生成</span></label>
-          <input type="text" id="gKey" placeholder="例如 pals">
-          <div class="btns">
-            <button class="primary" onclick="saveGroup()">保存分组</button>
-            <button onclick="hideGroupForm()">取消</button>
-          </div>
-          <div class="msg bad" id="gMsg"></div>
-        </div>
-
-        <div class="tips" id="tomlTip" style="display:none">
-          新建的分组还要写进站点配置：把下面这段粘到 <code>content/friends/index.md</code> 开头
-          <code>+++</code> 与 <code>+++</code> 之间（放在已有 <code>[[friend_groups]]</code> 后面）。
-          不粘的话，这些友链在网站上<strong>不会显示</strong>。
-          <pre class="out wrapable" id="toml" style="margin-top:8px"></pre>
-        </div>
-
-        <div class="note" style="margin-top:10px">
-          「官方检索 / 常用工具 / 博友 / 博客圈」是站点已有的分组，名称和顺序在 <code>content/friends/index.md</code> 里改，这里锁着不动。
-        </div>
+  <!-- 第 3 项起整行通栏：左右对称，不再在左侧留白 -->
+    <div class="card jump-target" id="sec-groups">
+      <h2><span class="num">3</span>分组管理 <span class="hint">顺序即页面上从上到下的顺序</span></h2>
+      <table class="gtable">
+        <thead><tr><th>分组名称</th><th style="width:34%">标识（group）</th><th style="width:52px">条数</th><th style="width:96px"></th></tr></thead>
+        <tbody id="gbody"></tbody>
+      </table>
+      <div class="btns">
+        <button onclick="showGroupForm()">＋ 新建分组</button>
+        <button id="btnToml" onclick="copyToml()" style="display:none">复制新增分组的站点配置</button>
       </div>
 
-      <div class="card jump-target" id="sec-yaml">
-        <h2><span class="num">4</span>整份代码</h2>
-        <div class="note" style="margin-bottom:10px">想整体覆盖文件、或把全部友链按现在的分组与顺序重排时，用这一份。</div>
-        <pre class="out" id="yaml"></pre>
+      <div class="gform" id="gForm" style="display:none">
+        <label>分组名称 <span class="hint">显示在友链页上的标题，例如「同好」</span></label>
+        <input type="text" id="gName" placeholder="例如 同好" oninput="suggestKey()">
+        <label>分组标识 <span class="hint">写进 friends.yml 的 group 值，只能英文小写、数字、短横线；留空自动生成</span></label>
+        <input type="text" id="gKey" placeholder="例如 pals">
         <div class="btns">
-          <button class="primary" onclick="copyYaml()">复制整份</button>
-          <a class="jump-btn" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">写作助手 ↗</a>
-          <button onclick="download()">下载 friends.yml</button>
+          <button class="primary" onclick="saveGroup()">保存分组</button>
+          <button onclick="hideGroupForm()">取消</button>
         </div>
-        <div class="msg" id="yamlMsg"></div>
+        <div class="msg bad" id="gMsg"></div>
       </div>
 
-      <div class="card jump-target" id="sec-help">
-        <h2><span class="num">5</span>怎么粘贴</h2>
-        <div class="note" style="margin-bottom:8px">右侧固定侧边栏（手机上点右下角「☰ 目录」）可以随时在<b>自动识别</b>与<b>手动输入</b>之间切换；在列表里改动，最上方的友链代码会立刻跟着变。</div>
+      <div class="tips" id="tomlTip" style="display:none">
+        新建的分组还要写进站点配置：把下面这段粘到 <code>content/friends/index.md</code> 开头
+        <code>+++</code> 与 <code>+++</code> 之间（放在已有 <code>[[friend_groups]]</code> 后面）。
+        不粘的话，这些友链在网站上<strong>不会显示</strong>。
+        <pre class="out wrapable" id="toml" style="margin-top:8px"></pre>
+      </div>
+
+      <div class="note" style="margin-top:10px">
+        「官方检索 / 常用工具 / 博友 / 博客圈」是站点已有的分组，名称和顺序在 <code>content/friends/index.md</code> 里改，这里锁着不动。
+      </div>
+    </div>
+
+    <div class="card jump-target" id="sec-yaml">
+      <h2><span class="num">4</span>整份代码</h2>
+      <div class="note" style="margin-bottom:10px">想整体覆盖文件、或把全部友链按现在的分组与顺序重排时，用这一份。</div>
+      <pre class="out" id="yaml"></pre>
+      <div class="btns">
+        <button class="primary" onclick="copyYaml()">复制整份</button>
+        <a class="jump-btn" href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" title="在新标签页打开写作助手">写作助手 ↗</a>
+        <button onclick="download()">下载 friends.yml</button>
+      </div>
+      <div class="msg" id="yamlMsg"></div>
+    </div>
+
+    <div class="card jump-target" id="sec-help">
+      <h2><span class="num">5</span>怎么粘贴</h2>
+      <div class="note" style="margin-bottom:8px">右侧固定侧边栏（手机上点右下角「☰ 目录」）可以随时在<b>自动识别</b>与<b>手动输入</b>之间切换；在列表里改动，最上方的友链代码会立刻跟着变。</div>
+      <div class="help-grid">
         <ol class="steps">
           <li>在<b>第 1 步</b>粘贴内容并点「识别并加入列表」，或点「＋ 新增一条友链」手动填；两类新增都会立刻出现在最上方的「友链代码」里，改列表也会实时同步</li>
           <li>点绿色 <b>「复制并打开后台 ↗」</b>：代码自动复制，浏览器新开一个标签页打开 GitHub 上的 <code>data/friends.yml</code>（没登录就先登录）</li>
@@ -389,12 +398,11 @@ var _hmt = _hmt || [];
           <li>拉到页面下方点绿色 <b>Commit changes</b>，等 1～2 分钟，强刷 <code>/friends/</code> 就能看到</li>
           <li>想整体整理 / 重排全部友链，用<b>第 4 步「复制整份」</b>覆盖整个文件</li>
         </ol>
-        <div class="note" style="margin-top:10px">
+        <div class="help-side note" style="margin-top:8px">
           同一个分组内，页面顺序只看 <b>weight</b>（数字越大越靠前），跟写在文件第几行无关 —— 所以粘到末尾最省事，想置顶就把 weight 填大一点。
         </div>
       </div>
     </div>
-  </div>
 
   <p class="jump-target" id="page-bottom" style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
     其他工具（点开都是新标签页，当前页填的内容不会丢）：<a href="https://2019527.xyz/tools/xiezuo.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:none">写作助手</a>
