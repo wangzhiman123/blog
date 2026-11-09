@@ -236,7 +236,7 @@
     color: var(--brand); background: var(--brand-weak); border: 1px solid var(--line);
   }
   .code-card .code-box {
-    width: 100%; height: 260px; min-height: 100px; resize: vertical;
+    width: 100%; height: 236px; min-height: 100px; resize: vertical;
     font: 13px/1.8 ui-monospace, Consolas, "Courier New", monospace;
     white-space: pre; overflow: auto; tab-size: 2;
     color: var(--text); background: var(--bg);
@@ -244,7 +244,7 @@
   }
   .code-card .code-box:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
   .code-card .btns { margin-top: 6px; }
-  @media (max-width: 620px) { .code-card .code-box { height: 200px; } }
+  @media (max-width: 620px) { .code-card .code-box { height: 180px; } }
 </style>
 <!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
      所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
@@ -1426,13 +1426,17 @@ function renderAdded() {
   autoCodeHeight();
 }
 
-/* 每行代码短、行数多：按实际行数给高度；空的时候收矮，最多 340px */
+/* 每行代码短、行数多：按实际行数给高度；默认比原先少留约一行空白，空的时候收矮 */
 function autoCodeHeight() {
   var box = document.getElementById('addedYaml');
   if (!box || box.getAttribute('data-big') === '1') return;
-  var lines = box.value ? box.value.split('\n').length : 0;
-  var cap = window.innerWidth < 620 ? 260 : 340;
-  var h = lines ? Math.min(cap, Math.max(200, Math.round(lines * 23.4 + 24))) : 120;
+  // 末尾空行不算一行，避免代码以换行结尾时白白多撑一行高度
+  var lines = box.value ? box.value.replace(/\n+$/, '').split('\n').length : 0;
+  var cap = window.innerWidth < 620 ? 236 : 316;
+  // 13px/1.8 = 23.4px 一行，上下 padding 20px + 边框 2px；去掉原先 200px 的硬下限
+  var need = Math.round(lines * 23.4 + 22);
+  // 只比上限多不到一行时按实际高度给，避免最后一行被裁；行数很多才封顶
+  var h = lines ? Math.max(140, (need <= cap + 24 ? need : cap)) : 120;
   box.style.height = h + 'px';
 }
 window.addEventListener('resize', autoCodeHeight);
