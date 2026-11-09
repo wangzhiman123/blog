@@ -35,13 +35,13 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 24px 16px 64px;
+    padding: 14px 16px 48px;
     background: var(--bg);
     color: var(--text);
     font: 15px/1.7 -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
   }
   .wrap { max-width: 1180px; margin: 0 auto; }
-  header { margin-bottom: 20px; }
+  header { margin-bottom: 12px; }
   h1 { font-size: 22px; margin: 0 0 6px; }
   .sub { color: var(--muted); font-size: 13px; }
   /* 跳转入口：与页面按钮同一套规范（primary 绿实心 = 复制全文，其余白底灰边） */
@@ -50,7 +50,7 @@
   .head-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   a.jump-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    font: inherit; font-size: 14px; padding: 8px 12px; border-radius: 7px;
     border: 1px solid var(--line); background: var(--card); color: var(--text);
     text-decoration: none; cursor: pointer; white-space: nowrap;
   }
@@ -71,17 +71,17 @@
     .head-links { width: 100%; }
   }
 
-  .cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; align-items: start; }
+  .cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 14px; align-items: start; }
   .cols > div { min-width: 0; }
   @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 16px;
+    padding: 13px 16px;
+    margin-bottom: 12px;
   }
-  .card h2 { font-size: 15px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 { font-size: 15px; margin: 0 0 9px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
   .card h2 span.num {
     display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
     background: var(--brand-weak); color: var(--brand);
@@ -101,7 +101,7 @@
   .row label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   @media (max-width: 620px) { .row { grid-template-columns: 1fr; } }
   button {
-    font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 7px;
+    font: inherit; font-size: 14px; padding: 7px 12px; border-radius: 7px;
     border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer;
   }
   button:hover { border-color: var(--muted); }
@@ -110,8 +110,8 @@
   button.danger { color: var(--danger); }
   button.danger:hover { border-color: var(--danger); }
   button.mini { padding: 5px 9px; font-size: 12.5px; }
-  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
   pre.out {
     margin: 0; padding: 12px; background: var(--bg); border: 1px solid var(--line);
     border-radius: 8px; font: 12.5px/1.65 ui-monospace, Consolas, "Courier New", monospace;
@@ -147,93 +147,6 @@
   .spacer { flex: 1; }
   .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 24px 0; }
 
-  /* 效果预览：与网站 /friends/ 的 domino 卡片、分组标题保持同一套视觉 */
-  .preview {
-    --pv-bg: #f5f2ec; --pv-line: #ccc5b5; --pv-inner: #ddd7ca;
-    --pv-av-line: #e8e3d8; --pv-name: #1677ff; --pv-desc: #57606a;
-    --pv-url: #57606a; --pv-count: #8b949e; --pv-text: #1f2328;
-    --pv-shadow: rgba(0,0,0,.06); --pv-inset: rgba(255,255,255,.7);
-  }
-  @media (prefers-color-scheme: dark) {
-    .preview {
-      --pv-bg: #252c36; --pv-line: #3e4a5a; --pv-inner: #354050;
-      --pv-av-line: #3a4555; --pv-name: #69b1ff; --pv-desc: #9aa4b2;
-      --pv-url: #adbac7; --pv-count: #9aa4b2; --pv-text: #e6edf3;
-      --pv-shadow: rgba(0,0,0,.2); --pv-inset: rgba(255,255,255,.04);
-    }
-  }
-  .pv-section { margin-top: 1.3rem; }
-  .pv-section:first-child { margin-top: 0; }
-  .pv-group {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem;
-    margin: 0 0 .85rem; font-size: 1.02rem; font-weight: 600; color: var(--pv-text);
-  }
-  .pv-gname { position: relative; padding-left: .6rem; }
-  .pv-gname::before {
-    content: ""; position: absolute; top: .15em; bottom: .15em; left: 0;
-    width: 3px; background: #c2a86f; border-radius: 2px;
-  }
-  .pv-gcount {
-    padding: 0 .4rem; font-size: .72rem; font-weight: 500; line-height: 1.5;
-    color: var(--pv-count); background: rgba(140,140,140,.14); border-radius: 999px;
-  }
-  .pv-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 1rem; }
-  .pv {
-    display: flex; flex-direction: row; align-items: center;
-    width: 100%; max-width: 380px; height: 120px; gap: .75rem; padding: 0 .75rem;
-    background: var(--pv-bg); border: 1.5px solid var(--pv-line);
-    box-shadow: 0 1px 4px var(--pv-shadow), inset 0 1px var(--pv-inset);
-    outline: 1px solid var(--pv-inner); outline-offset: -5px;
-    border-radius: 10px; box-sizing: border-box; overflow: hidden;
-    justify-self: center; color: var(--pv-text);
-  }
-  .pv .av {
-    width: 90px; min-width: 90px; height: 90px; flex: 0 0 90px;
-    border-radius: 50%; border: 2px solid var(--pv-av-line); padding: 2px;
-    background: rgba(140,140,140,.12); color: var(--pv-desc);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 26px; overflow: hidden; box-sizing: border-box;
-  }
-  .pv .av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
-  .pv .av.fit-contain img {
-    object-fit: contain; padding: 7px; box-sizing: border-box; background: rgba(140,140,140,.12);
-  }
-  .pv-info { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; overflow: hidden; flex: 1; min-width: 0; }
-  .pv .t {
-    display: block; max-width: 100%; color: var(--pv-name); font-weight: 700;
-    font-size: .9rem; letter-spacing: .02em; line-height: 1.8;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .pv .d {
-    margin-top: .15rem; color: var(--pv-desc); font-size: .8rem; line-height: 1.5; text-align: left;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
-  }
-  .pv .u {
-    margin-top: .15rem; color: var(--pv-url); font-size: .72rem; line-height: 1.4;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-  }
-  @media (max-width: 620px) {
-    .pv { height: auto; min-height: 110px; }
-    .pv .av { width: 52px; min-width: 52px; height: 52px; flex-basis: 52px; font-size: 16px; }
-  }
-  /* 按网站宽度查看：两列，和线上 /friends/ 一样 */
-  .pv-modal {
-    position: fixed; inset: 0; z-index: 120; display: none;
-    align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.45);
-  }
-  .pv-modal-inner {
-    width: min(900px, 100%); max-height: 88vh; display: flex; flex-direction: column;
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.25); overflow: hidden;
-  }
-  .pv-modal-head {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14px;
-  }
-  .pv-modal-body { padding: 18px 20px 24px; overflow: auto; }
-  .pv-modal-body .pv-links { grid-template-columns: repeat(2, minmax(0, 380px)); }
-  @media (max-width: 700px) { .pv-modal-body .pv-links { grid-template-columns: 1fr; } }
-
   /* 分组管理 */
   .gform { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
   .glock { font-size: 11.5px; color: var(--muted); }
@@ -247,7 +160,7 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* 快速导入（原友链代码转换器并入本页） */
-  textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
+  textarea { min-height: 116px; resize: vertical; line-height: 1.6; }
   .label-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .label-row label { margin: 0; flex: 1 1 auto; min-width: 0; }
   .label-row button { flex: 0 0 auto; white-space: nowrap; }
@@ -309,19 +222,25 @@
     .sidenav.open .sn-body { max-height: calc(100vh - 90px); overflow-y: auto; }
   }
 
-  /* 页面最上方：「处理后的友链代码」审核区 */
-  .code-card { border-left: 3px solid var(--brand); }
-  .code-card h2 { margin-bottom: 8px; }
+  /* 页面最上方：「友链代码」主舞台；每行代码短但行数多，行距放宽、一屏看更多行 */
+  .code-card { border-left: 4px solid var(--brand); box-shadow: 0 2px 14px rgba(26,127,90,.08); }
+  .code-card h2 { margin-bottom: 8px; font-size: 16px; }
+  .cc-title { color: var(--brand); font-weight: 700; }
+  .code-state {
+    margin-left: auto; font-size: 12px; font-weight: 600; white-space: nowrap;
+    padding: 2px 10px; border-radius: 999px;
+    color: var(--brand); background: var(--brand-weak); border: 1px solid var(--line);
+  }
   .code-card .code-box {
-    width: 100%; height: 108px; min-height: 84px; resize: vertical;
-    font: 12.5px/1.65 ui-monospace, Consolas, "Courier New", monospace;
+    width: 100%; height: 260px; min-height: 100px; resize: vertical;
+    font: 13px/1.8 ui-monospace, Consolas, "Courier New", monospace;
     white-space: pre; overflow: auto; tab-size: 2;
     color: var(--text); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px;
   }
   .code-card .code-box:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
   .code-card .btns { margin-top: 8px; }
-  @media (max-width: 620px) { .code-card .code-box { height: 100px; } }
+  @media (max-width: 620px) { .code-card .code-box { height: 200px; } }
 </style>
 <!-- 百度统计（2026-11-02 接入）。本站静态工具页不经过 Hugo 模板，
      所以在这里手写一段，与 config/_default/params.toml 里的 id 保持一致；
@@ -341,7 +260,7 @@ var _hmt = _hmt || [];
   <header class="page-head">
     <div class="page-head-text">
       <h1>友链管理器</h1>
-      <div class="sub">粘贴识别 → 在上方代码框审核改字 → 点「复制并打开后台 ↗」粘到 <code>data/friends.yml</code> 末尾。列表只是草稿，数据只存在你的浏览器里。快捷导航在页面右侧（手机上点右下角「☰ 目录」）。</div>
+      <div class="sub">整页围绕最上方的「友链代码」：新增 / 修改友链 → 代码实时更新 → 复制粘到 <code>data/friends.yml</code>。数据只存本机；快捷导航在右侧（手机点「☰ 目录」）。</div>
     </div>
     <div class="head-links">
       <a class="jump-btn" href="https://2019527.xyz/friends/" target="_blank" rel="noopener noreferrer" title="在新标签页打开友情链接页面">友情链接页面 ↗</a>
@@ -350,18 +269,19 @@ var _hmt = _hmt || [];
     </div>
   </header>
 
-  <section class="card code-card jump-target" id="sec-added" aria-label="处理后的友链代码">
-    <h2><span class="num">★</span>处理后的友链代码 <span class="hint" id="addedCount"></span><span class="hint" id="codeState" style="margin-left:auto"></span></h2>
+  <section class="card code-card jump-target" id="sec-added" aria-label="友链代码">
+    <h2><span class="num">★</span><span class="cc-title">友链代码</span><span class="hint" id="addedCount"></span><span class="code-state" id="codeState"></span></h2>
     <div class="note" style="margin-bottom:8px">
-      识别完的代码就在这里，<b>可以直接在框里改字</b>；在列表里改会自动同步，手动改过之后点「↺ 按列表重新生成」才覆盖。复制 / 下载 / 打开后台都以框里内容为准。
+      <b>整页的中心</b>：新增或修改友链，这里立刻同步更新，复制走就能粘到 <code>data/friends.yml</code>。
+      也可以直接在框里改字（改列表、刷新或点「↺ 按列表重新生成」后会按列表重建）；这里只放本次新增的条目，整理全部友链请用「整份代码」。
     </div>
-    <textarea id="addedYaml" class="code-box" spellcheck="false" placeholder="还没有处理过友链。到下面第 1 步粘贴内容，点「识别并加入列表」，代码会自动出现在这里。"></textarea>
+    <textarea id="addedYaml" class="code-box" spellcheck="false" placeholder="还没有友链代码。&#10;到下面第 1 步粘贴内容，点「识别并加入列表」即可。"></textarea>
     <div class="btns">
       <a class="jump-btn primary" id="btnCopyOpen" href="https://github.com/wangzhiman123/blog/edit/main/data/friends.yml" target="_blank" rel="noopener noreferrer" title="复制框里的代码并在新标签页打开后台文件">复制并打开后台 ↗</a>
-      <button onclick="copyAdded()">复制当前代码</button>
+      <button onclick="copyAdded()">📋 复制友链代码</button>
       <button onclick="downloadAdded()">下载 .yml</button>
-      <button onclick="regenCode()" title="放弃手动修改，按友链列表重新生成代码">↺ 按列表重新生成</button>
-      <button id="btnCodeExpand" onclick="toggleCodeBox()" title="把代码框拉高，方便一次审核多条">⤢ 展开代码框</button>
+      <button onclick="regenCode()" title="代码框被改乱时，按友链列表重新生成">↺ 按列表重新生成</button>
+      <button id="btnCodeExpand" onclick="toggleCodeBox()" title="把代码框拉高，一次看更多行">⤢ 展开代码框</button>
       <button onclick="goNav('smart')">↓ 去粘贴识别</button>
     </div>
     <div class="msg" id="addedMsg"></div>
@@ -371,7 +291,7 @@ var _hmt = _hmt || [];
     <!-- 左：快速导入 -->
     <div>
       <div class="card jump-target" id="sec-smart">
-        <h2><span class="num">1</span>快速导入：粘贴你复制到的内容</h2>
+        <h2><span class="num">1</span>新增友链：粘贴识别 / 手动填</h2>
         <div class="label-row">
           <label for="smartInput">原始内容 <span class="hint">粘贴后点「识别并加入列表」；一次贴多条请用空行隔开</span></label>
           <button class="mini" onclick="smartClear()">清空输入</button>
@@ -391,21 +311,16 @@ var _hmt = _hmt || [];
         <label class="checkline"><input type="checkbox" id="smartContain"><span>头像完整显示（长条 logo 用，加 <code>avatar_fit: contain</code>）</span></label>
         <div class="btns"><button onclick="smartBulk()">把上面的设置应用到本次新增</button></div>
         <div class="note" style="margin-top:10px">
-          认得：<b>纯网址</b>、<b>名称 + 网址</b>、<b>Markdown 链接</b>、<b>别人友链页的卡片</b>（含图片）、<b>「站点名称：…」申请模板</b>、<b>title / imgurl / desc / siteurl 信息块</b>、<b>friends.yml 代码</b>、<b>JSON</b>。识别出来的条目直接进右侧的「友链列表」，可以逐条改；生成的代码在页面最上方单独展示。
-        </div>
-
-        <div class="note" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
-          识别出来的代码已经放在<b>页面最上方的「处理后的友链代码」</b>里，打开页面就能审核、修改和复制。
-          <a href="#sec-added" onclick="goNav('added');return false;" style="color:var(--brand);text-decoration:none">↑ 回到代码区</a>
+          认得：<b>纯网址</b>、<b>名称 + 网址</b>、<b>Markdown 链接</b>、<b>别人友链页的卡片</b>（含图片）、<b>「站点名称：…」申请模板</b>、<b>title / imgurl / desc / siteurl 信息块</b>、<b>friends.yml 代码</b>、<b>JSON</b>。识别出来的条目直接进右侧的「友链列表」，可以逐条改；代码在最上方实时更新。
         </div>
       </div>
 
     </div>
 
-    <!-- 右：友链列表 / 预览 / 分组 / 输出 -->
+    <!-- 右：友链列表 / 分组 / 整份代码 / 使用说明 -->
     <div>
       <div class="card jump-target" id="sec-list">
-        <h2><span class="num">2</span>友链列表 <span class="hint" id="count"></span></h2>
+        <h2><span class="num">2</span>友链列表 <span class="hint">改这里 → 上方代码实时更新</span><span class="hint" id="count"></span></h2>
         <div class="toolbar">
           <button class="primary" onclick="addItem()">＋ 新增一条友链</button>
           <button onclick="document.getElementById('file').click()">导入（yml / 备份 json）</button>
@@ -417,14 +332,8 @@ var _hmt = _hmt || [];
         <div class="list" id="list"></div>
       </div>
 
-      <div class="card jump-target" id="sec-preview">
-        <h2><span class="num">3</span>效果预览 <button class="mini" style="margin-left:auto" onclick="openWidePreview()" title="按网站宽度查看两列排布">🖥 按网站宽度查看</button></h2>
-        <div class="note" style="margin-bottom:10px">按网站 <code>/friends/</code> 上同样的卡片和分组标题显示；这一栏较窄，点右上按钮可以看网站上的两列画面。</div>
-        <div class="preview" id="preview"></div>
-      </div>
-
       <div class="card jump-target" id="sec-groups">
-        <h2><span class="num">4</span>分组管理 <span class="hint">顺序即页面上从上到下的顺序</span></h2>
+        <h2><span class="num">3</span>分组管理 <span class="hint">顺序即页面上从上到下的顺序</span></h2>
         <table class="gtable">
           <thead><tr><th>分组名称</th><th style="width:34%">标识（group）</th><th style="width:52px">条数</th><th style="width:96px"></th></tr></thead>
           <tbody id="gbody"></tbody>
@@ -459,7 +368,7 @@ var _hmt = _hmt || [];
       </div>
 
       <div class="card jump-target" id="sec-yaml">
-        <h2><span class="num">5</span>整份代码</h2>
+        <h2><span class="num">4</span>整份代码</h2>
         <div class="note" style="margin-bottom:10px">想整体覆盖文件、或把全部友链按现在的分组与顺序重排时，用这一份。</div>
         <pre class="out" id="yaml"></pre>
         <div class="btns">
@@ -471,14 +380,14 @@ var _hmt = _hmt || [];
       </div>
 
       <div class="card jump-target" id="sec-help">
-        <h2><span class="num">6</span>怎么粘贴</h2>
-        <div class="note" style="margin-bottom:8px">页面顶部「快速跳到」和右下角悬浮按钮，可以随时在<b>自动识别</b>与<b>手动输入</b>之间切换，不用往回翻页。</div>
+        <h2><span class="num">5</span>怎么粘贴</h2>
+        <div class="note" style="margin-bottom:8px">右侧固定侧边栏（手机上点右下角「☰ 目录」）可以随时在<b>自动识别</b>与<b>手动输入</b>之间切换；在列表里改动，最上方的友链代码会立刻跟着变。</div>
         <ol class="steps">
-          <li>在<b>第 1 步</b>粘贴内容并点「识别并加入列表」，或点最上面「＋ 新增一条友链」手动填；代码会显示在页面最上方的「处理后的友链代码」里，可以直接改字审核</li>
+          <li>在<b>第 1 步</b>粘贴内容并点「识别并加入列表」，或点「＋ 新增一条友链」手动填；两类新增都会立刻出现在最上方的「友链代码」里，改列表也会实时同步</li>
           <li>点绿色 <b>「复制并打开后台 ↗」</b>：代码自动复制，浏览器新开一个标签页打开 GitHub 上的 <code>data/friends.yml</code>（没登录就先登录）</li>
           <li>在那个页面把光标点到<b>文件最末尾</b>，回车空出一行，按 <code>Ctrl+V</code></li>
           <li>拉到页面下方点绿色 <b>Commit changes</b>，等 1～2 分钟，强刷 <code>/friends/</code> 就能看到</li>
-          <li>想整体整理 / 重排全部友链，用<b>第 5 步「复制整份」</b>覆盖整个文件</li>
+          <li>想整体整理 / 重排全部友链，用<b>第 4 步「复制整份」</b>覆盖整个文件</li>
         </ol>
         <div class="note" style="margin-top:10px">
           同一个分组内，页面顺序只看 <b>weight</b>（数字越大越靠前），跟写在文件第几行无关 —— 所以粘到末尾最省事，想置顶就把 weight 填大一点。
@@ -495,13 +404,6 @@ var _hmt = _hmt || [];
   </p>
 </div>
 
-<div class="pv-modal" id="pvModal" role="dialog" aria-label="网站宽屏效果预览">
-  <div class="pv-modal-inner">
-    <div class="pv-modal-head"><b>网站上的效果（宽屏两列）</b><button class="mini" onclick="closeWidePreview()">✕ 关闭</button></div>
-    <div class="preview pv-modal-body" id="pvWide"></div>
-  </div>
-</div>
-
 <aside class="sidenav" id="sidenav" aria-label="页面快捷导航">
   <button type="button" class="sn-toggle" id="snToggle" aria-expanded="false" aria-controls="snBody" onclick="toggleSideNav()" title="展开 / 收起快捷导航">☰ 目录</button>
   <div class="sn-title">快速跳到</div>
@@ -509,8 +411,8 @@ var _hmt = _hmt || [];
     <a class="jump-btn primary jb-main" href="#sec-smart" onclick="goNav('smart');closeSideNav();return false;" title="跳到第 1 步，光标直接落到输入框">⚡ 自动识别</a>
     <a class="jump-btn jb-main" href="#sec-list" onclick="goNav('manual');closeSideNav();return false;" title="跳到第 2 步，自动新建一条空白友链并定位光标">✚ 手动输入</a>
     <div class="sn-sep"></div>
-    <a class="jump-btn" href="#sec-added" onclick="goNav('added');closeSideNav();return false;" title="跳到页面最上方的代码审核区">处理后的代码</a>
-    <a class="jump-btn" href="#sec-preview" onclick="goNav('preview');closeSideNav();return false;" title="跳到效果预览">效果预览</a>
+    <a class="jump-btn" href="#sec-added" onclick="goNav('added');closeSideNav();return false;" title="跳到页面最上方的友链代码">友链代码</a>
+    <a class="jump-btn" href="#sec-added" onclick="copyAdded();closeSideNav();return false;" title="直接复制最上方的友链代码">📋 复制代码</a>
     <a class="jump-btn" href="#sec-groups" onclick="goNav('groups');closeSideNav();return false;" title="跳到分组管理">分组管理</a>
     <a class="jump-btn" href="#sec-yaml" onclick="goNav('yaml');closeSideNav();return false;" title="跳到整份代码">整份代码</a>
     <a class="jump-btn" href="#sec-help" onclick="goNav('help');closeSideNav();return false;" title="跳到使用说明">使用说明</a>
@@ -527,9 +429,7 @@ var _hmt = _hmt || [];
 
 var KEY = 'fixit_friends_v1';
 var GKEY = 'fixit_friends_groups_v1';
-var AKEY = 'fixit_friends_review_v1';   // 上次处理的代码（跨刷新保留）
-var codeManual = false;                  // 用户是否直接在代码框里改过
-var reviewCode = '';                     // 手动改过的代码文本
+var AKEY = 'fixit_friends_review_v1';   // 本次新增条目的 id（跨刷新保留）
 
 /* 站点 content/friends/index.md 里已有的分组：锁定，不可改名删除 */
 var BUILTIN_GROUPS = [
@@ -580,20 +480,16 @@ function load() {
     if (!it.avatar_fit) it.avatar_fit = 'cover';
   });
 
-  /* 上次处理过的代码和手动修改也一起恢复，打开页面就能接着审核 */
+  /* 恢复上次「本次新增」的条目 id；代码始终按列表现况生成 */
   try {
     var a = JSON.parse(localStorage.getItem(AKEY) || '{}');
     if (a && Array.isArray(a.ids)) addedIds = a.ids;
-    if (a && a.manual && typeof a.code === 'string' && a.code.trim()) {
-      reviewCode = a.code;
-      codeManual = true;
-    }
-  } catch (e) { /* 没有历史代码就跳过 */ }
+  } catch (e) { /* 没有历史记录就跳过 */ }
 }
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {}
   try {
-    localStorage.setItem(AKEY, JSON.stringify({ ids: addedIds, code: reviewCode, manual: codeManual }));
+    localStorage.setItem(AKEY, JSON.stringify({ ids: addedIds }));
   } catch (e) {}
   saveGroups();
 }
@@ -750,7 +646,6 @@ function render() {
   }
   document.getElementById('count').textContent = items.length ? '共 ' + items.length + ' 条' : '';
   renderGroups();
-  renderPreview();
   renderYaml();
   save();
   renderAdded();
@@ -780,43 +675,6 @@ function renderGroups() {
   if (customCount) document.getElementById('toml').textContent = buildToml();
 }
 
-/* 与 layouts/friends.html 里的 placeholder 完全相同的默认头像 */
-var PV_FACE = '<svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" style="width:100%;height:100%;display:block">'
-  + '<rect width="100" height="100" rx="8" fill="currentColor" opacity="0.08"/>'
-  + '<circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>'
-  + '<circle cx="38" cy="42" r="3" opacity="0.5"/><circle cx="62" cy="42" r="3" opacity="0.5"/>'
-  + '<path d="M36 58c4 6 24 6 28 0" stroke="currentColor" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>'
-  + '</svg>';
-
-function renderPreview() {
-  var box = document.getElementById('preview');
-  if (!items.length) { box.innerHTML = '<div class="empty">暂无预览</div>'; return; }
-  var html = '';
-  groups.forEach(function (g) {
-    var list = items.filter(function (x) { return x.group === g.key; })
-      .slice().sort(function (a, b) { return (Number(b.weight) || 0) - (Number(a.weight) || 0); });
-    if (!list.length) return;
-    html += '<div class="pv-section">'
-      + '<div class="pv-group"><span class="pv-gname">' + esc(g.name) + '</span>'
-      + '<span class="pv-gcount">' + list.length + '</span></div>'
-      + '<div class="pv-links">'
-      + list.map(function (it) {
-        var name = it.nickname;
-        var av = it.avatar
-          ? '<div class="av' + (it.avatar_fit === 'contain' ? ' fit-contain' : '') + '"><img src="' + esc(it.avatar) + '" alt="" referrerpolicy="no-referrer"></div>'
-          : '<div class="av">' + PV_FACE + '</div>';
-        var url = String(it.url || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
-        return '<div class="pv">' + av + '<div class="pv-info">'
-          + '<div class="t">' + esc(name || '（未命名）') + '</div>'
-          + (it.description ? '<div class="d">' + esc(it.description) + '</div>' : '')
-          + (url ? '<div class="u">' + esc(url) + '</div>' : '')
-          + '</div></div>';
-      }).join('')
-      + '</div></div>';
-  });
-  box.innerHTML = html || '<div class="empty">暂无预览</div>';
-}
-
 /* ---------- 编辑 ---------- */
 function onEdit(el) {
   var it = items.find(function (x) { return x.id === el.dataset.id; });
@@ -825,8 +683,8 @@ function onEdit(el) {
   it[k] = k === 'weight' ? (parseInt(el.value, 10) || 0) : el.value;
   save();
   validateOne(it);
-  renderPreview();
   renderYaml();
+  renderAdded();
 }
 
 function onGroupChange(el) {
@@ -840,7 +698,6 @@ function onGroupChange(el) {
   var badge = el.closest('.item').querySelector('.badge');
   if (badge && it) badge.textContent = gname(it.group);
   renderGroups();
-  renderPreview();
 }
 
 function validateOne(it) {
@@ -862,7 +719,9 @@ function validateOne(it) {
 
 function addItem() {
   var w = 100;
-  items.push({ id: uid(), nickname: '', url: '', description: '', avatar: '', avatar_fit: 'cover', group: 'blogs', weight: w });
+  var it = { id: uid(), nickname: '', url: '', description: '', avatar: '', avatar_fit: 'cover', group: 'blogs', weight: w };
+  items.push(it);
+  addedIds.push(it.id);   // 手动新增的条目同样进入「友链代码」
   render();
   var inputs = document.querySelectorAll('input[data-k="nickname"]');
   if (inputs.length) { inputs[inputs.length - 1].focus(); inputs[inputs.length - 1].scrollIntoView({ block: 'center' }); }
@@ -1176,7 +1035,7 @@ var SM_ALIAS = {
 /* 友链信息里常见的无关字段：只忽略，不当成简介拼进结果 */
 var SM_IGNORE_KEYS = /^(?:tags?|labels?|categories|category|rss|feed|author|email|owner|since|date|type|status|id|keywords?|lang|language)$/i;
 var SM_FIELD_LINE = /^\s*-?\s*([A-Za-z_\u4e00-\u9fa5]+)\s*[:：]\s*(.*)$/;
-var addedIds = [];          // 本次识别加进来的条目 id，用于生成「新增代码」
+var addedIds = [];          // 本次新增（粘贴识别或手动填）的条目 id，用于生成「友链代码」
 var known = {};             // 线上 /friends/ 已有的网址，用于重复提示
 var smartTimer = null;
 
@@ -1491,10 +1350,9 @@ function smartAdd() {
   var missing = list.filter(function (it) { return !smValidUrl(it.url); }).length;
   render();
   flash('sec-added');
-  msg('smartMsg', '已识别并加入 ' + list.length + ' 条（' + (r.type || '文本') + '），代码已更新到页面最上方的「处理后的友链代码」。'
+  msg('smartMsg', '已识别并加入 ' + list.length + ' 条（' + (r.type || '文本') + '），代码已更新到页面最上方的「友链代码」。'
     + (missing ? ' 其中 ' + missing + ' 条没认出网址，请在「友链列表」里补好再复制。' : '')
-    + (dup ? ' 其中 ' + dup + ' 条网址本站已有，列表里标了「⚠ 可能重复」，注意别重复添加。' : '')
-    + (codeManual ? ' ⚠ 代码框里是你手动改过的内容，新条目没有并进去；要看全部请点「↺ 按列表重新生成」。' : ''), 'ok');
+    + (dup ? ' 其中 ' + dup + ' 条网址本站已有，列表里标了「⚠ 可能重复」，注意别重复添加。' : ''), 'ok');
   toast('已识别 ' + list.length + ' 条，代码已更新到最上方');
 }
 function smartSample() {
@@ -1549,32 +1407,35 @@ function buildAddedYaml() { return addedItems().map(itemYaml).join('\n\n'); }
 function renderAdded() {
   var box = document.getElementById('addedYaml');
   var list = addedItems();
-  var auto = list.length ? list.map(itemYaml).join('\n\n') : '';
-  if (!codeManual) {
-    box.value = auto;
-    reviewCode = auto;
-  } else if (box.value !== reviewCode) {
-    box.value = reviewCode;
-  }
+  box.value = list.length ? list.map(itemYaml).join('\n\n') : '';
   document.getElementById('addedCount').textContent = list.length ? '共 ' + list.length + ' 条' : '';
   var st = document.getElementById('codeState');
   if (st) {
-    st.textContent = codeManual ? '✎ 你手动改过，复制以框里内容为准'
-      : (list.length ? '✓ 已和友链列表同步' : '等待识别');
-    st.style.color = codeManual ? 'var(--warn)' : 'var(--brand)';
+    st.textContent = list.length ? '✓ 已同步' : '等待识别';
+    st.style.color = 'var(--brand)';
   }
-  if (!list.length && !codeManual) document.getElementById('addedMsg').textContent = '';
+  if (!list.length) document.getElementById('addedMsg').textContent = '';
+  autoCodeHeight();
 }
+
+/* 每行代码短、行数多：按实际行数给高度；空的时候收矮，最多 340px */
+function autoCodeHeight() {
+  var box = document.getElementById('addedYaml');
+  if (!box || box.getAttribute('data-big') === '1') return;
+  var lines = box.value ? box.value.split('\n').length : 0;
+  var cap = window.innerWidth < 620 ? 260 : 340;
+  var h = lines ? Math.min(cap, Math.max(200, Math.round(lines * 23.4 + 24))) : 120;
+  box.style.height = h + 'px';
+}
+window.addEventListener('resize', autoCodeHeight);
 function currentCode() {
   var box = document.getElementById('addedYaml');
   return box ? box.value : '';
 }
 function regenCode() {
-  codeManual = false;
-  reviewCode = '';
   renderAdded();
   save();
-  msg('addedMsg', '已按友链列表重新生成，之前的手动修改已放弃。', 'ok');
+  msg('addedMsg', '已按「友链列表」重新生成代码。', 'ok');
   toast('代码已重新生成');
 }
 function addedValidate() {
@@ -1582,7 +1443,6 @@ function addedValidate() {
     msg('addedMsg', '还没有代码：在下面第 1 步粘贴内容，点「识别并加入列表」', 'bad');
     return false;
   }
-  if (codeManual) return true;   // 手动改过，格式由自己把关
   var list = addedItems();
   for (var i = 0; i < list.length; i++) {
     if (!smValidUrl(list[i].url)) {
@@ -1628,37 +1488,8 @@ document.getElementById('btnCopyOpen').addEventListener('click', function (e) {
   msg('addedMsg', '已复制框里的代码。后台打开后，拉到文件最末尾空一行，按 Ctrl+V。', 'ok');
 });
 document.getElementById('addedYaml').addEventListener('input', function () {
-  codeManual = true;
-  reviewCode = this.value;
   var st = document.getElementById('codeState');
-  if (st) { st.textContent = '✎ 你手动改过，复制以框里内容为准'; st.style.color = 'var(--warn)'; }
-  save();
-});
-/* 头像外链打不开时，换成和网站一样的默认头像（预览区与宽屏浮层共用） */
-function bindPvFallback(root) {
-  root.addEventListener('error', function (e) {
-    var img = e.target;
-    if (img && img.tagName === 'IMG' && img.parentNode && img.parentNode.classList.contains('av')) {
-      img.parentNode.innerHTML = PV_FACE;
-    }
-  }, true);
-}
-bindPvFallback(document.getElementById('preview'));
-bindPvFallback(document.getElementById('pvWide'));
-
-/* 按网站宽度查看两列画面 */
-function openWidePreview() {
-  document.getElementById('pvWide').innerHTML = document.getElementById('preview').innerHTML;
-  document.getElementById('pvModal').style.display = 'flex';
-}
-function closeWidePreview() {
-  document.getElementById('pvModal').style.display = 'none';
-}
-document.getElementById('pvModal').addEventListener('click', function (e) {
-  if (e.target === this) closeWidePreview();
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeWidePreview();
+  if (st) { st.textContent = '✎ 手动改过'; st.style.color = 'var(--warn)'; }
 });
 document.getElementById('smartInput').addEventListener('input', function () {
   clearTimeout(smartTimer);
@@ -1672,7 +1503,7 @@ document.getElementById('smartInput').addEventListener('input', function () {
 /* ---------- 快速导航：目录 / 顶部 / 底部 / 两种录入方式 ---------- */
 var NAV_TARGETS = {
   smart: 'sec-smart', added: 'sec-added', list: 'sec-list',
-  preview: 'sec-preview', groups: 'sec-groups', yaml: 'sec-yaml',
+  groups: 'sec-groups', yaml: 'sec-yaml',
   help: 'sec-help', bottom: 'page-bottom'
 };
 function flash(id) {
@@ -1739,8 +1570,13 @@ function toggleCodeBox() {
   var btn = document.getElementById('btnCodeExpand');
   if (!box) return;
   var big = box.getAttribute('data-big') === '1';
-  if (big) { box.style.height = ''; box.setAttribute('data-big', '0'); }
-  else { box.style.height = '320px'; box.setAttribute('data-big', '1'); }
+  if (big) {
+    box.setAttribute('data-big', '0');
+    autoCodeHeight();
+  } else {
+    box.style.height = '520px';
+    box.setAttribute('data-big', '1');
+  }
   if (btn) btn.textContent = big ? '⤢ 展开代码框' : '⤡ 收起代码框';
 }
 
