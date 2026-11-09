@@ -68,6 +68,7 @@
 - nickname: "友链管理器"
   url: "https://2019527.xyz/tools/youlian.html"
   description: 本站的友链管理工具之一
+  avatar: "https://2019527.xyz/friends-icon.svg"
   group: tools
   weight: 73
 

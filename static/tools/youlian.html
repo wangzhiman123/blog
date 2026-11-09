@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>友链管理器 · 王志满律师</title>
+<link rel="icon" type="image/svg+xml" href="/friends-icon.svg">
 <style>
   :root {
     --bg: #f6f7f9;
@@ -43,6 +44,7 @@
   .wrap { max-width: 1180px; margin: 0 auto; }
   header { margin-bottom: 12px; }
   h1 { font-size: 22px; margin: 0 0 6px; }
+  .hd-ico { height: 26px; width: 26px; vertical-align: -5px; margin-right: 6px; border-radius: 6px; }
   .sub { color: var(--muted); font-size: 13px; }
   /* 跳转入口：与页面按钮同一套规范（primary 绿实心 = 复制全文，其余白底灰边） */
   header.page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -263,7 +265,7 @@ var _hmt = _hmt || [];
 <div class="wrap" id="page-top">
   <header class="page-head">
     <div class="page-head-text">
-      <h1>友链管理器</h1>
+      <h1><img class="hd-ico" src="/friends-icon.svg" alt="友链管理器图标">友链管理器</h1>
       <div class="sub">整页围绕最上方的「友链代码」：新增 / 修改友链 → 代码实时更新 → 复制粘到 <code>data/friends.yml</code>。数据只存本机；快捷导航在右侧（手机点「☰ 目录」）。</div>
     </div>
     <div class="head-links">
@@ -835,9 +837,9 @@ function headComment() {
 
 function itemYaml(it) {
   var s = '- nickname: ' + ystr(it.nickname) + '\n  url: ' + ystr(it.url);
-  if (it.description) s += '\n  description: ' + ystr(it.description);
-  if (it.avatar) s += '\n  avatar: ' + ystr(it.avatar);
-  if (it.avatar === '' && it.avatar_fit === 'contain') s += '\n  avatar: ""';
+  // 可选字段即使没填也保留该行并留空，保证代码结构完整、便于之后补填
+  s += '\n  description: ' + ystr(it.description || '');
+  s += '\n  avatar: ' + ystr(it.avatar || '');
   if (it.avatar_fit === 'contain') s += '\n  avatar_fit: contain';
   s += '\n  group: ' + yplain(it.group || 'blogs');
   s += '\n  weight: ' + (Number(it.weight) || 0);
