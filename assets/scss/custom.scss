@@ -1482,10 +1482,97 @@ main.fi-container > .page.home.posts {
   // 0 = 左右都不留白，左边缘与段落文字严格对齐
   margin: 0.75rem 0;
   border-radius: 0.4rem;
+  // 鼠标变成放大镜，提示「点一下可以看大图」
+  cursor: zoom-in;
 }
 
 @media (max-width: 767.98px) {
   .page.single .content img:not([width]):not([height]) {
     margin-block: 0.6rem;
   }
+}
+
+// -----------------------------------------------------------------------------
+// 正文文字宽度：与配图差不多宽，别让一行字拉得比图片长出一大截
+//   正文栏本身约 708px，配图是 420px。以前文字铺满整行、右边还剩一大截，
+//   和左对齐的配图看着不成一个块。这里把段落 / 列表 / 引用 / 小标题收到
+//   480px（比图片略宽一点，中文每行约 30 字，读着不累），左边缘仍共用基线。
+//   代码块、表格刻意不收窄，留够横向空间；窄屏因为 480px 大于屏宽，
+//   max-width 自然不起作用，不用再写媒体查询。
+// -----------------------------------------------------------------------------
+.page.single .content > p,
+.page.single .content > ul,
+.page.single .content > ol,
+.page.single .content > blockquote,
+.page.single .content > h2,
+.page.single .content > h3,
+.page.single .content > h4,
+.page.single .content > hr {
+  max-width: 480px;
+}
+
+// -----------------------------------------------------------------------------
+// 正文配图灯箱：点一下放大，再点一下还原（交互逻辑见 assets/js/custom.js）
+//   纯 CSS 遮罩，不引第三方灯箱库，样式随站点一起压缩。
+//   灯箱挂在 body 下，不在 .content 里，所以不会被上面的配图规则影响。
+// -----------------------------------------------------------------------------
+.wb-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3vh 3vw;
+  background: rgba(0, 0, 0, 0.88);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  cursor: zoom-out;
+  outline: none;
+}
+
+.wb-lightbox.is-open {
+  opacity: 1;
+}
+
+.wb-lightbox__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 94vw;
+  max-height: 86vh;
+  object-fit: contain;
+  border-radius: 0.4rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  cursor: zoom-out;
+}
+
+.wb-lightbox__close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wb-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.wb-lightbox__hint {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  left: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  pointer-events: none;
 }

@@ -616,6 +616,124 @@
     }, true)
   }
 
+  // ---------------------------------------------------------------------------
+  // 正文配图：点一下放大查看，再点一下（或按 Esc）还原
+  //
+  // 站点的 lightgallery 是关掉的，Markdown 图片也没有被 <a> 包起来，
+  // 所以这里用 document 上的事件委托自己做一个极简灯箱：不依赖第三方库、
+  // 不改任何文章 Markdown、全站文章一次性生效。
+  // 放大时把图床链接里的 w_800 换成 w_1600，让大图仍然是清楚的；
+  // 万一取不到大图，自动退回页面里已经加载好的那张。
+  // ---------------------------------------------------------------------------
+
+  /** 由页面里的小图地址推算出放大用的大图地址 */
+  function getLargeImageUrl(src) {
+    if (!src)
+      return src
+    // 协议相对地址（//q*.itc.cn/...）补上当前页面的协议
+    var url = src.charAt(0) === '/' && src.charAt(1) === '/'
+      ? window.location.protocol + src
+      : src
+    // 只对本站在用的阿里云 OSS 系图床（搜狐 q*.itc.cn）改写参数，
+    // 其它图源一律用原地址，避免加上不支持的参数导致 404
+    if (!/^https?:\/\/q\d+\.itc\.cn\//i.test(url))
+      return url
+    if (/[?&]x-oss-process=/i.test(url))
+      return url.replace(/([?&]x-oss-process=image\/resize,)w_\d+/i, '$1w_1600')
+    return url + (url.indexOf('?') === -1 ? '?' : '&')
+      + 'x-oss-process=image/resize,w_1600/format,webp'
+  }
+
+  function initImageZoom() {
+    var overlay = null
+    var previousOverflow = ''
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape' || e.keyCode === 27)
+        close()
+    }
+
+    function close() {
+      if (!overlay)
+        return
+      var node = overlay
+      overlay = null
+      node.classList.remove('is-open')
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', onKeyDown)
+      // 等淡出动画走完再移除节点
+      window.setTimeout(function () {
+        if (node.parentNode)
+          node.parentNode.removeChild(node)
+      }, 200)
+    }
+
+    function open(img) {
+      close() // 保险：先收掉可能残留的旧灯箱
+      previousOverflow = document.body.style.overflow
+
+      overlay = document.createElement('div')
+      overlay.className = 'wb-lightbox'
+      overlay.setAttribute('role', 'dialog')
+      overlay.setAttribute('aria-label', '图片放大查看')
+      overlay.setAttribute('tabindex', '-1')
+
+      var big = document.createElement('img')
+      big.className = 'wb-lightbox__img'
+      big.alt = img.alt || ''
+      big.src = getLargeImageUrl(img.getAttribute('src') || img.currentSrc || img.src)
+      // 大图加载失败就退回页面上已经显示的那张，不会出现空白
+      big.addEventListener('error', function () {
+        var fallback = img.currentSrc || img.src
+        if (big.src !== fallback)
+          big.src = fallback
+      })
+
+      var closeBtn = document.createElement('button')
+      closeBtn.className = 'wb-lightbox__close'
+      closeBtn.type = 'button'
+      closeBtn.setAttribute('aria-label', '关闭')
+      closeBtn.textContent = '×'
+
+      var hint = document.createElement('div')
+      hint.className = 'wb-lightbox__hint'
+      hint.textContent = '点击图片或按 Esc 还原'
+
+      overlay.appendChild(big)
+      overlay.appendChild(closeBtn)
+      overlay.appendChild(hint)
+      document.body.appendChild(overlay)
+      document.body.style.overflow = 'hidden'
+      document.addEventListener('keydown', onKeyDown)
+
+      // 强制一次重排，让淡入动画生效
+      void overlay.offsetWidth
+      overlay.classList.add('is-open')
+      overlay.focus()
+
+      // 「再点一下还原」：点遮罩、点大图、点右上角 × 都算
+      overlay.addEventListener('click', function (e) {
+        e.preventDefault()
+        close()
+      })
+    }
+
+    document.addEventListener('click', function (e) {
+      var target = e.target
+      if (!target || !target.closest)
+        return
+      if (target.closest('.wb-lightbox'))
+        return // 灯箱内部交给上面的 close，不要重复处理
+      var img = target.closest('.page.single .content img:not([width]):not([height])')
+      if (!img)
+        return
+      // 带修饰键 / 非左键的点击不拦截（留给浏览器自己的行为）
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0)
+        return
+      open(img)
+    })
+  }
+
   function init() {
     mirrorBusuanzi()
     initToBottom()
@@ -625,6 +743,7 @@
     initFriendAvatarFallback()
     initFriendSearch()
     initFootnoteJump()
+    initImageZoom()
   }
 
   if (document.readyState === 'loading')
