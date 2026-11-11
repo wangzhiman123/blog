@@ -8,9 +8,9 @@ tags:
 - 汽车
 summary: "记录我第一次汽车年检的经历和所思所想。"
 description: "记录我第一次汽车年检的经历和所思所想。"
-featured_image_preview: "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_1000/format,webp"
+featured_image_preview: "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_500/format,webp"
 images:
-- "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_1000/format,webp"
+- "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_500/format,webp"
 authors:
 - 王志满律师
 ---
@@ -19,9 +19,9 @@ authors:
 
 耗时一个小时，花费七十五块钱，汽车第一次上线检测（俗称“年检”）顺利通过。
 
-![f89fa1fb6f4cf035221ca82ed609c3c9.jpg](//q8.itc.cn/images01/20261111/3819a1e1843b4695bcbee87929f16d2d.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![f89fa1fb6f4cf035221ca82ed609c3c9.jpg](//q8.itc.cn/images01/20261111/3819a1e1843b4695bcbee87929f16d2d.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
-![1d1731add0f384df01e5eb002f4f7f2c.jpg](//q3.itc.cn/images01/20261111/6a2ab16e743b4c058fbd9afccdde5708.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![1d1731add0f384df01e5eb002f4f7f2c.jpg](//q3.itc.cn/images01/20261111/6a2ab16e743b4c058fbd9afccdde5708.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
 把汽车行驶证拿回来的时候顺手看了一眼有效期，已经更新到了2028 年。也就是说，往后再数两年，这台小油车都能光明正大地合法上路行驶了。从汽车检测中心出来，翻看了一下给车做的记录，忽然觉得该给这有车的六年做一个总结。
 
@@ -33,7 +33,7 @@ authors:
 
 车是2020 年提的，指导价是6.38 万，新宝骏rs3手动挡，车标比较符合我的审美，车的外观也很漂亮，白色很耐脏，而且晚上比较亮，更安全，小型 SUV，空间不会太小可以装很多东西方便搬家，也不会很大很好停车。落地的价格，当时是在4s店买的保险，加上购置税，选配了一个倒车影像花了2000块（第一次买车被坑了，肉疼），最后加一起落地7.9万多，将近八万。然后贷款贷了4万，分两年还清，2022年才还清了车贷。
 
-![1ddd39f51ab38b21169470e340e641e9.jpg](//q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![1ddd39f51ab38b21169470e340e641e9.jpg](//q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
 八万块，对我这个普通人家不算小数目。买车之前，我在心里把算盘打了好几遍，买车有没有必要，养不养的起车，要不要存起来先留着。后面左思右想，还是想买个车。然后又算了一笔账，把开车和打车做了一个比较，如果打车按每公里两块钱算，那么自己开车的话，油费、高速费、保险、停车、偶尔的违章、小刮小蹭的赔偿、维修和保养，统统摊进去，一公里撑死一块钱，那么每开一公里，就等于比打车省下一块钱；一年只要开够一万公里，就省一万块钱，而且自己有车随时想去哪里就去哪里，接媳妇也很方便，家人的幸福感也会提高。这样一想，心里就踏实了。最终还是决定买车。
 
@@ -41,7 +41,7 @@ authors:
 
 开了快6年了，如今里程表显示总里程为六万多公里。
 
-![47eedce3264d26ea7d8b6e0002e9e9c7.jpg](//q6.itc.cn/images01/20261111/a81824ce695d445fb8ae4d126d0df38f.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![47eedce3264d26ea7d8b6e0002e9e9c7.jpg](//q6.itc.cn/images01/20261111/a81824ce695d445fb8ae4d126d0df38f.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
 按照之前的算法，六万公里，省了六万块钱。再开两年，一年开一万公里，就是两万公里，就相当于再省两万块钱，一共就省了八万块钱，正好把当年买车的钱全部「省」回来。两年后刚好是 2028年，也就是下一次年检的时候了。
 
@@ -49,7 +49,7 @@ authors:
 
 我还专门自己做了一个表格，取名叫《油耗记录》，记录了加油日期、加油时总里程数（km）、加油金额（元）、加油量（L）、油量警示、是否加满。我每加一次油，就记录一行数据，攒到现在，快记了两年了（因为之前没这么记过）。综合算下来，这辆小型suv纯油车的百公里油耗大概在6.5L左右。
 
-![92c77d43bcf9e0d24d4cf79f86645f1a.jpg](//q7.itc.cn/images01/20261111/7aa51c661c8c486ea350435c41189d77.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![92c77d43bcf9e0d24d4cf79f86645f1a.jpg](//q7.itc.cn/images01/20261111/7aa51c661c8c486ea350435c41189d77.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
 # 结语
 
@@ -57,6 +57,6 @@ authors:
 
 小时候特别羡慕别人家有车的人，站在路边看别人开车觉得很潇洒，如今自己家也有了，一台八万块的手动挡，方向盘上已经磨出了印子，所谓圆梦，有时候就是这么朴素。
 
-![ee92324a409317130b543e11b7ab8ab7.jpg](//q7.itc.cn/images01/20261112/4e77f90cdf4d47659b089f65f89c8cbd.jpeg?x-oss-process=image/resize,w_1000/format,webp)
+![ee92324a409317130b543e11b7ab8ab7.jpg](//q7.itc.cn/images01/20261112/4e77f90cdf4d47659b089f65f89c8cbd.jpeg?x-oss-process=image/resize,w_500/format,webp)
 
 人生知足常乐，珍惜当下，健健康康，平平安安，开开心心，就好。
