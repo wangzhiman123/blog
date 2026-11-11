@@ -1496,22 +1496,21 @@ main.fi-container > .page.home.posts {
 //   不做自动分列，也不做浮动绕排。
 
 // -----------------------------------------------------------------------------
-// 正文配图灯箱：点一下放大，再点一下还原（交互逻辑见 assets/js/custom.js）
+// 正文配图灯箱：点一下放大，滚轮 / +− 缩放，放大后拖动查看长图
 //   纯 CSS 遮罩，不引第三方灯箱库，样式随站点一起压缩。
 //   灯箱挂在 body 下，不在 .content 里，所以不会被上面的配图规则影响。
+//   viewport 是滚动容器；stage 用 width:max-content + min-width:100%，
+//   小图由 flex 居中，放大后内容真的把滚动区撑开（不会向左溢出被裁掉）。
+//   canvas 的宽高由 JS 按缩放倍数设置，img 用 transform:scale 从左上角放大，
+//   视觉尺寸与 canvas 一致，滚动条才能正确覆盖整张长图。
 // -----------------------------------------------------------------------------
 .wb-lightbox {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3vh 3vw;
-  background: rgba(0, 0, 0, 0.88);
+  background: rgba(0, 0, 0, 0.9);
   opacity: 0;
   transition: opacity 0.18s ease;
-  cursor: zoom-out;
   outline: none;
 }
 
@@ -1519,6 +1518,54 @@ main.fi-container > .page.home.posts {
   opacity: 1;
 }
 
+.wb-lightbox__viewport {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  cursor: zoom-out;
+  outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.wb-lightbox.is-zoomed .wb-lightbox__viewport {
+  cursor: grab;
+}
+
+.wb-lightbox__viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.wb-lightbox__viewport::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.wb-lightbox__viewport::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.wb-lightbox__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: -webkit-max-content; // 老版本 Safari 需要前缀
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.wb-lightbox__canvas {
+  position: relative;
+  flex: none;
+  line-height: 0;
+}
+
+// 图片未加载完成时按普通块级元素显示（居中、限宽限高），加载完成后
+// 由 JS 加上 is-ready，切成绝对定位 + transform 缩放。
 .wb-lightbox__img {
   display: block;
   width: auto;
@@ -1528,13 +1575,27 @@ main.fi-container > .page.home.posts {
   object-fit: contain;
   border-radius: 0.4rem;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
-  cursor: zoom-out;
+  cursor: inherit;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.wb-lightbox__img.is-ready {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .wb-lightbox__close {
   position: absolute;
   top: 16px;
   right: 20px;
+  z-index: 2;
   width: 40px;
   height: 40px;
   border: 0;
@@ -1550,11 +1611,51 @@ main.fi-container > .page.home.posts {
   background: rgba(255, 255, 255, 0.3);
 }
 
+.wb-lightbox__toolbar {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.wb-lightbox__btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wb-lightbox__btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.wb-lightbox__level {
+  min-width: 56px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .wb-lightbox__hint {
   position: absolute;
   right: 0;
   bottom: 18px;
   left: 0;
+  z-index: 2;
+  padding: 0 12px;
   text-align: center;
   color: rgba(255, 255, 255, 0.72);
   font-size: 0.8rem;

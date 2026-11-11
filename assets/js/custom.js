@@ -624,6 +624,9 @@
   // 不改任何文章 Markdown、全站文章一次性生效。
   // 放大时把图床链接里的 w_800 换成 w_1600，让大图仍然是清楚的；
   // 万一取不到大图，自动退回页面里已经加载好的那张。
+  // 灯箱内支持滚轮 / +− 按钮缩放（1–8 倍，以鼠标位置为锚点），放大后可按住
+  // 拖动、用方向键或触屏单指滑动查看长图，不再被「适应窗口」的高度限制住。
+  // 放大状态不会误触关闭，关闭统一交给 × / Esc / 复位后点一下。
   // ---------------------------------------------------------------------------
 
   /** 由页面里的小图地址推算出放大用的大图地址 */
@@ -681,9 +684,21 @@
       overlay.setAttribute('aria-label', '图片放大查看')
       overlay.setAttribute('tabindex', '-1')
 
+      // 结构：遮罩 > 可滚动视口 > 舞台 > 画布 > 图片。
+      // 舞台 width:max-content + min-width:100%：小图居中，放大溢出时左侧
+      // 不会被 flex 居中裁掉，滚动条能一路看完整张长图。
+      var viewport = document.createElement('div')
+      viewport.className = 'wb-lightbox__viewport'
+      viewport.setAttribute('tabindex', '-1')
+      var stage = document.createElement('div')
+      stage.className = 'wb-lightbox__stage'
+      var canvas = document.createElement('div')
+      canvas.className = 'wb-lightbox__canvas'
+
       var big = document.createElement('img')
       big.className = 'wb-lightbox__img'
       big.alt = img.alt || ''
+      big.draggable = false
       big.src = getLargeImageUrl(img.getAttribute('src') || img.currentSrc || img.src)
       // 大图加载失败就退回页面上已经显示的那张，不会出现空白
       big.addEventListener('error', function () {
@@ -692,31 +707,215 @@
           big.src = fallback
       })
 
+      canvas.appendChild(big)
+      stage.appendChild(canvas)
+      viewport.appendChild(stage)
+
       var closeBtn = document.createElement('button')
       closeBtn.className = 'wb-lightbox__close'
       closeBtn.type = 'button'
       closeBtn.setAttribute('aria-label', '关闭')
       closeBtn.textContent = '×'
 
+      var toolbar = document.createElement('div')
+      toolbar.className = 'wb-lightbox__toolbar'
+      var level = document.createElement('span')
+      level.className = 'wb-lightbox__level'
+      level.textContent = '100%'
+
+      function toolButton(text, label, handler) {
+        var b = document.createElement('button')
+        b.type = 'button'
+        b.className = 'wb-lightbox__btn'
+        b.textContent = text
+        b.setAttribute('aria-label', label)
+        b.addEventListener('click', function (e) {
+          e.stopPropagation()
+          handler()
+        })
+        return b
+      }
+
       var hint = document.createElement('div')
       hint.className = 'wb-lightbox__hint'
-      hint.textContent = '点击图片或按 Esc 还原'
 
-      overlay.appendChild(big)
+      // ---- 缩放状态 ----
+      var MIN_SCALE = 1
+      var MAX_SCALE = 8
+      var scale = 1
+      var baseW = 0
+      var baseH = 0
+      var dragging = false
+      var moved = false
+      var startX = 0, startY = 0, startLeft = 0, startTop = 0
+
+      function clamp(v, lo, hi) {
+        return v < lo ? lo : (v > hi ? hi : v)
+      }
+
+      function setHint() {
+        hint.textContent = scale > 1
+          ? '按住拖动或用方向键查看长图 · 点 × / Esc 关闭'
+          : '滚轮或 +/− 缩放 · 点一下还原 · Esc 关闭'
+      }
+
+      /** 图片加载完成后算出「适应窗口」的基准尺寸，进入可缩放状态 */
+      function fitImage() {
+        var nw = big.naturalWidth
+        var nh = big.naturalHeight
+        if (!nw || !nh || big.classList.contains('is-ready'))
+          return
+        var maxW = Math.max(200, viewport.clientWidth - 48)
+        var maxH = Math.max(200, viewport.clientHeight - 96)
+        var fit = Math.min(maxW / nw, maxH / nh, 1)
+        baseW = Math.round(nw * fit)
+        baseH = Math.round(nh * fit)
+        big.style.width = baseW + 'px'
+        big.style.height = baseH + 'px'
+        big.classList.add('is-ready')
+        applyZoom(MIN_SCALE)
+      }
+
+      /** 以 (ax, ay) 这个屏幕点为锚点缩放，锚点下的画面保持不动 */
+      function applyZoom(next, ax, ay) {
+        if (!baseW || !baseH)
+          return
+        next = clamp(next, MIN_SCALE, MAX_SCALE)
+        var rect = viewport.getBoundingClientRect()
+        var vw = viewport.clientWidth
+        var vh = viewport.clientHeight
+        if (ax == null) ax = rect.left + vw / 2
+        if (ay == null) ay = rect.top + vh / 2
+
+        var oldW = baseW * scale
+        var oldH = baseH * scale
+        var oldLeft = (Math.max(vw, oldW) - oldW) / 2
+        var oldTop = (Math.max(vh, oldH) - oldH) / 2
+        var cx = viewport.scrollLeft + (ax - rect.left)
+        var cy = viewport.scrollTop + (ay - rect.top)
+        var ux = clamp(oldW ? (cx - oldLeft) / oldW : 0.5, 0, 1)
+        var uy = clamp(oldH ? (cy - oldTop) / oldH : 0.5, 0, 1)
+
+        scale = next
+        var newW = baseW * scale
+        var newH = baseH * scale
+        canvas.style.width = Math.round(newW) + 'px'
+        canvas.style.height = Math.round(newH) + 'px'
+        big.style.transform = 'scale(' + scale + ')'
+        level.textContent = Math.round(scale * 100) + '%'
+        if (scale > 1)
+          overlay.classList.add('is-zoomed')
+        else
+          overlay.classList.remove('is-zoomed')
+        setHint()
+
+        var newLeft = (Math.max(vw, newW) - newW) / 2
+        var newTop = (Math.max(vh, newH) - newH) / 2
+        viewport.scrollLeft = Math.max(0, newLeft + ux * newW - (ax - rect.left))
+        viewport.scrollTop = Math.max(0, newTop + uy * newH - (ay - rect.top))
+      }
+
+      big.addEventListener('load', fitImage)
+
+      var zoomOut = toolButton('−', '缩小', function () { applyZoom(scale / 1.25) })
+      var zoomIn = toolButton('+', '放大', function () { applyZoom(scale * 1.25) })
+      var reset = toolButton('复位', '恢复适应窗口', function () { applyZoom(MIN_SCALE) })
+      toolbar.appendChild(zoomOut)
+      toolbar.appendChild(level)
+      toolbar.appendChild(zoomIn)
+      toolbar.appendChild(reset)
+
+      overlay.appendChild(viewport)
       overlay.appendChild(closeBtn)
+      overlay.appendChild(toolbar)
       overlay.appendChild(hint)
       document.body.appendChild(overlay)
       document.body.style.overflow = 'hidden'
       document.addEventListener('keydown', onKeyDown)
+      setHint()
+
+      // 缓存命中时 load 不会再触发，这里补一次（此时已插入 DOM，能取到尺寸）
+      if (big.complete && big.naturalWidth)
+        fitImage()
 
       // 强制一次重排，让淡入动画生效
       void overlay.offsetWidth
       overlay.classList.add('is-open')
-      overlay.focus()
+      viewport.focus()
 
-      // 「再点一下还原」：点遮罩、点大图、点右上角 × 都算
-      overlay.addEventListener('click', function (e) {
+      // 滚轮缩放（passive:false 才能阻止页面跟着滚）
+      viewport.addEventListener('wheel', function (e) {
+        if (!baseW)
+          return
         e.preventDefault()
+        applyZoom(scale * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX, e.clientY)
+      }, { passive: false })
+
+      // 键盘：+ / - / 0；方向键、PageUp/Down 交给滚动容器原生处理
+      viewport.addEventListener('keydown', function (e) {
+        if (e.key === '+' || e.key === '=') {
+          e.preventDefault()
+          applyZoom(scale * 1.25)
+        } else if (e.key === '-' || e.key === '_') {
+          e.preventDefault()
+          applyZoom(scale / 1.25)
+        } else if (e.key === '0') {
+          e.preventDefault()
+          applyZoom(MIN_SCALE)
+        }
+      })
+
+      // 鼠标按住拖动查看（触屏交给 overflow:auto 的原生单指滑动）
+      viewport.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch' || e.button !== 0)
+          return
+        dragging = true
+        moved = false
+        startX = e.clientX
+        startY = e.clientY
+        startLeft = viewport.scrollLeft
+        startTop = viewport.scrollTop
+        if (scale > 1)
+          viewport.classList.add('is-dragging')
+        try { viewport.setPointerCapture(e.pointerId) } catch (err) {}
+      })
+      viewport.addEventListener('pointermove', function (e) {
+        if (!dragging)
+          return
+        var dx = e.clientX - startX
+        var dy = e.clientY - startY
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4)
+          moved = true
+        if (scale > 1) {
+          viewport.scrollLeft = startLeft - dx
+          viewport.scrollTop = startTop - dy
+          e.preventDefault()
+        }
+      })
+      function endDrag() {
+        dragging = false
+        viewport.classList.remove('is-dragging')
+      }
+      viewport.addEventListener('pointerup', endDrag)
+      viewport.addEventListener('pointercancel', endDrag)
+
+      // 未放大时点一下还原；放大状态下不误关，只用 × / Esc 关闭
+      overlay.addEventListener('click', function (e) {
+        var t = e.target
+        if (!t || !t.closest)
+          return
+        if (t.closest('.wb-lightbox__close')) {
+          close()
+          return
+        }
+        if (t.closest('.wb-lightbox__toolbar'))
+          return
+        if (moved) {
+          moved = false
+          return
+        }
+        if (scale > 1)
+          return
         close()
       })
     }
