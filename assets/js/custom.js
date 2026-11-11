@@ -682,13 +682,7 @@
       var count = run.reduce(function (sum, item) {
         return sum + item.imgs.length
       }, 0)
-      // 只有孤立的一张图：加个 class，让下面的文字环绕到它右侧，
-      // 别让一张图独占整行高度（具体样式在 custom.scss 的 .wb-img-float）
-      if (count === 1 && run.length === 1 && run[0].imgs.length === 1) {
-        run[0].imgs[0].classList.add('wb-img-float')
-        run = []
-        return
-      }
+      // 单张图保持原样（420px 宽、左对齐、文字在下方正常换行），不做浮动绕排
       if (count < 2) {
         run = []
         return

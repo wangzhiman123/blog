@@ -1525,36 +1525,7 @@ main.fi-container > .page.home.posts {
   }
 }
 
-// -----------------------------------------------------------------------------
-// 孤立单图：图片靠左浮动，下面的文字自动绕到右边，不再一张图占掉整行高度
-//   class 由 assets/js/custom.js 整理图片时加上（只有单张、且不属于连续多图）。
-//   图片宽 42%（最多 300px），右侧还剩约 400px 给文字，中文每行约 24 字，
-//   不至于挤成一条窄缝；手机上改回上下排列。
-//   .content::after 清除浮动，避免把页脚、相关文章等后续区块带偏。
-// -----------------------------------------------------------------------------
-.page.single .content img.wb-img-float:not([width]):not([height]) {
-  float: left;
-  width: 42%;
-  max-width: 300px;
-  height: auto;
-  max-height: none;
-  margin: 0.25rem 1rem 0.75rem 0;
-}
-
-.page.single .content::after {
-  content: '';
-  display: block;
-  clear: both;
-}
-
-@media (max-width: 767.98px) {
-  .page.single .content img.wb-img-float:not([width]):not([height]) {
-    float: none;
-    width: 100%;
-    max-width: 420px;
-    margin: 0.6rem 0;
-  }
-}
+// 说明：单张配图保持 420px 宽、左对齐，文字在下方正常换行，不做浮动绕排。
 
 // -----------------------------------------------------------------------------
 // 正文配图灯箱：点一下放大，再点一下还原（交互逻辑见 assets/js/custom.js）
