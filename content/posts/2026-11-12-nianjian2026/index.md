@@ -8,9 +8,9 @@ tags:
 - 汽车
 summary: "记录我第一次汽车年检的经历和所思所想。"
 description: "记录我第一次汽车年检的经历和所思所想。"
-featured_image_preview: "https://q3.itc.cn/images01/20261111/6a2ab16e743b4c058fbd9afccdde5708.jpeg?x-oss-process=image/resize,w_1000/format,webp"
+featured_image_preview: "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_1000/format,webp"
 images:
-- "https://q3.itc.cn/images01/20261111/6a2ab16e743b4c058fbd9afccdde5708.jpeg?x-oss-process=image/resize,w_1000/format,webp"
+- "https://q7.itc.cn/images01/20261111/831263ff0936435da7edfc41d49b840b.jpeg?x-oss-process=image/resize,w_1000/format,webp"
 authors:
 - 王志满律师
 ---
