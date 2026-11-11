@@ -227,8 +227,8 @@ var _hmt = _hmt || [];
 
         <div class="check">
           <input type="checkbox" id="autoImg" checked>
-          <label for="autoImg" style="margin:0">自动给图片加压缩参数
-            <span class="hint">缩到宽 1000px、转 webp，体积通常能小一半以上</span></label>
+          <label for="autoImg" style="margin:0">自动优化图片尺寸
+            <span class="hint">缩到宽 800px、转 webp，正文里不会顶满一屏，体积也小三成</span></label>
         </div>
 
         <div class="btns">
@@ -240,6 +240,7 @@ var _hmt = _hmt || [];
         <div class="tips" style="font-size:12.5px">
           只对认得出是<strong>对象存储图床</strong>的图片追加参数（目前认搜狐 <code>q*.itc.cn</code>、阿里云 OSS）。
           站内图片（<code>/images/…</code>）和 <strong>GIF 动图</strong>不会动 —— 加了参数没用，动图还可能变成一张静止图。
+          旧文章里写的 <code>resize,w_1000</code> 会自动校正成 800，把旧稿粘进来重新生成即可。
         </div>
 
         <details>
@@ -251,7 +252,7 @@ var _hmt = _hmt || [];
             <tr><td>加粗</td><td><code>**要加粗的字**</code></td></tr>
             <tr><td>列表</td><td><code>- 第一项</code>（每行一个短横线加空格）</td></tr>
             <tr><td>引用</td><td><code>&gt; 引用的内容</code></td></tr>
-            <tr><td>插入图片</td><td><code>![图片说明](图片网址)</code>　压缩参数自动加，不用手写</td></tr>
+            <tr><td>插入图片</td><td><code>![图片说明](图片网址)</code>　自动缩到 800px 并转 webp，不用手写</td></tr>
             <tr><td>插入链接</td><td><code>[显示的文字](https://网址)</code></td></tr>
             <tr><td>分割线</td><td><code>---</code></td></tr>
           </table>
@@ -324,9 +325,13 @@ var AUTHOR = "王志满律师";
 var SITE  = "https://2019527.xyz";
 
 /* ============ 图片自动压缩 ============ */
-/* 阿里云 OSS 系图片服务的处理参数：缩到宽 1000px，转 webp。
-   搜狐图床（q*.itc.cn）和阿里云 OSS 都支持这套写法。 */
-var OSS_PARAM = "x-oss-process=image/resize,w_1000/format,webp";
+/* 阿里云 OSS 系图片服务的处理参数：缩到宽 800px，转 webp。
+   正文区约 708px 宽，800px 足够清楚；再大只是白占流量 —— 实测同一张图
+   1000px 为 92.6KB、800px 为 61.0KB。搜狐图床（q*.itc.cn）和阿里云 OSS
+   都支持这套写法。注意：这里只管「文件像素」，页面上显示多大由主题的
+   assets/scss/custom.scss 统一约束，两者配合才不会一张图顶满一屏。 */
+var OSS_WIDTH = "800";
+var OSS_PARAM = "x-oss-process=image/resize,w_" + OSS_WIDTH + "/format,webp";
 
 /* 认得出支持该参数的域名（含其所有子域）。不在名单里的地址一律不动，
    避免给不支持的图床加上无效参数、反而把图片搞挂。 */
@@ -353,12 +358,15 @@ function isOssHost(host) {
   return false;
 }
 
-/* 单张图片地址加参数。幂等：已经有参数的原样返回。 */
+/* 单张图片地址加参数。幂等：已经有参数的不会重复追加；
+   但本站旧默认值 w_1000 会顺手收敛到 800，其它自定义参数原样保留。 */
 function optimizeImageUrl(raw, enabled) {
   var url = cleanUrl(raw);
   if (enabled === false) return url;
   if (!/^https?:\/\//i.test(url) && !/^\/\//i.test(url)) return url; // 站内相对路径（/images/ 之类），不动
-  if (/[?&]x-oss-process=/i.test(url)) return url;      // 已经加过了
+  if (/[?&]x-oss-process=/i.test(url)) {
+    return url.replace(/(x-oss-process=image\/resize,)w_1000(?=\/|&|$)/i, "$1w_" + OSS_WIDTH);
+  }
   if (GIF_RE.test(url)) return url;                    // 动图不动，转了会变静止图
   if (!isOssHost(hostOf(url))) return url;             // 不认识的图床，不动
   return url + (url.indexOf("?") === -1 ? "?" : "&") + OSS_PARAM;
@@ -479,7 +487,7 @@ if (typeof module !== "undefined" && module.exports) {
     buildMarkdown: buildMarkdown, dirName: dirName, postPath: postPath,
     githubNewUrl: githubNewUrl, countCJKChars: countCJKChars, pad2: pad2,
     optimizeImageUrl: optimizeImageUrl, optimizeImagesInMarkdown: optimizeImagesInMarkdown,
-    listImages: listImages, OSS_PARAM: OSS_PARAM
+    listImages: listImages, OSS_PARAM: OSS_PARAM, OSS_WIDTH: OSS_WIDTH
   };
 }
 
@@ -529,7 +537,7 @@ if (typeof document !== "undefined") {
     var changed = imgs.filter(function (x) { return x.changed; }).length;
     var rows = imgs.map(function (x, i) {
       var state = x.changed
-        ? '<span class="done">已压缩</span>'
+        ? '<span class="done">已优化</span>'
         : (/[?&]x-oss-process=/i.test(x.raw) ? '<span class="skip">已有参数</span>'
            : (GIF_RE.test(x.raw) ? '<span class="skip">动图跳过</span>' : '<span class="skip">未改动</span>'));
       return "<tr><td>" + (i + 1) + "</td><td class=\"st\">" + state +
@@ -537,7 +545,7 @@ if (typeof document !== "undefined") {
     }).join("");
     box.style.display = "block";
     box.innerHTML =
-      '<div class="head">正文图片 ' + imgs.length + " 张，本次会加压缩参数 " + changed + " 张</div>" +
+      '<div class="head">正文图片 ' + imgs.length + " 张，本次会处理 " + changed + " 张（缩到 800px / 转 webp）</div>" +
       "<table><tr><th>#</th><th>状态</th><th>生成后的地址</th></tr>" + rows + "</table>";
   }
 

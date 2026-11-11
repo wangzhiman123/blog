@@ -1458,3 +1458,37 @@ main.fi-container > .page.home.posts {
 .footnotes li[id^='fn:'] {
   scroll-margin-top: 5rem;
 }
+
+// -----------------------------------------------------------------------------
+// 文章正文配图：别让一张图顶满一屏
+//   图床链接里的 w_1000 只管「文件像素宽」，不管「页面上显示多大」；
+//   主题只给了 max-width: 100%，于是竖图 / 近方图会按正文宽度铺满，
+//   一张照片要滚好几屏才看完。这里统一收一档：最多 640px 宽、28rem 高，
+//   等比缩放后居中，手机上再收一档。全站文章一次性生效，不用逐篇改链接。
+//   :not([width]):not([height]) 用来排除模板生成的固定尺寸图
+//   （分享二维码、头像等），只作用于自己在 Markdown 正文里贴的图。
+// -----------------------------------------------------------------------------
+.page.single .content img:not([width]):not([height]) {
+  display: block;
+  width: auto;
+  height: auto;
+  // 窄屏以 100% 兜底，不会撑破正文栏
+  max-width: 100%;
+  max-height: 28rem;
+  margin: 0.75rem auto;
+  border-radius: 0.4rem;
+}
+
+// 桌面端正文区约 708px，配图再收一档，左右留白，不铺满整行
+@media (min-width: 768px) {
+  .page.single .content img:not([width]):not([height]) {
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .page.single .content img:not([width]):not([height]) {
+    max-height: 20rem;
+    margin-block: 0.6rem;
+  }
+}
