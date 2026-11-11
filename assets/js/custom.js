@@ -644,6 +644,78 @@
       + 'x-oss-process=image/resize,w_1600/format,webp'
   }
 
+  // ---------------------------------------------------------------------------
+  // 连续多张配图：自动收进两列网格，让页面紧凑一些
+  //
+  // Markdown 里连续贴的图片会渲染成相邻的 <p><img></p>。CSS 没法把「相邻的
+  // 兄弟节点」临时装进同一个容器，所以这里在页面加载后做一次轻量整理：
+  // 找到连续 ≥2 张的纯图片段落，把 <img> 直接移进一个 .wb-img-grid 里，
+  // 空掉的 <p> 删掉。只动 DOM 结构，不改图片地址、不改任何文章 Markdown。
+  // 单张图、带图注的 <figure>、有 width/height 的固定尺寸图都不受影响。
+  // ---------------------------------------------------------------------------
+  function imagesOfParagraph(node) {
+    if (!node || node.nodeType !== 1 || node.tagName !== 'P')
+      return null
+    var imgs = []
+    for (var i = 0; i < node.children.length; i++) {
+      var child = node.children[i]
+      if (child.tagName !== 'IMG')
+        return null
+      if (child.hasAttribute('width') || child.hasAttribute('height'))
+        return null
+      imgs.push(child)
+    }
+    if (!imgs.length || (node.textContent || '').trim())
+      return null
+    return imgs
+  }
+
+  function initImageGrid() {
+    var content = document.querySelector('.page.single .content')
+    if (!content || content.querySelector('.wb-img-grid'))
+      return // 已经整理过，不重复处理
+
+    var nodes = Array.prototype.slice.call(content.children)
+    var run = []
+
+    function flush() {
+      var count = run.reduce(function (sum, item) {
+        return sum + item.imgs.length
+      }, 0)
+      // 只有孤立的一张图：加个 class，让下面的文字环绕到它右侧，
+      // 别让一张图独占整行高度（具体样式在 custom.scss 的 .wb-img-float）
+      if (count === 1 && run.length === 1 && run[0].imgs.length === 1) {
+        run[0].imgs[0].classList.add('wb-img-float')
+        run = []
+        return
+      }
+      if (count < 2) {
+        run = []
+        return
+      }
+      var grid = document.createElement('div')
+      grid.className = 'wb-img-grid'
+      content.insertBefore(grid, run[0].node)
+      run.forEach(function (item) {
+        item.imgs.forEach(function (img) {
+          grid.appendChild(img)
+        })
+        if (item.node.parentNode)
+          item.node.parentNode.removeChild(item.node)
+      })
+      run = []
+    }
+
+    nodes.forEach(function (node) {
+      var imgs = imagesOfParagraph(node)
+      if (imgs)
+        run.push({ node: node, imgs: imgs })
+      else
+        flush()
+    })
+    flush()
+  }
+
   function initImageZoom() {
     var overlay = null
     var previousOverflow = ''
@@ -743,6 +815,7 @@
     initFriendAvatarFallback()
     initFriendSearch()
     initFootnoteJump()
+    initImageGrid()
     initImageZoom()
   }
 

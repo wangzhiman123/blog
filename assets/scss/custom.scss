@@ -1493,22 +1493,67 @@ main.fi-container > .page.home.posts {
 }
 
 // -----------------------------------------------------------------------------
-// 正文文字宽度：与配图差不多宽，别让一行字拉得比图片长出一大截
-//   正文栏本身约 708px，配图是 420px。以前文字铺满整行、右边还剩一大截，
-//   和左对齐的配图看着不成一个块。这里把段落 / 列表 / 引用 / 小标题收到
-//   480px（比图片略宽一点，中文每行约 30 字，读着不累），左边缘仍共用基线。
-//   代码块、表格刻意不收窄，留够横向空间；窄屏因为 480px 大于屏宽，
-//   max-width 自然不起作用，不用再写媒体查询。
+// 连续多张配图：自动排成两列（或更多），别让长图一张接一张把页面拉得很长
+//   文字宽度刻意不加任何限制，保持主题默认的正文栏宽（约 708px）。
+//   只有「连续出现 ≥2 张单独成段的图片」才会被 assets/js/custom.js 的
+//   initImageGrid() 收进 .wb-img-grid 这个网格；单张图仍是 420px 左对齐。
+//   列数按容器宽度自适应（每列至少 240px），手机上自动退回一列。
+//   下面用完整选择器覆盖单图规则，避免网格里的图还带着 420px / 60rem 的约束。
 // -----------------------------------------------------------------------------
-.page.single .content > p,
-.page.single .content > ul,
-.page.single .content > ol,
-.page.single .content > blockquote,
-.page.single .content > h2,
-.page.single .content > h3,
-.page.single .content > h4,
-.page.single .content > hr {
-  max-width: 480px;
+.wb-img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+  margin: 0.75rem 0;
+}
+
+.page.single .content .wb-img-grid > img:not([width]):not([height]) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  border-radius: 0.4rem;
+  cursor: zoom-in;
+}
+
+@media (max-width: 480px) {
+  .wb-img-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 孤立单图：图片靠左浮动，下面的文字自动绕到右边，不再一张图占掉整行高度
+//   class 由 assets/js/custom.js 整理图片时加上（只有单张、且不属于连续多图）。
+//   图片宽 42%（最多 300px），右侧还剩约 400px 给文字，中文每行约 24 字，
+//   不至于挤成一条窄缝；手机上改回上下排列。
+//   .content::after 清除浮动，避免把页脚、相关文章等后续区块带偏。
+// -----------------------------------------------------------------------------
+.page.single .content img.wb-img-float:not([width]):not([height]) {
+  float: left;
+  width: 42%;
+  max-width: 300px;
+  height: auto;
+  max-height: none;
+  margin: 0.25rem 1rem 0.75rem 0;
+}
+
+.page.single .content::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+@media (max-width: 767.98px) {
+  .page.single .content img.wb-img-float:not([width]):not([height]) {
+    float: none;
+    width: 100%;
+    max-width: 420px;
+    margin: 0.6rem 0;
+  }
 }
 
 // -----------------------------------------------------------------------------
