@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="写作图标">
+  <!-- 浅雾绿底板 -->
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="#F4F8F6"/>
+
+  <!-- 纸页 -->
+  <rect x="260" y="190" width="440" height="560" rx="56"
+        fill="#FFFFFF" stroke="#D9E6E1" stroke-width="8"/>
+
+  <!-- 纸页上的书写曲线 -->
+  <path d="M340 350
+           C400 310 440 390 500 350
+           C540 322 580 334 610 366"
+        fill="none" stroke="#9AC7C4" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- 一条浅色辅助线 -->
+  <path d="M340 470 H520"
+        stroke="#D9E6E1" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- 铅笔：斜跨右下，笔尖落在纸页内 -->
+  <g transform="rotate(30 650 604)">
+    <!-- 笔杆 -->
+    <rect x="520" y="572" width="260" height="64" rx="18" fill="#3F5F5A"/>
+    <!-- 笔尖：暖橙点缀 -->
+    <path d="M520 572 L458 604 L520 636 Z" fill="#E9A06B"/>
+    <!-- 橡皮端 -->
+    <rect x="780" y="572" width="48" height="64" rx="18" fill="#AFCBC5"/>
+  </g>
+</svg>

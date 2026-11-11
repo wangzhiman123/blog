@@ -355,15 +355,21 @@
 
     .post-meta {
       grid-area: meta;
-      // 三段：日期（不缩）／分类（可截）／阅读量（不缩）
+      // 两行：第一行「发布日期 + 阅读/评论」，第二行「收录于 一级 › 二级」。
+      // 以前三样挤一行，卡片带右侧缩略图时文字栏只剩 292px，而内容要 309px，
+      // 浏览器只能把分类压成一个字再硬切（线上 2026-11-11 的问题），
+      // 所以改成固定两行，分类独占整行，任何缩略图/窗口宽度都不会再被截。
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 0.55rem;
+      column-gap: 0.6rem;
+      row-gap: 0.1rem;
       margin: 0.45rem 0 0;
       font-size: 0.8rem;
+      line-height: 1.5;
       color: #8b949e;
       color: light-dark(#8b949e, #7d8590);
-      // 分类多的卡片 meta 会折行、把卡片顶高一截，截断只留给分类自己
+      // 日期那一段永不折行；需要折的只有分类
       white-space: nowrap;
 
       // 首页每篇都是同一个作者，这个名字纯属占位
@@ -377,12 +383,15 @@
         min-width: 0;
       }
 
-      // 分类单独一段：桌面跟着日期占同一行，超长时截这一截，不再连累日期
+      // 分类整段独占第二行：不再和日期、阅读量抢同一行的宽度。
+      // 一级、二级都放在这里，读起来就是「工作 › 非诉实务」，不会被切开。
       .post-meta-cats {
-        flex: 0 1 auto;
+        order: 2;
+        flex: 1 1 100%;
         min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        // 分类名再长也是折行，不截断、不省略
+        white-space: normal;
+        overflow-wrap: anywhere;
 
         // 单个分类标签别被拆成两半
         .post-category {
@@ -394,9 +403,12 @@
         white-space: nowrap;
       }
 
-      // 阅读量与评论数：数字由 custom.js 异步填，接口失败时整项隐藏
+      // 阅读量与评论数：数字由 custom.js 异步填，接口失败时整项隐藏。
+      // 排在第一行最右端，与左侧日期分列两端，和分类那一行彻底分开。
       .post-stats {
+        order: 1;
         flex: 0 0 auto;
+        margin-inline-start: auto;
         display: inline-flex;
         align-items: center;
         gap: 0.85rem;
@@ -557,22 +569,14 @@
         font-size: 0.875rem;
       }
 
-      // 手机：日期 + 阅读量占第一行，分类整段落到第二行。
-      // 横向塞不下时宁可多一行，也不能把日期和二级分类用省略号吃掉。
+      // 手机：两行结构与桌面完全一致（见上面 .post-meta 的注释），
+      // 这里只把字号、间距收小一点，别让卡片被顶高。
       .post-meta {
-        flex-wrap: wrap;
-        row-gap: 0.15rem;
         font-size: 0.75rem;
-        gap: 0.4rem;
-        // 主题全局行高 2，两行信息会撑出 50px；这里按 1.5 收紧，卡片不至于被顶高
-        line-height: 1.5;
-        white-space: normal;
+        column-gap: 0.4rem;
 
         .post-stats {
           gap: 0.6rem;
-          order: 1;
-          // 顶到最右，和日期分列两端，中间留白给日期
-          margin-inline-start: auto;
         }
 
         .post-meta-line {
@@ -583,13 +587,8 @@
           text-overflow: ellipsis;
         }
 
-        // 分类独立成行，允许换行；不再 ellipsis
         .post-meta-cats {
-          order: 2;
-          flex: 1 1 100%;
-          overflow: visible;
           line-height: 1.6;
-          white-space: normal;
         }
       }
     }

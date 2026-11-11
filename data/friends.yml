@@ -72,6 +72,13 @@
   group: tools
   weight: 73
 
+- nickname: "写作助手"
+  url: "https://2019527.xyz/tools/xiezuo.html"
+  description: "本站写作工具之一"
+  avatar: "https://2019527.xyz/xiezuo.svg"
+  group: tools
+  weight: 72
+
 # ============ 博友 ============
 - nickname: 买四个萝卜
   url: https://blog.msglbo.cn
