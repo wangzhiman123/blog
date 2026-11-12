@@ -653,6 +653,16 @@
   function initImageZoom() {
     var overlay = null
     var previousOverflow = ''
+    var onNavKey = null      // ←/→ 切换图片的监听器，关闭时要一起摘掉
+    var images = []          // 当前文章里所有可放大的图（按页面顺序）
+    var current = 0          // 正在看第几张，从 0 开始
+
+    /** 重新收集正文配图：用同一套选择器，顺序与页面上看到的一致 */
+    function collectImages() {
+      images = Array.prototype.slice.call(
+        document.querySelectorAll('.page.single .content img:not([width]):not([height])')
+      )
+    }
 
     function onKeyDown(e) {
       if (e.key === 'Escape' || e.keyCode === 27)
@@ -667,6 +677,10 @@
       node.classList.remove('is-open')
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', onKeyDown)
+      if (onNavKey) {
+        document.removeEventListener('keydown', onNavKey)
+        onNavKey = null
+      }
       // 等淡出动画走完再移除节点
       window.setTimeout(function () {
         if (node.parentNode)
@@ -677,6 +691,13 @@
     function open(img) {
       close() // 保险：先收掉可能残留的旧灯箱
       previousOverflow = document.body.style.overflow
+      // 记下这篇文章里都有哪些图、点开的是第几张，好算「上一张 / 下一张」
+      collectImages()
+      current = images.indexOf(img)
+      if (current < 0) {
+        images = [img]
+        current = 0
+      }
 
       overlay = document.createElement('div')
       overlay.className = 'wb-lightbox'
@@ -697,15 +718,7 @@
 
       var big = document.createElement('img')
       big.className = 'wb-lightbox__img'
-      big.alt = img.alt || ''
       big.draggable = false
-      big.src = getLargeImageUrl(img.getAttribute('src') || img.currentSrc || img.src)
-      // 大图加载失败就退回页面上已经显示的那张，不会出现空白
-      big.addEventListener('error', function () {
-        var fallback = img.currentSrc || img.src
-        if (big.src !== fallback)
-          big.src = fallback
-      })
 
       canvas.appendChild(big)
       stage.appendChild(canvas)
@@ -717,11 +730,35 @@
       closeBtn.setAttribute('aria-label', '关闭')
       closeBtn.textContent = '×'
 
+      // 左右切换：文章里有多张图时，不用退出去再点下一张
+      var navPrev = document.createElement('button')
+      navPrev.type = 'button'
+      navPrev.className = 'wb-lightbox__nav wb-lightbox__nav--prev'
+      navPrev.setAttribute('aria-label', '上一张')
+      navPrev.textContent = '‹'
+      navPrev.addEventListener('click', function (e) {
+        e.stopPropagation()
+        showImage(current - 1)
+      })
+
+      var navNext = document.createElement('button')
+      navNext.type = 'button'
+      navNext.className = 'wb-lightbox__nav wb-lightbox__nav--next'
+      navNext.setAttribute('aria-label', '下一张')
+      navNext.textContent = '›'
+      navNext.addEventListener('click', function (e) {
+        e.stopPropagation()
+        showImage(current + 1)
+      })
+
       var toolbar = document.createElement('div')
       toolbar.className = 'wb-lightbox__toolbar'
       var level = document.createElement('span')
       level.className = 'wb-lightbox__level'
       level.textContent = '100%'
+      // 页码：3 / 6，让人知道这篇文章一共几张、现在看到第几张
+      var count = document.createElement('span')
+      count.className = 'wb-lightbox__count'
 
       function toolButton(text, label, handler) {
         var b = document.createElement('button')
@@ -753,10 +790,60 @@
         return v < lo ? lo : (v > hi ? hi : v)
       }
 
+      /** 切到第 i 张（首尾循环），并把缩放复位到「适应窗口」 */
+      function showImage(i) {
+        if (!images.length)
+          return
+        current = (i % images.length + images.length) % images.length
+        var source = images[current]
+        var fallback = source.currentSrc || source.src
+
+        // 复位缩放：新图要按自己的长宽重新算「适应窗口」
+        scale = 1
+        baseW = 0
+        baseH = 0
+        big.classList.remove('is-ready')
+        big.style.transform = ''
+        big.style.width = ''
+        big.style.height = ''
+        canvas.style.width = ''
+        canvas.style.height = ''
+        level.textContent = '100%'
+        overlay.classList.remove('is-zoomed')
+        viewport.scrollLeft = 0
+        viewport.scrollTop = 0
+
+        big.alt = source.alt || ''
+        // 大图加载失败就退回页面上已经显示的那张，不会出现空白
+        big.onerror = function () {
+          if (big.src !== fallback)
+            big.src = fallback
+        }
+        big.src = getLargeImageUrl(source.getAttribute('src') || source.currentSrc || source.src)
+
+        updateNav()
+        setHint()
+        // 命中缓存时 load 不会再触发，这里补一次算尺寸
+        if (big.complete && big.naturalWidth)
+          fitImage()
+      }
+
+      /** 只有一张图时不显示左右按钮和页码 */
+      function updateNav() {
+        var many = images.length > 1
+        navPrev.hidden = !many
+        navNext.hidden = !many
+        count.hidden = !many
+        count.textContent = many ? (current + 1) + ' / ' + images.length : ''
+      }
+
       function setHint() {
-        hint.textContent = scale > 1
-          ? '按住拖动或用方向键查看长图 · 点 × / Esc 关闭'
-          : '滚轮或 +/− 缩放 · 点一下还原 · Esc 关闭'
+        if (scale > 1) {
+          hint.textContent = '按住拖动或用方向键查看长图 · 点 × / Esc 关闭'
+          return
+        }
+        hint.textContent = (images.length > 1 ? '← → 或左右按钮切换图片 · ' : '')
+          + '滚轮或 +/− 缩放 · 点一下还原 · Esc 关闭'
       }
 
       /** 图片加载完成后算出「适应窗口」的基准尺寸，进入可缩放状态 */
@@ -824,8 +911,11 @@
       toolbar.appendChild(level)
       toolbar.appendChild(zoomIn)
       toolbar.appendChild(reset)
+      toolbar.appendChild(count)
 
       overlay.appendChild(viewport)
+      overlay.appendChild(navPrev)
+      overlay.appendChild(navNext)
       overlay.appendChild(closeBtn)
       overlay.appendChild(toolbar)
       overlay.appendChild(hint)
@@ -834,9 +924,8 @@
       document.addEventListener('keydown', onKeyDown)
       setHint()
 
-      // 缓存命中时 load 不会再触发，这里补一次（此时已插入 DOM，能取到尺寸）
-      if (big.complete && big.naturalWidth)
-        fitImage()
+      // 第一张图在这里开始加载（showImage 里按当前序号取图）
+      showImage(current)
 
       // 强制一次重排，让淡入动画生效
       void overlay.offsetWidth
@@ -864,6 +953,20 @@
           applyZoom(MIN_SCALE)
         }
       })
+
+      // 键盘 ←/→：没放大时看上一张/下一张；放大后方向键继续用来移动画面
+      onNavKey = function (e) {
+        if (images.length < 2 || scale > 1)
+          return
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault()
+          showImage(current - 1)
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault()
+          showImage(current + 1)
+        }
+      }
+      document.addEventListener('keydown', onNavKey)
 
       // 鼠标按住拖动查看（触屏交给 overflow:auto 的原生单指滑动）
       viewport.addEventListener('pointerdown', function (e) {
@@ -910,6 +1013,8 @@
         }
         if (t.closest('.wb-lightbox__toolbar'))
           return
+        if (t.closest('.wb-lightbox__nav'))
+          return // 左右按钮自己处理切换，别顺带把灯箱关掉
         if (moved) {
           moved = false
           return

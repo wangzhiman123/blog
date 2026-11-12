@@ -1460,12 +1460,16 @@ main.fi-container > .page.home.posts {
 }
 
 // -----------------------------------------------------------------------------
-// 文章正文配图：统一宽度、与正文左对齐，别让一张图顶满一屏
+// 文章正文配图：统一宽度上限、与正文左对齐，别让一张图顶满一屏
 //   图床链接里的 w_800 只管「文件像素宽」，不管「页面上显示多大」。
-//   早期版本用 max-height 统一限高，结果宽高比不同的图被压成同一个高度，
-//   宽度反而变成 206 / 335 / 436px 三种，同篇文章里看着大小不一。
-//   现在统一按 420px 宽显示、高度按原比例：420px 显示 + 800px 文件 ≈ 2 倍图，
-//   高分屏也清楚，比正文栏（约 708px）窄，不会铺满一屏。窄屏退回 100%。
+//   宽度上限统一 420px：420px 显示 + 800px 文件 ≈ 2 倍图，高分屏也清楚，
+//   比正文栏（约 708px）窄，不会铺满一屏。窄屏退回 100%。
+//   高度再封一道顶：min(36rem, 78vh)，即最高 576px、窗口矮时按可视高度 78% 收。
+//   手机截图这类竖长图（800×1733，比例 2.17）按 420 宽要占 910px 高，
+//   一张就把一屏占满，往下翻半天还在图里；封顶后自动等比收窄到约 266×576，
+//   一屏看得完，细节看不清再点开看大图（灯箱）。
+//   普通照片（比例 1.33，420×560）在封顶线以内，尺寸和以前完全一样。
+//   注意 width 必须是 auto 不能是 100%：宽度跟着高度走，长图被收窄时才不会压扁。
 //   margin-left 必须是 0（不要用 auto 居中）：正文文字是左对齐的，配图若居中，
 //   左边缘会和文字差出一百多像素，读起来视线来回跳。左对齐后共用一条基线。
 //   :not([width]):not([height]) 用来排除模板生成的固定尺寸图
@@ -1473,11 +1477,12 @@ main.fi-container > .page.home.posts {
 // -----------------------------------------------------------------------------
 .page.single .content img:not([width]):not([height]) {
   display: block;
-  width: 100%;
+  // 宽度跟着高度走：长图被 max-height 收窄时仍按原比例缩放，不会变形
+  width: auto;
   max-width: 420px;
   height: auto;
-  // 极端长图兜底：超过 960px 高时等比收进框内，避免一屏滚不到底
-  max-height: 60rem;
+  // 高度封顶：最高 576px，窗口矮时按可视高度的 78% 收，避免一屏只剩一张图
+  max-height: min(36rem, 78vh);
   object-fit: contain;
   // 0 = 左右都不留白，左边缘与段落文字严格对齐
   margin: 0.75rem 0;
@@ -1488,6 +1493,9 @@ main.fi-container > .page.home.posts {
 
 @media (max-width: 767.98px) {
   .page.single .content img:not([width]):not([height]) {
+    // 手机上按整栏宽显示、不封顶：长图就让它长着，双指放大比缩成小图更好用
+    width: 100%;
+    max-height: none;
     margin-block: 0.6rem;
   }
 }
@@ -1647,6 +1655,77 @@ main.fi-container > .page.home.posts {
   color: rgba(255, 255, 255, 0.85);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+}
+
+// 左右切换按钮：贴屏幕左右边缘、垂直居中，一篇文章有多张图时出现
+//   position: fixed 相对窗口定位，不受遮罩内滚动区影响
+.wb-lightbox__nav {
+  position: fixed;
+  top: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.wb-lightbox__nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+// display: flex 会盖掉浏览器给 [hidden] 的默认样式，这里显式藏起来
+.wb-lightbox__nav[hidden] {
+  display: none;
+}
+
+.wb-lightbox__nav--prev {
+  left: 16px;
+}
+
+.wb-lightbox__nav--next {
+  right: 16px;
+}
+
+// 页码：3 / 6
+.wb-lightbox__count {
+  min-width: 42px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-lightbox__count[hidden] {
+  display: none;
+}
+
+// 手机上按钮收小一点，别挡住图
+@media (max-width: 767.98px) {
+  .wb-lightbox__nav {
+    width: 38px;
+    height: 38px;
+    margin-top: -19px;
+    font-size: 24px;
+  }
+
+  .wb-lightbox__nav--prev {
+    left: 8px;
+  }
+
+  .wb-lightbox__nav--next {
+    right: 8px;
+  }
 }
 
 .wb-lightbox__hint {
