@@ -20,7 +20,6 @@ authors:
 耗时一个小时，花费七十五块钱，汽车第一次上线检测（俗称“年检”）顺利通过。
 
 ![f89fa1fb6f4cf035221ca82ed609c3c9.jpg](//q8.itc.cn/images01/20261111/3819a1e1843b4695bcbee87929f16d2d.jpeg?x-oss-process=image/resize,w_800/format,webp)
-
 ![1d1731add0f384df01e5eb002f4f7f2c.jpg](//q3.itc.cn/images01/20261111/6a2ab16e743b4c058fbd9afccdde5708.jpeg?x-oss-process=image/resize,w_800/format,webp)
 
 把汽车行驶证拿回来的时候顺手看了一眼有效期，已经更新到了2028 年。也就是说，往后再数两年，这台小油车都能光明正大地合法上路行驶了。从汽车检测中心出来，翻看了一下给车做的记录，忽然觉得该给这有车的六年做一个总结。
