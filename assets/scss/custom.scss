@@ -1661,3 +1661,31 @@ main.fi-container > .page.home.posts {
   font-size: 0.8rem;
   pointer-events: none;
 }
+
+.page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin: 0.75rem 0;
+  container-type: inline-size;
+}
+.page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) > img:not([width]):not([height]) {
+  height: 64cqw;
+  max-height: 30rem;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  object-fit: contain;
+  object-position: left top;
+}
+@media (max-width: 767.98px) {
+  .page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) {
+    display: block;
+    container-type: normal;
+  }
+  .page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) > img:not([width]):not([height]) {
+    height: auto; width: 100%; max-width: 420px; margin: 0.6rem 0;
+  }
+}
