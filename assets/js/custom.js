@@ -647,8 +647,8 @@
       + 'x-oss-process=image/resize,w_1600/format,webp'
   }
 
-  // 说明：正文配图一律按单张显示（420px 宽、左对齐、文字在下方换行），
-  //   不做自动分列，也不做浮动绕排。
+  // 说明：正文配图默认单张显示（420px 宽上限、左对齐、文字在下方换行）；同一段落里
+  //   连写两张时会并排两栏（样式见 custom.scss 末尾），想上下排就中间空一行。
 
   function initImageZoom() {
     var overlay = null
