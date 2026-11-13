@@ -1760,11 +1760,20 @@ main.fi-container > .page.home.posts {
   object-position: left top;
 }
 @media (max-width: 767.98px) {
+  // 手机上并排两张必然挤成邮票，改回上下堆叠，每张按整栏宽显示
   .page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) {
     display: block;
     container-type: normal;
   }
   .page.single .content > p:has(> img:nth-of-type(2)):not(:has(> img:nth-of-type(3))) > img:not([width]):not([height]) {
-    height: auto; width: 100%; max-width: 420px; margin: 0.6rem 0;
+    height: auto;
+    width: 100%;
+    max-width: 420px;
+    // 必须显式取消：上面并排规则里的 max-height: 30rem 会漏到这里，
+    // 把 800×1733 的长截图塞进 420×480 的框，contain 后只剩 221px 宽、左右各空一大块
+    max-height: none;
+    margin: 0.6rem 0;
+    object-fit: fill;
+    object-position: center;
   }
 }
