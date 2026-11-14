@@ -61,21 +61,21 @@
 - nickname: HTML转Markdown
   url: https://2019527.xyz/tools/html2md.html
   description: 本站写作工具之一
-  avatar: "https://2019527.xyz/html2md.svg"
+  avatar: "https://q8.itc.cn/images06/20261115/1dc0557eda22412a8f4fed7c4f7d7c9a.svg"
   group: tools
   weight: 74
 
 - nickname: "友链管理器"
   url: "https://2019527.xyz/tools/youlian.html"
   description: 本站的友链管理工具之一
-  avatar: "https://2019527.xyz/friends-icon.svg"
+  avatar: "https://q7.itc.cn/images06/20261115/4dd8ae96fac6436496accb8447012f45.svg"
   group: tools
   weight: 73
 
 - nickname: "写作助手"
   url: "https://2019527.xyz/tools/xiezuo.html"
   description: "本站写作工具之一"
-  avatar: "https://2019527.xyz/xiezuo.svg"
+  avatar: "https://q7.itc.cn/images06/20261115/912b193c9e2c40ba835080950afc6b73.svg"
   group: tools
   weight: 72
 
