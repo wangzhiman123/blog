@@ -1874,6 +1874,10 @@ main.fi-container > .page.home.posts {
   color: var(--fi-global-link-hover-color, #2563eb);
 }
 
+.archive-nav__year > a {
+  font-weight: 600;
+}
+
 .archive-nav__months {
   padding-left: 0.7rem !important;
 }
@@ -1889,8 +1893,13 @@ main.fi-container > .page.home.posts {
   color: var(--fi-global-font-secondary-color, #9aa3af);
 }
 
+// 标题里「58」和「归档」原本紧贴在一起，补一点间距
+.page.archive .archive-title sup {
+  margin-right: 0.3rem;
+}
+
 @media (max-width: 959.98px) {
-  // 窄屏：目录挪到正文上方，限高滚动，别把正文挤到第二屏
+  // 窄屏：目录挪到正文上方，展平成一排排小标签，别再竖着占掉半屏
   .wrapper main.fi-container:has(> .page.archive) {
     flex-wrap: wrap;
   }
@@ -1899,9 +1908,51 @@ main.fi-container > .page.home.posts {
     order: -1;
     position: static;
     flex: 1 1 100%;
+    // 必须给 0：否则标签撑出屏幕，整页横向滚动，右侧内容被裁掉
+    min-width: 0;
     max-width: none;
-    max-height: 38vh;
+    max-height: none;
     margin-bottom: 0.75rem;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  .archive-aside__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .archive-aside__title {
+    flex: 0 0 100%;
+    margin: 0 0 0.15rem;
+  }
+
+  // display:contents 把 li / ul 从布局里抹掉，a 直接成为外层 flex 的一项
+  .archive-nav,
+  .archive-nav__year,
+  .archive-nav__months,
+  .archive-nav__months li {
+    display: contents;
+  }
+
+  .archive-nav a {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid rgba(120, 130, 145, 0.25);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .archive-nav__year > a {
+    background: rgba(120, 130, 145, 0.08);
+  }
+
+  .archive-nav__count {
+    display: none;
   }
 
   .wrapper main.fi-container > .page.archive {
