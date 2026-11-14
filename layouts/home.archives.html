@@ -37,7 +37,7 @@
 
       {{- range $month := $year.Pages.GroupByDate "01" -}}
         <h3 class="group-month" id="m-{{ $year.Key }}-{{ $month.Key }}">
-          <span class="group-month__label">{{ int $month.Key }} 月</span>
+          <span class="group-month__label">{{ strings.TrimPrefix "0" $month.Key }} 月</span>
           <span class="group-count">{{ len $month.Pages }}</span>
         </h3>
 
@@ -73,7 +73,7 @@
               {{- range $month := $year.Pages.GroupByDate "01" -}}
                 <li>
                   <a href="#m-{{ $year.Key }}-{{ $month.Key }}">
-                    <span class="archive-nav__label">{{ int $month.Key }} 月</span>
+                    <span class="archive-nav__label">{{ strings.TrimPrefix "0" $month.Key }} 月</span>
                     <span class="archive-nav__count">{{ len $month.Pages }}</span>
                   </a>
                 </li>
