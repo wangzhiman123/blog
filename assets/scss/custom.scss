@@ -1777,3 +1777,135 @@ main.fi-container > .page.home.posts {
     object-position: center;
   }
 }
+
+// -----------------------------------------------------------------------------
+// 归档页：一页到底 + 右侧「年 / 月」目录
+//   模板是 layouts/home.archives.html（覆盖主题同名文件），样式全在这里。
+//   页面骨架：main.fi-container（flex）> article.page.archive + aside.archive-aside
+//   注意两处主题默认值要覆盖：
+//     ① .wrapper main aside:first-of-type:not(:has(~aside)) 会把「唯一的 aside」隐藏；
+//     ② ≤959.9px 时 .wrapper main aside 直接 display:none!important。
+//   所以下面必须写 display:block!important，否则目录根本不出现。
+// -----------------------------------------------------------------------------
+.wrapper main.fi-container > .page.archive {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.page.archive .group-title {
+  // 点目录跳转时，标题别被顶部固定栏盖住
+  scroll-margin-top: 5.5rem;
+}
+
+.page.archive .group-month {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.1rem 0 0.45rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid rgba(120, 130, 145, 0.28);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--fi-global-font-secondary-color, #6b7280);
+  scroll-margin-top: 5.5rem;
+}
+
+.page.archive .group-count {
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(120, 130, 145, 0.12);
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--fi-global-font-secondary-color, #6b7280);
+}
+
+// 右侧目录：整列吸顶，内容超出时自己滚动
+.wrapper main.fi-container > .archive-aside {
+  display: block !important;
+  position: sticky;
+  top: 5rem;
+  flex: 0 0 200px;
+  align-self: flex-start;
+  max-width: 200px;
+  max-height: calc(100vh - 6.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.25rem 0.25rem 0.5rem;
+  scrollbar-width: thin;
+}
+
+.archive-aside__inner {
+  padding-left: 0.85rem;
+  border-left: 2px solid rgba(120, 130, 145, 0.18);
+}
+
+.archive-aside__title {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--fi-global-font-secondary-color, #9aa3af);
+}
+
+.archive-nav,
+.archive-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archive-nav a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.22rem 0.35rem;
+  border-radius: 0.35rem;
+  font-size: 0.875rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.archive-nav a:hover,
+.archive-nav a:focus-visible {
+  background: rgba(120, 130, 145, 0.1);
+  color: var(--fi-global-link-hover-color, #2563eb);
+}
+
+.archive-nav__months {
+  padding-left: 0.7rem !important;
+}
+
+.archive-nav__months a {
+  font-size: 0.8125rem;
+  opacity: 0.88;
+}
+
+.archive-nav__count {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--fi-global-font-secondary-color, #9aa3af);
+}
+
+@media (max-width: 959.98px) {
+  // 窄屏：目录挪到正文上方，限高滚动，别把正文挤到第二屏
+  .wrapper main.fi-container:has(> .page.archive) {
+    flex-wrap: wrap;
+  }
+
+  .wrapper main.fi-container > .archive-aside {
+    order: -1;
+    position: static;
+    flex: 1 1 100%;
+    max-width: none;
+    max-height: 38vh;
+    margin-bottom: 0.75rem;
+  }
+
+  .wrapper main.fi-container > .page.archive {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}

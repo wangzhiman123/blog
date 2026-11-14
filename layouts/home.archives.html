@@ -1,0 +1,87 @@
+{{- /*
+  归档页（/archives/）：一页列出全部文章，按「年 → 月 → 文章」分组，
+  右侧固定一列目录（年＝一级、月＝二级），点击跳到对应位置。
+
+  与主题原版的区别：
+  1. 不再调用 .Paginate —— 原版每 20 篇分一页，现在一页到底；
+  2. 年份下面多了「月」这一层小标题，并给年/月都加了锚点 id；
+  3. 右侧多出一列 .archive-aside 目录（纯静态链接，不依赖 JS）。
+
+  改行号/改样式请看 assets/scss/custom.scss 末尾的「归档页」段落。
+*/ -}}
+
+{{- define "title" -}}
+  {{- .Params.Title | default (T "archives") -}}
+  {{- if .Site.Params.with_site_title }} {{ .Site.Params.title_delimiter }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  {{- $pages := .Site.Store.Get "mainSectionPages" -}}
+  {{- $dateFormat := .Site.Params.archives.date_format | default "01-02" -}}
+  {{- $years := $pages.GroupByDate "2006" -}}
+
+  <article class="page archive">
+    {{- partial "section/archive-header.html" (dict
+      "Pages" $pages
+      "Title" (.Params.Title | default (T "archives"))
+      "Icon" "fa-solid fa-box-archive"
+    ) -}}
+    {{- partial "section/archive-meta.html" (dict "Page" . "Pages" $pages) -}}
+
+    {{- range $year := $years -}}
+      <h2 class="group-title" id="y-{{ $year.Key }}">
+        {{- dict "Class" "fa-regular fa-calendar me-1" | partial "plugin/icon.html" -}}
+        {{- $year.Key -}}
+        <span class="group-count">{{ len $year.Pages }}</span>
+      </h2>
+
+      {{- range $month := $year.Pages.GroupByDate "01" -}}
+        <h3 class="group-month" id="m-{{ $year.Key }}-{{ $month.Key }}">
+          <span class="group-month__label">{{ int $month.Key }} 月</span>
+          <span class="group-count">{{ len $month.Pages }}</span>
+        </h3>
+
+        {{- range $month.Pages -}}
+          <article class="archive-item">
+            <a href="{{ .RelPermalink }}" class="archive-item-link" title="{{ .Title }}">
+              {{- $repost := .Params.repost | default dict -}}
+              {{- if eq $repost.enable true -}}
+                {{- dict "Class" "fa-solid fa-retweet text-success me-1" | partial "plugin/icon.html" -}}
+              {{- end -}}
+              {{- cond (.Param "capitalize_titles") (title .LinkTitle) .LinkTitle -}}
+            </a>
+            <span class="archive-item-date" title='{{ "2006-01-02 15:04:05" | .Date.Format }}'>
+              {{- .Date | dateFormat $dateFormat -}}
+            </span>
+          </article>
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  </article>
+
+  <aside class="archive-aside" aria-label="按年月浏览">
+    <div class="archive-aside__inner">
+      <p class="archive-aside__title">{{ T "single.contents" | default "目录" }}</p>
+      <ul class="archive-nav">
+        {{- range $year := $years -}}
+          <li class="archive-nav__year">
+            <a href="#y-{{ $year.Key }}">
+              <span class="archive-nav__label">{{ $year.Key }}</span>
+              <span class="archive-nav__count">{{ len $year.Pages }}</span>
+            </a>
+            <ul class="archive-nav__months">
+              {{- range $month := $year.Pages.GroupByDate "01" -}}
+                <li>
+                  <a href="#m-{{ $year.Key }}-{{ $month.Key }}">
+                    <span class="archive-nav__label">{{ int $month.Key }} 月</span>
+                    <span class="archive-nav__count">{{ len $month.Pages }}</span>
+                  </a>
+                </li>
+              {{- end -}}
+            </ul>
+          </li>
+        {{- end -}}
+      </ul>
+    </div>
+  </aside>
+{{- end -}}
