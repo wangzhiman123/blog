@@ -25,8 +25,27 @@
   }
 
   /**
+   * 统计服务不可用时收尾。
+   *
+   * vercount / 不蒜子是第三方公益服务，接口挂过不止一次（2026-11 页脚
+   * 两个数字一直转圈就是 vercount.one 主域解析失败）。模板把加载动画
+   * 直接写在数值节点里，脚本不来就永远转，观感比没有数字更糟。
+   * 这里在超时后把动画换成占位符；数字若晚到，脚本会直接覆写 textContent。
+   */
+  function dropLoading() {
+    var ids = ['busuanzi_value_site_uv', 'busuanzi_value_site_pv']
+    ids.forEach(function (id) {
+      var el = document.getElementById(id)
+      if (!el || readNumber(el))
+        return
+      el.textContent = '—'
+      el.setAttribute('title', '统计服务暂时不可用')
+    })
+  }
+
+  /**
    * 不蒜子的数值是异步写入的，用轮询兜底：
-   * 一旦全部读到就停止，最长等 30 秒。
+   * 一旦全部读到就停止；8 秒还读不到就认定服务挂了，切占位符。
    */
   function mirrorBusuanzi() {
     var mapping = [
@@ -60,8 +79,15 @@
     var tries = 0
     var timer = window.setInterval(function () {
       tries++
-      if (tick() || tries > 60)
+      if (tick()) {
         window.clearInterval(timer)
+        return
+      }
+      // 500ms × 16 = 8 秒。实测接口 2.7s 返回，留三倍余量足够
+      if (tries > 16) {
+        window.clearInterval(timer)
+        dropLoading()
+      }
     }, 500)
   }
 

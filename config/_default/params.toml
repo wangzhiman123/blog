@@ -1281,7 +1281,12 @@ font_family = "inherit"
 # Whether to enable busuanzi count.
 enable = true
 # Busuanzi count core script source. Default is https://vercount.one/js.
-source = "https://vercount.one/js"
+#
+# 2026-11-17 换域：vercount.one 主域连不上（curl 返回 000，DNS 解析失败），
+# 页脚「总访客 / 总访问」两个数字一直转圈就是因为这个——脚本 404，数值永远不写入。
+# cn.vercount.one 是同一份脚本的国内加速节点（3043B，内容与 events 版一致，
+# 内部 API 仍打 events.vercount.one/api/v2/log），实测 200 / 2.4s。
+source = "https://cn.vercount.one/js"
 # Whether to show the site views.
 site_views = true
 # Whether to show the page views.
