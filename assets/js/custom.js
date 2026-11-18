@@ -1067,8 +1067,47 @@
     })
   }
 
+  /**
+   * Twikoo 后端不可达时的兜底提示
+   *
+   * envId 指向 twikoo.2019527.xyz（托管在 Vercel）。国内明文 DNS 递归解析
+   * 这条 CNAME 链会 SERVFAIL，浏览器 fetch 直接抛 TypeError，Twikoo 把这类
+   * 网络层失败统一显示成「请求被跨域策略拦截 status 0」——既误导读者，也
+   * 把「服务挂了」说成「你的浏览器有问题」。这里换成可读的说明 + 联系渠道。
+   */
+  function initTwikooFallback() {
+    var host = document.getElementById('twikoo')
+    if (!host)
+      return
+
+    var replaced = false
+    var observer = new MutationObserver(function () {
+      if (replaced)
+        return
+      var text = host.textContent || ''
+      if (text.indexOf('跨域策略拦截') === -1 && text.indexOf('status 0') === -1)
+        return
+      replaced = true
+      observer.disconnect()
+      host.innerHTML
+        = '<div class="admonition note">'
+        + '<p class="admonition-title">评论暂时加载不了</p>'
+        + '<div class="admonition-content">'
+        + '<p>这不是你的网络问题：评论服务所在线路在部分网络下解析不稳定。</p>'
+        + '<p>想留言可以发邮件到 '
+        + '<a href="mailto:1320233415@qq.com">1320233415@qq.com</a>'
+        + '，或关注公众号「王志满律师」。</p>'
+        + '</div></div>'
+    })
+    observer.observe(host, { childList: true, subtree: true })
+
+    // 评论正常渲染时不会有这段文本，10 秒后停掉观察，省开销
+    window.setTimeout(function () { observer.disconnect() }, 10000)
+  }
+
   function init() {
     mirrorBusuanzi()
+    initTwikooFallback()
     initToBottom()
     initPageJump()
     initPostStats()
