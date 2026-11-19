@@ -47,11 +47,9 @@ authors:
 咨询电话：南昌高新区政务服务中心0791-88123107、0791-88391130。
 
 ![](//q1.itc.cn/images01/20261120/0431b984119248f08bf358f9d7fbc20e.jpeg?x-oss-process=image/resize,w_800/format,webp)
-
 ![](//q9.itc.cn/images01/20261120/ca9ed6ed933c4f35b4c64d3973ec139a.jpeg?x-oss-process=image/resize,w_800/format,webp)
 
 ![b085ea30b215cd5d3eab4d2df9fade07.png](//q7.itc.cn/images01/20261120/9cc7a6296cf3425fbfef35f3ae1cbe2d.png?x-oss-process=image/resize,w_800/format,webp)
-
 ![](//q1.itc.cn/images01/20261120/2df6abc89ad142869fed394f68b179be.jpeg?x-oss-process=image/resize,w_800/format,webp)
 
 2.附近停车推荐：
